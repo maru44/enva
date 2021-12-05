@@ -1,0 +1,15 @@
+export ENV="development"
+export API_PROTCOL="http://"
+export API_HOST="localhost"
+export API_PORT=":8080"
+export FRONT_PROTOCOL="http://"
+export FRONT_HOST="localhost"
+export FRONT_PORT=":3000"
+
+export POSTGRES_URL=
+export POSTGRES_MAX_CONNECTIONS="2"
+export POSTGRES_MAX_IDLE_CONNECTIONS="2"
+
+export COGNITO_REGION=
+export COGNITO_USERPOOL_ID=
+export COGNITO_SECRET=
