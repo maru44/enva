@@ -10,6 +10,12 @@ type (
 		IsActive        bool      `json:"is_active"`
 		IsEmailVerified bool      `json:"is_email_verified"`
 		UserType        *UserType `json:"user_type"`
+
+		// fk
+
+		MemberOf []ProjectID `json:"member_of"`
+		AdminOf  []ProjectID `json:"admin_of"`
+		GuestOf  []ProjectID `json:"guest_of"`
 	}
 
 	UserType string

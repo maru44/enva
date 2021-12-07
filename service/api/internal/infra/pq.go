@@ -41,7 +41,7 @@ const (
         instance
 ***************************/
 
-func NewSqlHandler() database.SqlHandlerAbstract {
+func NewSqlHandler() database.ISqlHandler {
 	conn, err := sql.Open("postgres", fmt.Sprintf(config.POSTGRES_URL))
 	if err != nil {
 		panic(err)
@@ -60,7 +60,7 @@ func NewSqlHandler() database.SqlHandlerAbstract {
     handler's methods
 ***************************/
 
-func (h *SqlHandler) BeginTx(ctx context.Context, opts *sql.TxOptions) (database.TxAbstract, error) {
+func (h *SqlHandler) BeginTx(ctx context.Context, opts *sql.TxOptions) (database.ITx, error) {
 	t, err := h.Conn.BeginTx(ctx, opts)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (h *SqlHandler) BeginTx(ctx context.Context, opts *sql.TxOptions) (database
 	return tx, err
 }
 
-func (h *SqlHandler) QueryContext(ctx context.Context, st string, args ...interface{}) (database.RowsAbstract, error) {
+func (h *SqlHandler) QueryContext(ctx context.Context, st string, args ...interface{}) (database.IRows, error) {
 	rows, err := h.Conn.QueryContext(ctx, st, args...)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (h *SqlHandler) QueryContext(ctx context.Context, st string, args ...interf
 	return r, nil
 }
 
-func (h *SqlHandler) QueryRowContext(ctx context.Context, st string, args ...interface{}) database.RowAbstract {
+func (h *SqlHandler) QueryRowContext(ctx context.Context, st string, args ...interface{}) database.IRow {
 	row := h.Conn.QueryRowContext(ctx, st, args...)
 	r := &SqlRow{
 		Row: row,
@@ -92,7 +92,7 @@ func (h *SqlHandler) QueryRowContext(ctx context.Context, st string, args ...int
 	return r
 }
 
-func (h *SqlHandler) ExecContext(ctx context.Context, st string, args ...interface{}) (database.ResultAbstract, error) {
+func (h *SqlHandler) ExecContext(ctx context.Context, st string, args ...interface{}) (database.IResult, error) {
 	result, err := h.Conn.ExecContext(ctx, st, args...)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (t SqlTx) Rollback() error {
 	return t.Tx.Rollback()
 }
 
-func (t SqlTx) QueryContext(ctx context.Context, st string, args ...interface{}) (database.RowsAbstract, error) {
+func (t SqlTx) QueryContext(ctx context.Context, st string, args ...interface{}) (database.IRows, error) {
 	rows, err := t.Tx.QueryContext(ctx, st, args...)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (t SqlTx) QueryContext(ctx context.Context, st string, args ...interface{})
 	return r, nil
 }
 
-func (t SqlTx) QueryRowContext(ctx context.Context, st string, args ...interface{}) database.RowAbstract {
+func (t SqlTx) QueryRowContext(ctx context.Context, st string, args ...interface{}) database.IRow {
 	row := t.Tx.QueryRowContext(ctx, st, args...)
 	r := &SqlRow{
 		Row: row,
@@ -136,7 +136,7 @@ func (t SqlTx) QueryRowContext(ctx context.Context, st string, args ...interface
 	return r
 }
 
-func (t SqlTx) ExecContext(ctx context.Context, st string, args ...interface{}) (database.ResultAbstract, error) {
+func (t SqlTx) ExecContext(ctx context.Context, st string, args ...interface{}) (database.IResult, error) {
 	stmt, err := t.Tx.Prepare(st)
 	if err != nil {
 		return nil, err
