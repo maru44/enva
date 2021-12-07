@@ -16,9 +16,9 @@ type (
 )
 
 const (
-	UserTypeAdmin  = UserType("admin")
-	UserTypeNormal = UserType("normal")
-	UserTypeGuest  = UserType("guest")
+	UserTypeAdmin = UserType("admin")
+	UserTypeUser  = UserType("user")
+	UserTypeGuest = UserType("guest")
 )
 
 func (u *User) IsAdmin() bool {

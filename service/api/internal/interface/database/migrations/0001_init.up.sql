@@ -2,6 +2,7 @@ BEGIN;
 
 CREATE TABLE orgs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
+    slug VARCHAR(63) NOT NULL,
     name VARCHAR(63) NOT NULL,
     description VARCHAR(511) NULL,
     is_valid BOOLEAN NOT NULL,
@@ -13,7 +14,7 @@ CREATE TABLE orgs (
 );
 
 CREATE TABLE users (
-    id VARCHAR(63),
+    id VARCHAR(127),
     email VARCHAR(255),
     username VARCHAR(31),
     image_url VARCHAR(255),
@@ -26,7 +27,7 @@ CREATE TABLE users (
 
 CREATE TABLE rel_org_members (
     org_id uuid NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
-    user_id VARCHAR(63) NOT NULL,
+    user_id VARCHAR(127) NOT NULL,
     user_type VARCHAR(15) NOT NULL DEFAULT 'user',
     is_valid BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE rel_org_members (
 
 CREATE TABLE projects (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name VARCHAR(63) NOT NULL,
     slug VARCHAR(63) NOT NULL,
     owner_type VARCHAR(15) NOT NULL,
     owner_user VARCHAR(127) NULL, -- dbのユーザーのidのfkにする?
@@ -52,6 +54,7 @@ CREATE TABLE projects (
 
 CREATE TABLE commits (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
+    commit_number INT NOT NULL,
     project_id uuid NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
     is_head BOOLEAN NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
