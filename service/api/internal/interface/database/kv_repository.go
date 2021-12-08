@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/maru44/ichigo/service/api/internal/interface/database/queryset"
 	"github.com/maru44/ichigo/service/api/pkg/domain"
@@ -38,7 +39,6 @@ func (repo *KvRepository) ListValid(ctx context.Context, projectID domain.Projec
 	return kvs, nil
 }
 
-// DetailValid(context.Context, domain.KvKey, domain.ProjectID) (*domain.Kv, error)
 func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, projectID domain.ProjectID) (*domain.Kv, error) {
 	// user := ctx.Value(domain.CtxUserKey).(domain.User)
 
@@ -67,29 +67,14 @@ func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, proj
 	}
 
 	row := tx.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
-	// if already exists key in projects
-	// update its is_valid and updated_by
 	if err := row.Err(); err == nil {
-		var kvID string
-		if err := row.Scan(&kvID); err != nil {
-			tx.Rollback()
-			return id, perr.Wrap(err, perr.BadRequest)
-		}
+		// var kvID string
+		// if err := row.Scan(&kvID); err != nil {
+		// 	tx.Rollback()
+		// 	return id, perr.Wrap(err, perr.BadRequest)
+		// }
 
-		exe, err := repo.ExecContext(
-			ctx,
-			queryset.KvDeactivateQuery,
-			user, kvID,
-		)
-		if err != nil {
-			tx.Rollback()
-			return id, perr.Wrap(err, perr.BadRequest)
-		}
-
-		if _, err := exe.RowsAffected(); err != nil {
-			tx.Rollback()
-			return id, perr.Wrap(err, perr.BadRequest)
-		}
+		return "", perr.New(fmt.Sprintf("the key(%s) is already exists", input.Key), perr.BadRequest)
 	}
 
 	if err := repo.QueryRowContext(
@@ -104,4 +89,57 @@ func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, proj
 	tx.Commit()
 
 	return id, nil
+}
+
+func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
+	user := ctx.Value(domain.CtxUserKey).(domain.User)
+
+	tx, err := repo.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.InternalServerErrorWithUrgency)
+	}
+
+	row := tx.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
+	// if already exists key in projects
+	// update its is_valid and updated_by
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	var kvID string
+	if err := row.Scan(&kvID); err != nil {
+		tx.Rollback()
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	// deactivate existing kv
+	exe, err := repo.ExecContext(
+		ctx,
+		queryset.KvDeactivateQuery,
+		user, kvID,
+	)
+	if err != nil {
+		tx.Rollback()
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	if _, err := exe.RowsAffected(); err != nil {
+		tx.Rollback()
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	// create kv
+	var ID *domain.KvID
+	if err := repo.QueryRowContext(
+		ctx,
+		queryset.KvInsertQuery,
+		input.Key, input.Value, projectID, user.ID,
+	).Scan(&ID); err != nil {
+		tx.Rollback()
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	tx.Commit()
+
+	return ID, nil
 }

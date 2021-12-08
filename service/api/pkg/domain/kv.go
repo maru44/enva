@@ -34,6 +34,7 @@ type (
 	IKvInteractor interface {
 		ListValid(context.Context, ProjectID) ([]Kv, error)
 		DetailValid(context.Context, KvKey, ProjectID) (*Kv, error)
-		Create(context.Context, KvInput, ProjectID) (string, error)
+		Create(context.Context, KvInput, ProjectID) (*KvID, error)
+		Update(context.Context, KvInput, ProjectID) (*KvID, error)
 	}
 )
