@@ -15,7 +15,8 @@ func main() {
 	sql := infra.NewSqlHandler()
 
 	base := controllers.NewBaseController(jp)
-	post := controllers.NewKvController(sql)
+	kv := controllers.NewKvController(sql)
+	project := controllers.NewProjectController(sql)
 
 	keySet, err := base.GetKeySet()
 	if err != nil {
@@ -25,8 +26,15 @@ func main() {
 	router.Handle("/", base.BaseMiddleware(keySet, http.HandlerFunc(base.NotFoundView)))
 	router.Handle("/test/user/", base.BaseMiddleware(keySet, base.GiveUserMiddleware(http.HandlerFunc(base.UserTestView))))
 
-	router.Handle("/post/", base.BaseMiddleware(keySet, base.GiveUserMiddleware(http.HandlerFunc(post.ListView))))
-	router.Handle("/post/create/", base.BaseMiddleware(keySet, base.PostOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(post.CreateView)))))
+	/* key value */
+	router.Handle("/kv/", base.BaseMiddleware(keySet, base.GiveUserMiddleware(http.HandlerFunc(kv.ListView))))
+	router.Handle("/kv/create/", base.BaseMiddleware(keySet, base.PostOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.CreateView)))))
+	router.Handle("/kv/update/", base.BaseMiddleware(keySet, base.PutOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.UpdateView)))))
+
+	/* projects */
+	router.Handle("/project/list/users/", base.BaseMiddleware(keySet, base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByUserView))))
+	router.Handle("/project/list/org/", base.BaseMiddleware(keySet, base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByProjectView))))
+	router.Handle("/project/create/", base.BaseMiddleware(keySet, base.PostOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.CreateView)))))
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		log.Println(err)
