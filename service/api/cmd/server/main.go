@@ -15,7 +15,7 @@ func main() {
 	sql := infra.NewSqlHandler()
 
 	base := controllers.NewBaseController(jp)
-	post := controllers.NewPostController(sql)
+	post := controllers.NewKvController(sql)
 
 	keySet, err := base.GetKeySet()
 	if err != nil {

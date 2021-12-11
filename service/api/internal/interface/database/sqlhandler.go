@@ -6,34 +6,34 @@ import (
 )
 
 type (
-	SqlHandlerAbstract interface {
-		QueryContext(context.Context, string, ...interface{}) (RowsAbstract, error)
-		QueryRowContext(context.Context, string, ...interface{}) RowAbstract
-		ExecContext(context.Context, string, ...interface{}) (ResultAbstract, error)
-		BeginTx(context.Context, *sql.TxOptions) (TxAbstract, error)
+	ISqlHandler interface {
+		QueryContext(context.Context, string, ...interface{}) (IRows, error)
+		QueryRowContext(context.Context, string, ...interface{}) IRow
+		ExecContext(context.Context, string, ...interface{}) (IResult, error)
+		BeginTx(context.Context, *sql.TxOptions) (ITx, error)
 	}
 
-	TxAbstract interface {
+	ITx interface {
 		Commit() error
-		QueryContext(context.Context, string, ...interface{}) (RowsAbstract, error)
-		QueryRowContext(context.Context, string, ...interface{}) RowAbstract
-		ExecContext(context.Context, string, ...interface{}) (ResultAbstract, error)
+		QueryContext(context.Context, string, ...interface{}) (IRows, error)
+		QueryRowContext(context.Context, string, ...interface{}) IRow
+		ExecContext(context.Context, string, ...interface{}) (IResult, error)
 		Rollback() error
 	}
 
-	RowAbstract interface {
+	IRow interface {
 		Err() error
 		Scan(...interface{}) error
 	}
 
-	RowsAbstract interface {
+	IRows interface {
 		Err() error
 		Scan(...interface{}) error
 		Next() bool
 		Close() error
 	}
 
-	ResultAbstract interface {
+	IResult interface {
 		// LastInserted() (int, error)
 		RowsAffected() (int, error)
 	}

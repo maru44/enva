@@ -1,24 +1,45 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type (
-	KVKey   string
-	KVValue string
+	KvID    string
+	KvKey   string
+	KvValue string
 
-	KV struct {
-		CommitID CommitID `json:"commit_id"`
-		Key      KVKey    `json:"kv_key"`
-		Value    KVValue  `json:"kv_value"`
+	// @TODO add craeted_by, updated_by
+	Kv struct {
+		ID        KvID      `json:"id"`
+		ProjectID ProjectID `json:"project_id"`
+		Key       KvKey     `json:"kv_key"`
+		Value     KvValue   `json:"kv_value"`
+		IsValid   bool      `json:"is_valid"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
 	}
 
-	KVInput struct {
-		Key   KVKey   `json:"kv_key"`
-		Value KVValue `json:"kv_value"`
+	KvValid struct {
+		Key   KvKey   `json:"key"`
+		Value KvValue `json:"value"`
 	}
 
-	IKVInteractor interface {
-		List(context.Context, CommitID) ([]KV, error)
-		Create(context.Context, KVInput, CommitID) (int, error)
+	KvInput struct {
+		Key   KvKey   `json:"kv_key"`
+		Value KvValue `json:"kv_value"`
+	}
+
+	KvInputWithProjectID struct {
+		ProjectID ProjectID `json:"project_id"`
+		Input     KvInput   `json:"input"`
+	}
+
+	IKvInteractor interface {
+		ListValid(context.Context, ProjectID) ([]Kv, error)
+		DetailValid(context.Context, KvKey, ProjectID) (*Kv, error)
+		Create(context.Context, KvInputWithProjectID) (*KvID, error)
+		Update(context.Context, KvInputWithProjectID) (*KvID, error)
 	}
 )

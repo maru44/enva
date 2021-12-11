@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
 )
 
@@ -26,15 +27,16 @@ type (
 	}
 
 	ProjectInput struct {
-		Slug string `json:"slug"`
-		Name string `json:"name"`
-		Org  *Org   `json:"org"`
+		Slug  string `json:"slug"`
+		Name  string `json:"name"`
+		OrgID *OrgID `json:"org"`
 	}
 
 	IProjectInteractor interface {
-		List(context.Context) ([]Project, error)
-		Detail(context.Context, string) (*Project, error)
-		Create(context.Context, ProjectInput) (string, error)
+		ListByUser(context.Context) ([]Project, error)
+		ListByOrg(context.Context, OrgID) ([]Project, error)
+		Detail(context.Context, ProjectID) (*Project, error)
+		Create(context.Context, ProjectInput) (*ProjectID, error)
 	}
 )
 
@@ -43,4 +45,9 @@ const (
 	OwnerTypeUser = OwnerType("user")
 	// if owner is org
 	OwnerTypeOrg = OwnerType("org")
+)
+
+var (
+	ErrProjectSlugAlreadyExistsUser = errors.New("Slug duplicated: Project slug has already exists for user")         // 400
+	ErrProjectSlugAlreadyExistsOrg  = errors.New("Slug duplicated: Project slug has already exists for organization") // 400
 )
