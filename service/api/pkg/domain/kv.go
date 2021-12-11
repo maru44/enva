@@ -31,10 +31,15 @@ type (
 		Value KvValue `json:"kv_value"`
 	}
 
+	KvInputWithProjectID struct {
+		ProjectID ProjectID `json:"project_id"`
+		Input     KvInput   `json:"input"`
+	}
+
 	IKvInteractor interface {
 		ListValid(context.Context, ProjectID) ([]Kv, error)
 		DetailValid(context.Context, KvKey, ProjectID) (*Kv, error)
-		Create(context.Context, KvInput, ProjectID) (*KvID, error)
-		Update(context.Context, KvInput, ProjectID) (*KvID, error)
+		Create(context.Context, KvInputWithProjectID) (*KvID, error)
+		Update(context.Context, KvInputWithProjectID) (*KvID, error)
 	}
 )

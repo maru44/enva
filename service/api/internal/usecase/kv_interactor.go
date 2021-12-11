@@ -36,10 +36,10 @@ func (in KvInteractor) DetailValid(ctx context.Context, key domain.KvKey, projec
 	return in.repo.DetailValid(ctx, key, projectID)
 }
 
-func (in KvInteractor) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
-	return in.repo.Create(ctx, input, projectID)
+func (in KvInteractor) Create(ctx context.Context, input domain.KvInputWithProjectID) (*domain.KvID, error) {
+	return in.repo.Create(ctx, input.Input, input.ProjectID)
 }
 
-func (in KvInteractor) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
-	return in.repo.Update(ctx, input, projectID)
+func (in KvInteractor) Update(ctx context.Context, input domain.KvInputWithProjectID) (*domain.KvID, error) {
+	return in.repo.Update(ctx, input.Input, input.ProjectID)
 }

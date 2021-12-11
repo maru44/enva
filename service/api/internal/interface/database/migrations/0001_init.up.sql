@@ -43,7 +43,7 @@ CREATE TABLE projects (
     slug VARCHAR(63) NOT NULL,
     owner_type VARCHAR(15) NOT NULL,
     owner_user_id VARCHAR(127) NULL, -- dbのユーザーのidのfkにする?
-    owner_org uuid NULL REFERENCES orgs (id) ON DELETE CASCADE,
+    owner_org_id uuid NULL REFERENCES orgs (id) ON DELETE CASCADE,
     is_valid BOOLEAN NOT NULL DEFAULT true,
     is_deleted BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,

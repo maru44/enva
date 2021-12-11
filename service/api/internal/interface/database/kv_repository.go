@@ -58,37 +58,26 @@ func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, pro
 	return kv, nil
 }
 
-func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (id string, err error) {
+func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
-	tx, err := repo.BeginTx(ctx, nil)
-	if err != nil {
-		return "", perr.Wrap(err, perr.InternalServerErrorWithUrgency)
-	}
-
-	row := tx.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
+	// if key exists >> return error
+	row := repo.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
 	if err := row.Err(); err == nil {
-		// var kvID string
-		// if err := row.Scan(&kvID); err != nil {
-		// 	tx.Rollback()
-		// 	return id, perr.Wrap(err, perr.BadRequest)
-		// }
-
-		return "", perr.New(fmt.Sprintf("the key(%s) is already exists", input.Key), perr.BadRequest)
+		return nil, perr.New(fmt.Sprintf("the key is already exists: %s", input.Key), perr.BadRequest)
 	}
 
+	var id string
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,
 	).Scan(&id); err != nil {
-		tx.Rollback()
-		return id, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	tx.Commit()
-
-	return id, nil
+	ID := domain.KvID(id)
+	return &ID, nil
 }
 
 func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
@@ -100,8 +89,6 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 	}
 
 	row := tx.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
-	// if already exists key in projects
-	// update its is_valid and updated_by
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
@@ -128,18 +115,19 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	// create kv
-	var ID *domain.KvID
+	// create new kv
+	var id string
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,
-	).Scan(&ID); err != nil {
+	).Scan(&id); err != nil {
 		tx.Rollback()
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
 	tx.Commit()
 
-	return ID, nil
+	ID := domain.KvID(id)
+	return &ID, nil
 }

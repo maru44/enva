@@ -1,9 +1,33 @@
 package queryset
 
 const (
-	ProjectListQuery = ""
+	ProjectListQuery = "SELECT " +
+		"id, name, slug, owner_type, owner_user_id, owner_org_id, " +
+		"created_at, updated_at " +
+		"FROM projects " +
+		"WHERE is_valid = true AND is_deleted = false"
 
-	ProjectQuery = ""
+	ProjectListByUserQuery = "SELECT " +
+		"id, name, slug, owner_type, owner_user_id, owner_org_id, " +
+		"created_at, updated_at " +
+		"FROM projects " +
+		"WEHRE is_valid = true AND is_deleted = false AND owner_user_id = $1"
 
-	ProjectCreateQuery = ""
+	ProjectListByOrgQuery = "SELECT " +
+		"id, name, slug, owenr_type, owner_org_id, " +
+		"created_at, updated_at " +
+		"FROM projects " +
+		"WHERE is_valid = true AND is_deleted = false AND owner_org_id = $1"
+
+	ProjectDetailQuery = "SELECT " +
+		"id, name, slug, owner_type, owner_user_id, owner_org_id, " +
+		"is_valid, is_deleted, " +
+		"created_at, updated_at " +
+		"FROM projects " +
+		"WHERE id = $1"
+
+	ProjectCreateQuery = "INSERT INTO " +
+		"projects(name, slug, owner_type, owner_user_id, owner_org_id) " +
+		"VALUES($1, $2, $3, $4, $5) " +
+		"RETURNING id"
 )
