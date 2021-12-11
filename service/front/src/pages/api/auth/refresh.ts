@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { serialize } from 'cookie'
-import { refreshCognitoToken } from '../../../../helper/auth'
+import { refreshCognitoToken } from '../../../../http/auth'
 import {
   CookieKeyAccessToken,
   CookieKeyIdToken,

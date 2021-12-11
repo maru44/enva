@@ -29,7 +29,7 @@ type (
 	ProjectInput struct {
 		Slug  string `json:"slug"`
 		Name  string `json:"name"`
-		OrgID *OrgID `json:"org"`
+		OrgID *OrgID `json:"org_id"`
 	}
 
 	IProjectInteractor interface {

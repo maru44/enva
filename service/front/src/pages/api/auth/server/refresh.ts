@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { GetServerSidePropsContext, GetStaticPathsContext, GetStaticPropsContext, NextApiRequest, NextApiResponse, NextPageContext } from 'next'
 import { serialize } from 'cookie'
-import { getCognitoToken } from '../../../../../http/auth'
+import { refreshCognitoToken } from '../../../../../http/auth'
 import {
   CookieKeyAccessToken,
   CookieKeyIdToken,
@@ -10,17 +10,15 @@ import {
 import { cognitoTokenResponse } from '../../../../../types/oauth'
 
 export default async function handler(
+  ctx: GetServerSidePropsContext | GetStaticPathsContext | GetStaticPropsContext | NextPageContext,
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const qs = req.query
+  const refreshToken = req.cookies.refresh_token
 
-  // request to cognito token endpoint
   try {
-    const response = await getCognitoToken(
-      qs.code as string,
-      qs.state as string
-    )
+    // request to cognito token endpoint
+    const response = await refreshCognitoToken(refreshToken)
     const ret: cognitoTokenResponse = await response.json()
 
     switch (response.status) {
@@ -39,11 +37,11 @@ export default async function handler(
           ),
           serialize(
             CookieKeyRefreshToken,
-            ret.refresh_token,
+            ret.refresh_token ?? refreshToken,
             getCookieOption(3600 * 24 * 7 * 3)
           ),
         ])
-        res.redirect('/')
+        res.status(200).json({ message: 'succeeded to refresh token' })
         return
       default:
         res.status(400).json(ret)

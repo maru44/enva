@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import { fetchCreatePost } from '../../../helper/post'
+import { fetchCreatePost } from '../../../http/post'
 import { PageProps } from '../../../types/page'
 import { PostInput } from '../../../types/post'
 
