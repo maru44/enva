@@ -12,7 +12,7 @@ type ProjectReposotory struct {
 	ISqlHandler
 }
 
-func (repo *ProjectReposotory) ListByUser(ctx context.Context, orgID domain.OrgID) ([]domain.Project, error) {
+func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
 	rows, err := repo.QueryContext(ctx, queryset.ProjectListByUserQuery, user)

@@ -25,7 +25,7 @@ func NewKvController(sql database.ISqlHandler) *KvController {
 }
 
 func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
-	projectID := r.URL.Query().Get("projectId")
+	projectID := r.URL.Query().Get(QueryParamsProjectID)
 	kvs, err := con.in.ListValid(r.Context(), domain.ProjectID(projectID))
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
