@@ -30,7 +30,7 @@ func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project
 			userID, orgID *string
 		)
 		if err := rows.Scan(
-			&p.ID, &p.Name, &p.Slug, &p.OwnerType,
+			&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
 			&userID, &orgID,
 			&p.CreatedAt, &p.UpdatedAt,
 		); err != nil {
@@ -71,7 +71,7 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 			orgID *string
 		)
 		if err := rows.Scan(
-			&p.ID, &p.Name, &p.Slug, &p.OwnerType,
+			&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
 			&orgID,
 			&p.CreatedAt, &p.UpdatedAt,
 		); err != nil {
@@ -104,9 +104,10 @@ func (repo *ProjectReposotory) Detail(ctx context.Context, id domain.ProjectID) 
 		userID, orgID *string
 	)
 	if err := row.Scan(
-		&p.ID, &p.Name, &p.Slug, &p.OwnerType,
+		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
 		&userID, &orgID,
 		&p.IsValid, &p.IsDeleted,
+		&p.CreatedAt, &p.UpdatedAt,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -150,7 +151,7 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.ProjectCreateQuery,
-		input.Name, input.Slug, ownerType, inputU, in.OrgID,
+		input.Name, input.Slug, input.Description, ownerType, inputU, in.OrgID,
 	).Scan(&id); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}

@@ -44,6 +44,7 @@ CREATE TABLE projects (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     name VARCHAR(63) NOT NULL,
     slug VARCHAR(63) NOT NULL,
+    description TEXT NULL,
     owner_type VARCHAR(15) NOT NULL,
     owner_user_id VARCHAR(127) NULL, -- dbのユーザーのidのfkにする?
     owner_org_id uuid NULL REFERENCES orgs (id) ON DELETE CASCADE,

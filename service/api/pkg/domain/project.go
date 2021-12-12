@@ -11,14 +11,15 @@ type (
 	OwnerType string
 
 	Project struct {
-		ID        ProjectID `json:"id"`
-		Slug      string    `json:"slug"`
-		Name      string    `json:"name"`
-		OwnerType OwnerType `json:"owner_type"`
-		IsValid   bool      `json:"is_valid"`
-		IsDeleted bool      `json:"is_deleted"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
+		ID          ProjectID `json:"id"`
+		Slug        string    `json:"slug"`
+		Name        string    `json:"name"`
+		Description string    `json:"description"`
+		OwnerType   OwnerType `json:"owner_type"`
+		IsValid     bool      `json:"is_valid"`
+		IsDeleted   bool      `json:"is_deleted"`
+		CreatedAt   time.Time `json:"created_at"`
+		UpdatedAt   time.Time `json:"updated_at"`
 
 		// fk
 
@@ -27,9 +28,10 @@ type (
 	}
 
 	ProjectInput struct {
-		Slug  string `json:"slug"`
-		Name  string `json:"name"`
-		OrgID *OrgID `json:"org_id"`
+		Slug        string `json:"slug"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		OrgID       *OrgID `json:"org_id"`
 	}
 
 	IProjectInteractor interface {
