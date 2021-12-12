@@ -14,7 +14,7 @@ type (
 		ID          ProjectID `json:"id"`
 		Slug        string    `json:"slug"`
 		Name        string    `json:"name"`
-		Description string    `json:"description"`
+		Description *string   `json:"description"`
 		OwnerType   OwnerType `json:"owner_type"`
 		IsValid     bool      `json:"is_valid"`
 		IsDeleted   bool      `json:"is_deleted"`
@@ -28,10 +28,10 @@ type (
 	}
 
 	ProjectInput struct {
-		Slug        string `json:"slug"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		OrgID       *OrgID `json:"org_id"`
+		Slug        string  `json:"slug"`
+		Name        string  `json:"name"`
+		Description *string `json:"description"`
+		OrgID       *OrgID  `json:"org_id"`
 	}
 
 	IProjectInteractor interface {
