@@ -19,8 +19,9 @@ func NewProjectInteractor(repo IProjectRepository) domain.IProjectInteractor {
 type IProjectRepository interface {
 	ListByUser(context.Context) ([]domain.Project, error)
 	ListByOrg(context.Context, domain.OrgID) ([]domain.Project, error)
-	Detail(context.Context, domain.ProjectID) (*domain.Project, error)
-	Create(context.Context, domain.ProjectInput) (*domain.ProjectID, error)
+	SlugListByUser(context.Context) ([]string, error)
+	Detail(context.Context, string) (*domain.Project, error)
+	Create(context.Context, domain.ProjectInput) (*string, error)
 }
 
 func (in ProjectInteractor) ListByUser(ctx context.Context) ([]domain.Project, error) {
@@ -31,10 +32,14 @@ func (in ProjectInteractor) ListByOrg(ctx context.Context, orgID domain.OrgID) (
 	return in.repo.ListByOrg(ctx, orgID)
 }
 
-func (in ProjectInteractor) Detail(ctx context.Context, id domain.ProjectID) (*domain.Project, error) {
-	return in.repo.Detail(ctx, id)
+func (in ProjectInteractor) SlugListByUser(ctx context.Context) ([]string, error) {
+	return in.repo.SlugListByUser(ctx)
 }
 
-func (in ProjectInteractor) Create(ctx context.Context, input domain.ProjectInput) (*domain.ProjectID, error) {
+func (in ProjectInteractor) Detail(ctx context.Context, slug string) (*domain.Project, error) {
+	return in.repo.Detail(ctx, slug)
+}
+
+func (in ProjectInteractor) Create(ctx context.Context, input domain.ProjectInput) (*string, error) {
 	return in.repo.Create(ctx, input)
 }

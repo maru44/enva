@@ -5,6 +5,7 @@ import "errors"
 const (
 	QueryParamsOrgID     = "orgId"
 	QueryParamsProjectID = "projectId"
+	QueryParamsSlug      = "slug"
 )
 
 var (

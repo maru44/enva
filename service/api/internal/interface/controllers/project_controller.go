@@ -32,6 +32,7 @@ func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Requ
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": ps})
+	return
 }
 
 func (con *ProjectController) ListByProjectView(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +49,35 @@ func (con *ProjectController) ListByProjectView(w http.ResponseWriter, r *http.R
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": ps})
+	return
+}
+
+func (con *ProjectController) SlugListByUserView(w http.ResponseWriter, r *http.Request) {
+	slugs, err := con.in.SlugListByUser(r.Context())
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": slugs})
+	return
+}
+
+func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.Request) {
+	slug := r.URL.Query().Get(QueryParamsSlug)
+	if slug == "" {
+		response(w, r, perr.New("No slug was given", perr.BadRequest), nil)
+		return
+	}
+
+	p, err := con.in.Detail(r.Context(), slug)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": p})
+	return
 }
 
 func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request) {
