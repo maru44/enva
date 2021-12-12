@@ -32,7 +32,7 @@ func main() {
 	router.Handle("/kv/update/", base.BaseMiddleware(keySet, base.PutOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.UpdateView)))))
 
 	/* projects */
-	router.Handle("/project/list/user/", base.BaseMiddleware(keySet, base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByUserView))))
+	router.Handle("/project/list/user/", base.BaseMiddleware(keySet, base.GetOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByUserView)))))
 	router.Handle("/project/list/org/", base.BaseMiddleware(keySet, base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByProjectView))))
 	router.Handle("/project/create/", base.BaseMiddleware(keySet, base.PostOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.CreateView)))))
 

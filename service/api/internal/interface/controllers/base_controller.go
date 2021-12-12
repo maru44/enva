@@ -59,6 +59,7 @@ func (con *BaseController) UserTestView(w http.ResponseWriter, r *http.Request) 
 
 func (con *BaseController) BaseMiddleware(keySet jwk.Set, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		con.corsMiddleware(w, r)
 		ctx := context.WithValue(
 			r.Context(),
 			domain.CtxAccessKey,
@@ -74,7 +75,6 @@ func (con *BaseController) BaseMiddleware(keySet jwk.Set, next http.Handler) htt
 		)
 		r = r.WithContext(ctx)
 
-		con.corsMiddleware(w, r)
 		next.ServeHTTP(w, r)
 	})
 }
@@ -105,6 +105,20 @@ func (con *BaseController) PostOnlyMiddleware(next http.Handler) http.Handler {
 func (con *BaseController) PutOnlyMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPut {
+			next.ServeHTTP(w, r)
+		} else if r.Method == http.MethodOptions {
+			response(w, r, nil, nil)
+			return
+		} else {
+			response(w, r, perr.New("", perr.MethodNotAllowed), nil)
+			return
+		}
+	})
+}
+
+func (con *BaseController) GetOnlyMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
 			next.ServeHTTP(w, r)
 		} else if r.Method == http.MethodOptions {
 			response(w, r, nil, nil)

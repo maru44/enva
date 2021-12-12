@@ -29,9 +29,9 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 	w.WriteHeader(status)
 	var mess map[string]interface{}
 	if perror, ok := perr.IsPerror(err); ok {
-		mess = map[string]interface{}{"message": perror.Output().Error()}
+		mess = map[string]interface{}{"error": perror.Output().Error()}
 	} else {
-		mess = map[string]interface{}{"message": err.Error()}
+		mess = map[string]interface{}{"error": err.Error()}
 	}
 
 	if config.IsEnvDevelopment {

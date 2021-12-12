@@ -15,7 +15,7 @@ type ProjectReposotory struct {
 func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
-	rows, err := repo.QueryContext(ctx, queryset.ProjectListByUserQuery, user)
+	rows, err := repo.QueryContext(ctx, queryset.ProjectListByUserQuery, user.ID)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}

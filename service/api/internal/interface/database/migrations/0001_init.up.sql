@@ -14,17 +14,17 @@ CREATE TABLE orgs (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE users (
-    id VARCHAR(127),
-    email VARCHAR(255),
-    username VARCHAR(31),
-    image_url VARCHAR(255),
-    is_valid BOOLEAN NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+-- CREATE TABLE users (
+--     id VARCHAR(127),
+--     email VARCHAR(255),
+--     username VARCHAR(31),
+--     image_url VARCHAR(255),
+--     is_valid BOOLEAN NOT NULL,
+--     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+--     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
-    PRIMARY KEY (id)
-);
+--     PRIMARY KEY (id)
+-- );
 
 -- relation org and users
 CREATE TABLE rel_org_members (
@@ -54,9 +54,10 @@ CREATE TABLE projects (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id),
-    CONSTRAINT slug_unique_every_owner UNIQUE (slug, owner_user_id, owner_org_id)
+    CONSTRAINT slug_unique_every_user UNIQUE (slug, owner_user_id),
+    CONSTRAINT slug_unique_every_org UNIQUE (slug, owner_org_id)
 );
-CREATE INDEX ON projects (owner_user_id); 
+CREATE INDEX ON projects (owner_user_id);
 
 -- key value sets
 CREATE TABLE kvs (
