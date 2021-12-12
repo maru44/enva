@@ -1,8 +1,8 @@
 import { ApiUrl } from '../config/env'
-import { ProjectInput } from '../types/project'
+import { Project, ProjectInput } from '../types/project'
 
 export const fetchProjectListByUser = async () => {
-  return await fetch(`${ApiUrl}/project/list/users/`, {
+  return await fetch(`${ApiUrl}/project/list/user/`, {
     method: 'GET',
     mode: 'cors',
     credentials: 'include',
@@ -12,7 +12,7 @@ export const fetchProjectListByUser = async () => {
   })
 }
 
-export const fetchProjectListByProject = async (orgId: string) => {
+export const fetchProjectListByOrg = async (orgId: string) => {
   return await fetch(`${ApiUrl}/project/list/org/?orgId=${orgId}`, {
     method: 'GET',
     mode: 'cors',

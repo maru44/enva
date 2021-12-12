@@ -1,17 +1,10 @@
-import {
-//   GetServerSidePropsContext,
-//   GetStaticPathsContext,
-//   GetStaticPropsContext,
-  NextPageContext,
-} from 'next'
+import { NextPageContext } from 'next'
 import { parseCookies } from 'nookies'
-import { ThisUrl } from '../config/env'
+import { ApiUrl, ThisUrl } from '../config/env'
 
-export async function fetcher(func: Promise<Response>) {
+export async function fetcher(func: Promise<Response>): Promise<Response> {
   const res = await func
   switch (res.status) {
-    case 200:
-      return res
     case 401:
       await fetch(`${ThisUrl}/api/auth/refresh`, {
         method: 'GET',
@@ -21,6 +14,28 @@ export async function fetcher(func: Promise<Response>) {
       return res2
     default:
       return res
+  }
+}
+
+export async function fetcherGetFromApi(path: string) {
+  try {
+    const fn = fetch(`${ApiUrl}${path}`, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    })
+
+    const res = await fetcher(fn)
+    const ret = await res.json()
+
+    return ret
+  } catch (e) {
+    const err = new Error('Internal Server Error')
+    throw err
+    // return { error: 'Internal Server Error' }
   }
 }
 
