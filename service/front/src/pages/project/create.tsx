@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { NextPage } from 'next'
 import { PageProps } from '../../../types/page'
-import { ProjectCreateForm } from '../components/form/project/create'
+import { ProjectCreateForm } from '../../components/form/project/create'
 
 const ProjectCreate: NextPage<PageProps> = (props) => {
   return (

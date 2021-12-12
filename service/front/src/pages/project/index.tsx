@@ -3,13 +3,15 @@ import { makeStyles } from '@mui/styles'
 import { NextPage } from 'next'
 import useSWR from 'swr'
 import { projectsResponseBody } from '../../../http/body/project'
-import { fetcherGetFromApi } from '../../../http/fetcher'
+import { fetcherGetFromApiUrl } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
+import { GetPath } from '../../../http/fetcher'
+import Link from 'next/link'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
-    '/project/list/user/',
-    fetcherGetFromApi
+    GetPath.PROJECT_LIST_USER,
+    fetcherGetFromApiUrl
   )
 
   if (error) console.log(error)
@@ -22,6 +24,9 @@ const ProjectList: NextPage<PageProps> = (props) => {
           data.data.map((p, i) => (
             <Card key={i}>
               {p.name} ::: {p.slug}
+              <Link as={`/project/${p.slug}`} href={`/project/[slug]`} passHref>
+                <a>Link</a>
+              </Link>
             </Card>
           ))}
         {data && data.error && <Box>{data.error}</Box>}

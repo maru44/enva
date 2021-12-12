@@ -9,5 +9,4 @@ export type projectsResponseBody =
 export type projectResponseBody =
   | {
       data: Project
-    }
-  & errorResponseBody
+    } & errorResponseBody

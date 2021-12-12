@@ -2,6 +2,19 @@ import { NextPageContext } from 'next'
 import { parseCookies } from 'nookies'
 import { ApiUrl, ThisUrl } from '../config/env'
 
+// export enum GetBodyTypeEnum {
+//   PROJECT_LIST_USER = 'Project[]',
+// }
+
+export const GetPath: { [key: string]: string } = {
+  PROJECT_LIST_USER: '/project/list/user/',
+  PROJECT_LIST_ORG: '/project/list/org',
+  PROJECT_DETAIl: '/project/detail',
+
+  KV_PROJECT: '/kv/',
+} as const
+export type GetPath = typeof GetPath[keyof typeof GetPath]
+
 export async function fetcher(func: Promise<Response>): Promise<Response> {
   const res = await func
   switch (res.status) {
@@ -17,7 +30,7 @@ export async function fetcher(func: Promise<Response>): Promise<Response> {
   }
 }
 
-export async function fetcherGetFromApi(path: string) {
+export async function fetcherGetFromApiUrl(path: string) {
   try {
     const fn = fetch(`${ApiUrl}${path}`, {
       method: 'GET',

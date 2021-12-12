@@ -2,10 +2,10 @@ import { Box, Button, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import clsx from 'clsx'
 import React, { useState } from 'react'
-import { fetcher } from '../../../../../http/fetcher'
-import { fetchCreateProject } from '../../../../../http/project'
-import { ProjectInput } from '../../../../../types/project'
-import { slugify } from '../../../../../utils/slug'
+import { fetcher } from '../../../../http/fetcher'
+import { fetchCreateProject } from '../../../../http/project'
+import { ProjectInput } from '../../../../types/project'
+import { slugify } from '../../../../utils/slug'
 
 export type ProjectCreateProps = {
   orgId?: string
@@ -29,10 +29,10 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
     const ret = await res.json()
     if (res.status === 200) {
       const id = ret['data']
-      console.log(id)
+      console.log(id) // @TODO fix
     } else {
-      const message = ret['message']
-      console.log(message)
+      const message = ret['error']
+      console.log(message) // @TODO fix
     }
   }
 
