@@ -6,8 +6,5 @@ export type kvsResponseBody = {
 } & errorResponseBody
 
 export type kvCreateResponseBody = {
-  data: {
-    env_key: string
-    env_value: string
-  }
+  data: string
 } & errorResponseBody

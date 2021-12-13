@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { projectResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
-import { KvCreateForm } from '../../components/form/kv/create'
+import { KvUpsertForm } from '../../components/form/kv/create'
 import { KvList } from '../../components/kv/list'
 
 const ProjectDetail: NextPage<PageProps> = (props) => {
@@ -24,9 +24,9 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
       <Box>
         {data && data.data && (
           <Box>
-            <Typography variant="h2">{data.data.name}</Typography>
+            <Typography variant="h3">{data.data.name}</Typography>
             <KvList projectId={data.data.id} />
-            <KvCreateForm projectId={data.data.id} />
+            <KvUpsertForm projectId={data.data.id} />
           </Box>
         )}
       </Box>

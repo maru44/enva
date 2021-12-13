@@ -1,18 +1,20 @@
 import { Box, Button, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import clsx from 'clsx'
-import React, { useState } from 'react'
+import React from 'react'
 import { useSWRConfig } from 'swr'
 import { kvCreateResponseBody } from '../../../../http/body/kv'
 import { fetcher, GetPath } from '../../../../http/fetcher'
-import { fetchCreateKv } from '../../../../http/kv'
+import { fetchCreateKv, fetchUpdateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
 
-export type KvCreateProps = {
+export type KvUpsertProps = {
   projectId: string
+  env_key?: string
 }
 
-export const KvCreateForm = ({ projectId }: KvCreateProps) => {
+// if env_key is exists >> update method is executed
+export const KvUpsertForm = ({ projectId, env_key }: KvUpsertProps) => {
   const { mutate } = useSWRConfig()
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -27,11 +29,12 @@ export const KvCreateForm = ({ projectId }: KvCreateProps) => {
         kv_value: v,
       },
     }
-    const res = await fetcher(fetchCreateKv(input))
+    const res = env_key
+      ? await fetcher(fetchUpdateKv(input))
+      : await fetcher(fetchCreateKv(input))
     const ret: kvCreateResponseBody = await res.json()
     if (res.status === 200) {
       const id = ret['data']
-      console.log(id) // @TODO fix
       mutate(`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`)
     } else {
       const message = ret['error']
@@ -45,13 +48,26 @@ export const KvCreateForm = ({ projectId }: KvCreateProps) => {
     <Box>
       <form onSubmit={submit}>
         <Box display="flex" flexDirection="column">
-          <TextField
-            name="kv_key"
-            variant="outlined"
-            label="key"
-            required
-            className={clsx(classes.textField)}
-          />
+          {!env_key && (
+            <TextField
+              name="kv_key"
+              variant="outlined"
+              label="key"
+              required
+              className={clsx(classes.textField)}
+            />
+          )}
+          {env_key && (
+            <TextField
+              name="kv_key"
+              variant="outlined"
+              label="key"
+              type="hidden"
+              value={env_key}
+              required
+              className={clsx(classes.textField)}
+            />
+          )}
           <TextField
             name="kv_value"
             label="value"
@@ -59,7 +75,7 @@ export const KvCreateForm = ({ projectId }: KvCreateProps) => {
             className={clsx(classes.textField)}
           />
           <Button type="submit" variant="outlined">
-            Create
+            {env_key ? 'UPDATE' : 'Create'}
           </Button>
         </Box>
       </form>

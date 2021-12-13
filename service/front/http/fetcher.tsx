@@ -13,9 +13,29 @@ export const GetPath: { [key: string]: string } = {
 
   KVS_BY_PROJECT: '/kv',
   KV_CREATE: '/kv/create',
+  KV_UPDATE: '/kv/update',
   KV_DELETE: '/kv/delete',
 } as const
 export type GetPath = typeof GetPath[keyof typeof GetPath]
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+
+export const fetchBaseApi = async (
+  path: string,
+  method: HttpMethod,
+  body: { [key: string]: any },
+  headers?: { [key: string]: string }
+): Promise<Response> => {
+  return fetch(`${ApiUrl}${path}`, {
+    method: method,
+    mode: 'cors',
+    credentials: 'include',
+    headers: headers ?? {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: body && JSON.stringify(body),
+  })
+}
 
 export async function fetcher(func: Promise<Response>): Promise<Response> {
   const res = await func
