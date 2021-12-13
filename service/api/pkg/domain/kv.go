@@ -21,10 +21,10 @@ type (
 		UpdatedAt time.Time `json:"updated_at"`
 	}
 
-	KvValid struct {
-		Key   KvKey   `json:"key"`
-		Value KvValue `json:"value"`
-	}
+	// KvValid struct {
+	// 	Key   KvKey   `json:"key"`
+	// 	Value KvValue `json:"value"`
+	// }
 
 	KvInput struct {
 		Key   KvKey   `json:"kv_key"`
@@ -39,7 +39,7 @@ type (
 	IKvInteractor interface {
 		ListValid(context.Context, ProjectID) ([]Kv, error)
 		DetailValid(context.Context, KvKey, ProjectID) (*Kv, error)
-		Create(context.Context, KvInputWithProjectID) (*KvID, error)
+		Create(context.Context, KvInputWithProjectID) (*string, *string, error)
 		Update(context.Context, KvInputWithProjectID) (*KvID, error)
 	}
 )

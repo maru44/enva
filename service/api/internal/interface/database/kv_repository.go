@@ -58,26 +58,26 @@ func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, pro
 	return kv, nil
 }
 
-func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
+func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*string, *string, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
 	// if key exists >> return error
+	var preId string
 	row := repo.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
-	if err := row.Err(); err == nil {
-		return nil, perr.New(fmt.Sprintf("the key is already exists: %s", input.Key), perr.BadRequest)
+	if err := row.Scan(&preId); err == nil {
+		return nil, nil, perr.New(fmt.Sprintf("the key is already exists: %s", input.Key), perr.BadRequest)
 	}
 
-	var id string
+	var key, value *string
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,
-	).Scan(&id); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+	).Scan(&key, &value); err != nil {
+		return nil, nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	ID := domain.KvID(id)
-	return &ID, nil
+	return key, value, nil
 }
 
 func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {

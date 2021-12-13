@@ -14,7 +14,7 @@ const (
 	KvInsertQuery = "INSERT INTO " +
 		"kvs(env_key, env_value, project_id, created_by) " +
 		"VALUES($1, $2, $3, $4) " +
-		"RETURNING id"
+		"RETURNING env_key, env_value"
 
 	ValidKvDetailID = "SELECT " +
 		"id " +

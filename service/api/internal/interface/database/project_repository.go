@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/maru44/ichigo/service/api/internal/interface/database/queryset"
 	"github.com/maru44/ichigo/service/api/pkg/domain"
@@ -156,8 +155,6 @@ func (repo *ProjectReposotory) Detail(ctx context.Context, slug string) (*domain
 			ID: domain.OrgID(*orgID),
 		}
 	}
-
-	fmt.Println(p)
 
 	return p, nil
 }

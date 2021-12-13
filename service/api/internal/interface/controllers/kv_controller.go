@@ -39,13 +39,19 @@ func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
 
-	id, err := con.in.Create(r.Context(), input)
+	key, value, err := con.in.Create(r.Context(), input)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}
 
-	response(w, r, nil, map[string]interface{}{"data": id})
+	response(w, r, nil,
+		map[string]interface{}{
+			"data": map[string]string{
+				"env_key":   *key,
+				"env_value": *value,
+			},
+		})
 	return
 }
 
