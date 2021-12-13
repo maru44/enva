@@ -58,26 +58,27 @@ func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, pro
 	return kv, nil
 }
 
-func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*string, *string, error) {
+func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
 	// if key exists >> return error
 	var preId string
 	row := repo.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
 	if err := row.Scan(&preId); err == nil {
-		return nil, nil, perr.New(fmt.Sprintf("the key is already exists: %s", input.Key), perr.BadRequest)
+		return nil, perr.New(fmt.Sprintf("the key is already exists: %s", input.Key), perr.BadRequest)
 	}
 
-	var key, value *string
+	var id string
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,
-	).Scan(&key, &value); err != nil {
-		return nil, nil, perr.Wrap(err, perr.BadRequest)
+	).Scan(&id); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	return key, value, nil
+	ID := domain.KvID(id)
+	return &ID, nil
 }
 
 func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
@@ -88,22 +89,11 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 		return nil, perr.Wrap(err, perr.InternalServerErrorWithUrgency)
 	}
 
-	row := tx.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
-	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
-	}
-
-	var kvID string
-	if err := row.Scan(&kvID); err != nil {
-		tx.Rollback()
-		return nil, perr.Wrap(err, perr.BadRequest)
-	}
-
 	// deactivate existing kv
 	exe, err := repo.ExecContext(
 		ctx,
 		queryset.KvDeactivateQuery,
-		user, kvID,
+		user.ID, projectID, input.Key,
 	)
 	if err != nil {
 		tx.Rollback()

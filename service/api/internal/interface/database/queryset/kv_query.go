@@ -14,14 +14,18 @@ const (
 	KvInsertQuery = "INSERT INTO " +
 		"kvs(env_key, env_value, project_id, created_by) " +
 		"VALUES($1, $2, $3, $4) " +
-		"RETURNING env_key, env_value"
+		"RETURNING id"
 
 	ValidKvDetailID = "SELECT " +
 		"id " +
 		"FROM kvs " +
 		"WHERE env_key = $1 AND project_id = $2 AND is_valid = true"
 
+	// KvDeactivateQuery = "UPDATE kvs " +
+	// 	"SET is_valid = false, updated_by = $1 " +
+	// 	"WHERE id = $2"
+
 	KvDeactivateQuery = "UPDATE kvs " +
 		"SET is_valid = false, updated_by = $1 " +
-		"WHERE id = $2"
+		"WHERE project_id = $2 AND env_key = $3 AND is_valid = true"
 )

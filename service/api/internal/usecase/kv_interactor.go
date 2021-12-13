@@ -20,7 +20,7 @@ func NewKvInteractor(kv IKvRepository) domain.IKvInteractor {
 type IKvRepository interface {
 	ListValid(context.Context, domain.ProjectID) ([]domain.Kv, error)
 	DetailValid(context.Context, domain.KvKey, domain.ProjectID) (*domain.Kv, error)
-	Create(context.Context, domain.KvInput, domain.ProjectID) (*string, *string, error)
+	Create(context.Context, domain.KvInput, domain.ProjectID) (*domain.KvID, error)
 	Update(context.Context, domain.KvInput, domain.ProjectID) (*domain.KvID, error)
 }
 
@@ -36,7 +36,7 @@ func (in KvInteractor) DetailValid(ctx context.Context, key domain.KvKey, projec
 	return in.repo.DetailValid(ctx, key, projectID)
 }
 
-func (in KvInteractor) Create(ctx context.Context, input domain.KvInputWithProjectID) (*string, *string, error) {
+func (in KvInteractor) Create(ctx context.Context, input domain.KvInputWithProjectID) (*domain.KvID, error) {
 	return in.repo.Create(ctx, input.Input, input.ProjectID)
 }
 
