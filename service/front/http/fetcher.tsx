@@ -1,17 +1,19 @@
 import { NextPageContext } from 'next'
 import { parseCookies } from 'nookies'
-import { ApiUrl, ThisUrl } from '../config/env'
+import { ApiUrl, IsDevelopment, ThisUrl } from '../config/env'
 
 // export enum GetBodyTypeEnum {
 //   PROJECT_LIST_USER = 'Project[]',
 // }
 
 export const GetPath: { [key: string]: string } = {
-  PROJECT_LIST_USER: '/project/list/user/',
+  PROJECT_LIST_USER: '/project/list/user',
   PROJECT_LIST_ORG: '/project/list/org',
   PROJECT_DETAIl: '/project/detail',
 
-  KV_PROJECT: '/kv/',
+  KVS_BY_PROJECT: '/kv',
+  KV_CREATE: '/kv/create',
+  KV_DELETE: '/kv/delete',
 } as const
 export type GetPath = typeof GetPath[keyof typeof GetPath]
 
@@ -46,9 +48,8 @@ export async function fetcherGetFromApiUrl(path: string) {
 
     return ret
   } catch (e) {
-    const err = new Error('Internal Server Error')
-    throw err
-    // return { error: 'Internal Server Error' }
+    IsDevelopment && console.log(e)
+    throw new Error('Internal Server Error')
   }
 }
 

@@ -5,7 +5,7 @@ export type ProjectInput = {
   org_id?: string
 }
 
-// @TODO UNION
+// @TODO UNION with 
 export type Project = {
   id: string
   slug: string
