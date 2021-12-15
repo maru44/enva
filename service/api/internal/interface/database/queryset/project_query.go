@@ -29,7 +29,7 @@ const (
 		"is_valid, is_deleted, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE slug = $1"
+		"WHERE slug = $1 AND is_deleted = false"
 
 	ProjectDetailByIDQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
@@ -42,6 +42,14 @@ const (
 		"projects(name, slug, description, owner_type, owner_user_id, owner_org_id) " +
 		"VALUES($1, $2, $3, $4, $5, $6) " +
 		"RETURNING slug"
+
+	ProjectDeleteQuery = "UPDATE projects " +
+		"SET is_deleted = true " +
+		"WHERE id = $1"
+
+	// KvDeactivateQuery = "UPDATE kvs " +
+	// 	"SET is_valid = false, updated_by = $1 " +
+	// 	"WHERE project_id = $2 AND env_key = $3 AND is_valid = true"
 
 	// @TODO: add query list of slug
 )

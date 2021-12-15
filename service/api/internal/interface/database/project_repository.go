@@ -182,15 +182,12 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 
 	// set user
 	if userID != nil {
-		if *userID != user.ID {
-			return nil, perr.New(perr.NotFound.Error(), perr.NotFound)
-		}
 		p.OwnerUser = &user
 	}
 
 	// set org
 	if orgID != nil {
-		// @TODO validate user is
+		// @TODO get org detail
 		p.OwnerOrg = &domain.Org{
 			ID: domain.OrgID(*orgID),
 		}
@@ -213,8 +210,6 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 		inputU = &user.ID
 	}
 
-	// @TODO get user's or org's project slug(all)
-
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.ProjectCreateQuery,
@@ -224,4 +219,18 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 	}
 
 	return slug, nil
+}
+
+func (repo *ProjectReposotory) Delete(ctx context.Context, projectID domain.ProjectID) (int, error) {
+	exe, err := repo.ExecContext(ctx, queryset.ProjectDeleteQuery, projectID)
+	if err != nil {
+		return 0, perr.Wrap(err, perr.BadRequest)
+	}
+
+	affected, err := exe.RowsAffected()
+	if err != nil {
+		return 0, perr.Wrap(err, perr.BadRequest)
+	}
+
+	return affected, nil
 }

@@ -41,9 +41,11 @@ type (
 		ListByOrg(context.Context, OrgID) ([]Project, error)
 		SlugListByUser(context.Context) ([]string, error)
 		// SlugListByOrg(context.Context, OrgID) ([]string, error)
+
 		GetBySlug(context.Context, string) (*Project, error)
 		GetByID(context.Context, ProjectID) (*Project, error)
 		Create(context.Context, ProjectInput) (*string, error)
+		Delete(context.Context, ProjectID) (int, error)
 
 		// by org 系
 	}

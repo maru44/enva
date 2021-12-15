@@ -23,6 +23,7 @@ type IProjectRepository interface {
 	GetBySlug(context.Context, string) (*domain.Project, error)
 	GetByID(context.Context, domain.ProjectID) (*domain.Project, error)
 	Create(context.Context, domain.ProjectInput) (*string, error)
+	Delete(context.Context, domain.ProjectID) (int, error)
 }
 
 func (in ProjectInteractor) ListByUser(ctx context.Context) ([]domain.Project, error) {
@@ -47,4 +48,8 @@ func (in ProjectInteractor) GetByID(ctx context.Context, id domain.ProjectID) (*
 
 func (in ProjectInteractor) Create(ctx context.Context, input domain.ProjectInput) (*string, error) {
 	return in.repo.Create(ctx, input)
+}
+
+func (in ProjectInteractor) Delete(ctx context.Context, projectID domain.ProjectID) (int, error) {
+	return in.repo.Delete(ctx, projectID)
 }

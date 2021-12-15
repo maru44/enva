@@ -34,10 +34,11 @@ func main() {
 
 	/* projects */
 	router.Handle("/project/list/user", base.BaseMiddleware(keySet, base.GetOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByUserView)))))
-	router.Handle("/project/list/org", base.BaseMiddleware(keySet, base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByProjectView))))
+	router.Handle("/project/list/org", base.BaseMiddleware(keySet, base.LoginRequiredMiddleware(http.HandlerFunc(project.ListByOrgView))))
 	router.Handle("/project/slugs/user", base.BaseMiddleware(keySet, base.GetOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.SlugListByUserView)))))
 	router.Handle("/project/detail", base.BaseMiddleware(keySet, base.GetOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.ProjectDetailView)))))
 	router.Handle("/project/create", base.BaseMiddleware(keySet, base.PostOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.CreateView)))))
+	router.Handle("/project/delete", base.BaseMiddleware(keySet, base.DeleteOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(project.DeleteView)))))
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		log.Println(err)

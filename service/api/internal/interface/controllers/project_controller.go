@@ -35,7 +35,7 @@ func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Requ
 	return
 }
 
-func (con *ProjectController) ListByProjectView(w http.ResponseWriter, r *http.Request) {
+func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Request) {
 	orgID := r.URL.Query().Get(QueryParamsOrgID)
 	if orgID == "" {
 		response(w, r, perr.New(ErrorNoOrgIdParams.Error(), perr.BadRequest), nil)
@@ -64,14 +64,23 @@ func (con *ProjectController) SlugListByUserView(w http.ResponseWriter, r *http.
 }
 
 func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	slug := r.URL.Query().Get(QueryParamsSlug)
 	if slug == "" {
 		response(w, r, perr.New("No slug was given", perr.BadRequest), nil)
 		return
 	}
 
-	p, err := con.in.GetBySlug(r.Context(), slug)
+	p, err := con.in.GetBySlug(ctx, slug)
 	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	// validate user access
+	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	if err := p.ValidateUserGet(user); err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
 	}
@@ -96,5 +105,32 @@ func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request)
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
+	return
+}
+
+func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	projectID := r.URL.Query().Get(QueryParamsProjectID)
+
+	p, err := con.in.GetByID(ctx, domain.ProjectID(projectID))
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	// validate user access
+	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	if err := p.ValidateUserGet(user); err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	affected, err := con.in.Delete(ctx, domain.ProjectID(projectID))
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": affected})
 	return
 }
