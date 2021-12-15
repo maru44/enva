@@ -14,6 +14,9 @@ CREATE TABLE orgs (
     PRIMARY KEY (id)
 );
 
+-- @TODO add username and email and cli password table
+-- OR make custome field to aws cognito
+
 -- CREATE TABLE users (
 --     id VARCHAR(127),
 --     email VARCHAR(255),
@@ -25,6 +28,18 @@ CREATE TABLE orgs (
 
 --     PRIMARY KEY (id)
 -- );
+
+-- cli password
+CREATE TABLE cli_passwords (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    username VARCHAR(63) NOT NULL,
+    password TEXT,
+
+    PRIMARY KEY (id)
+);
+CREATE INDEX ON cli_passwords (email);
+CREATE INDEX ON cli_passwords (username);
 
 -- relation org and users
 CREATE TABLE rel_org_members (
