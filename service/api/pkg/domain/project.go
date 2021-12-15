@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/maru44/perr"
 )
 
 type (
@@ -39,8 +41,11 @@ type (
 		ListByOrg(context.Context, OrgID) ([]Project, error)
 		SlugListByUser(context.Context) ([]string, error)
 		// SlugListByOrg(context.Context, OrgID) ([]string, error)
-		Detail(context.Context, string) (*Project, error)
+		GetBySlug(context.Context, string) (*Project, error)
+		GetByID(context.Context, ProjectID) (*Project, error)
 		Create(context.Context, ProjectInput) (*string, error)
+
+		// by org 系
 	}
 )
 
@@ -55,3 +60,21 @@ var (
 	ErrProjectSlugAlreadyExistsUser = errors.New("Slug duplicated: Project slug has already exists for user")         // 400
 	ErrProjectSlugAlreadyExistsOrg  = errors.New("Slug duplicated: Project slug has already exists for organization") // 400
 )
+
+func (p *Project) ValidateUserGet(u User) error {
+	// user type
+	if p.OwnerOrg == nil {
+		if p.OwnerUser.ID == u.ID {
+			return nil
+		}
+		return perr.New("Not owner of project", perr.Forbidden)
+	}
+
+	// org type
+	if p.OwnerOrg.IsMember(u) {
+		return nil
+	}
+	return perr.New("Not member of owner organization", perr.Forbidden)
+}
+
+// func (p *Project) ValidateUserPost()

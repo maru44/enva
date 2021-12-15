@@ -70,7 +70,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	p, err := con.in.Detail(r.Context(), slug)
+	p, err := con.in.GetBySlug(r.Context(), slug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -80,6 +80,8 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 	return
 }
 
+// @TODO if orgID not equal null >>
+// user need to be a member of that org
 func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request) {
 	var input domain.ProjectInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {

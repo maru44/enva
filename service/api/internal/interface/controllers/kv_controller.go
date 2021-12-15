@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -11,7 +12,8 @@ import (
 )
 
 type KvController struct {
-	in domain.IKvInteractor
+	in  domain.IKvInteractor
+	pIn domain.IProjectInteractor
 }
 
 func NewKvController(sql database.ISqlHandler) *KvController {
@@ -21,12 +23,24 @@ func NewKvController(sql database.ISqlHandler) *KvController {
 				ISqlHandler: sql,
 			},
 		),
+		pIn: usecase.NewProjectInteractor(
+			&database.ProjectReposotory{
+				ISqlHandler: sql,
+			},
+		),
 	}
 }
 
 func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	projectID := r.URL.Query().Get(QueryParamsProjectID)
-	kvs, err := con.in.ListValid(r.Context(), domain.ProjectID(projectID))
+
+	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+
+	kvs, err := con.in.ListValid(ctx, domain.ProjectID(projectID))
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -36,10 +50,17 @@ func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
 
-	id, err := con.in.Create(r.Context(), input)
+	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+
+	id, err := con.in.Create(ctx, input)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
@@ -50,8 +71,15 @@ func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
+
+	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
 
 	id, err := con.in.Update(r.Context(), input)
 	if err != nil {
@@ -60,4 +88,21 @@ func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 
 	response(w, r, nil, map[string]interface{}{"data": id})
 	return
+}
+
+func (con *KvController) userAccessToProject(ctx context.Context, projectID domain.ProjectID) error {
+	user := ctx.Value(domain.CtxUserKey).(domain.User)
+
+	// find parent project
+	p, err := con.pIn.GetByID(ctx, projectID)
+	if err != nil {
+		return perr.Wrap(err, perr.NotFound, "Project is not found")
+	}
+
+	// validate user can access to project
+	if err := p.ValidateUserGet(user); err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+
+	return nil
 }

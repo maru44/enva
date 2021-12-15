@@ -20,7 +20,9 @@ type (
 
 		// fk
 
-		Users []User `json:"users"`
+		Admins []User `json:"admin"`
+		Users  []User `json:"users"`
+		Guests []User `json:"guests"`
 	}
 
 	OrgInput struct {
@@ -35,3 +37,27 @@ type (
 		Create(context.Context)
 	}
 )
+
+func (o *Org) IsMember(u User) bool {
+	if o.Users != nil {
+		for _, user := range o.Users {
+			if user.ID == u.ID {
+				return true
+			}
+		}
+	}
+
+	return o.IsAdmin(u)
+}
+
+func (o *Org) IsAdmin(u User) bool {
+	if o.Admins != nil {
+		for _, user := range o.Admins {
+			if user.ID == u.ID {
+				return true
+			}
+		}
+	}
+
+	return false
+}

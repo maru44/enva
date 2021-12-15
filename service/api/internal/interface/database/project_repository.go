@@ -119,10 +119,50 @@ func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, er
 	return slugs, nil
 }
 
-func (repo *ProjectReposotory) Detail(ctx context.Context, slug string) (*domain.Project, error) {
+func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*domain.Project, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
-	row := repo.QueryRowContext(ctx, queryset.ProjectDetailQuery, slug)
+	row := repo.QueryRowContext(ctx, queryset.ProjectDetailBySlugQuery, slug)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		p             *domain.Project = &domain.Project{}
+		userID, orgID *string
+	)
+	if err := row.Scan(
+		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
+		&userID, &orgID,
+		&p.IsValid, &p.IsDeleted,
+		&p.CreatedAt, &p.UpdatedAt,
+	); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	// set user
+	if userID != nil {
+		if *userID != user.ID {
+			return nil, perr.New(perr.NotFound.Error(), perr.NotFound)
+		}
+		p.OwnerUser = &user
+	}
+
+	// set org
+	if orgID != nil {
+		// @TODO validate user is
+		p.OwnerOrg = &domain.Org{
+			ID: domain.OrgID(*orgID),
+		}
+	}
+
+	return p, nil
+}
+
+func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID) (*domain.Project, error) {
+	user := ctx.Value(domain.CtxUserKey).(domain.User)
+
+	row := repo.QueryRowContext(ctx, queryset.ProjectDetailByIDQuery, id)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}

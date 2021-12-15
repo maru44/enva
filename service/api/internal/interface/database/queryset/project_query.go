@@ -24,12 +24,19 @@ const (
 		"FROM projects " +
 		"WHERE is_valid = true AND is_deleted = false AND owner_org_id = $1"
 
-	ProjectDetailQuery = "SELECT " +
+	ProjectDetailBySlugQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"is_valid, is_deleted, " +
 		"created_at, updated_at " +
 		"FROM projects " +
 		"WHERE slug = $1"
+
+	ProjectDetailByIDQuery = "SELECT " +
+		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
+		"is_valid, is_deleted, " +
+		"created_at, updated_at " +
+		"FROM projects " +
+		"WHERE id = $1"
 
 	ProjectCreateQuery = "INSERT INTO " +
 		"projects(name, slug, description, owner_type, owner_user_id, owner_org_id) " +

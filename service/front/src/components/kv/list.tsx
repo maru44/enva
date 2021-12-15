@@ -1,7 +1,6 @@
 import { Box, Card } from '@mui/material'
 import React from 'react'
 import useSWR from 'swr'
-import { ApiUrl } from '../../../config/env'
 import { kvsResponseBody } from '../../../http/body/kv'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { sortKvs } from '../../../utils/kv'
