@@ -81,12 +81,33 @@ func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := con.in.Update(r.Context(), input)
+	id, err := con.in.Update(ctx, input)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
+	return
+}
+
+func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var input domain.KvInputWithProjectID
+	json.NewDecoder(r.Body).Decode(&input)
+
+	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+
+	affected, err := con.in.Delete(ctx, input)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": affected})
 	return
 }
 
