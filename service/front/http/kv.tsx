@@ -10,5 +10,8 @@ export const fetchUpdateKv = async (input: KvInput) => {
 }
 
 export const fetchDeleteKv = async (kvId: string, projectId: string) => {
-  return fetchBaseApi(`${GetPath.KV_DELETE}?kvId=${kvId}&projectId=${projectId}`, 'DELETE')
+  return fetchBaseApi(
+    `${GetPath.KV_DELETE}?kvId=${kvId}&projectId=${projectId}`,
+    'DELETE'
+  )
 }

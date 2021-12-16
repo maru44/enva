@@ -7,13 +7,14 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import { useSWRConfig } from 'swr'
 import { kvDeleteResponseBody } from '../../../../http/body/kv'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchDeleteKv } from '../../../../http/kv'
 import { Kv } from '../../../../types/kv'
 import { sortKvs } from '../../../../utils/kv'
+import { KvUpdateForm } from './update'
 
 type props = {
   kvs: Kv[]
@@ -22,7 +23,11 @@ type props = {
 
 export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
   const { mutate } = useSWRConfig()
+  const [isOpenUpdate, setIsOpenUpdate] = useState<boolean>(false)
+  const [updateKey, setUpdateKey] = useState<string>('')
+  const [defaultValue, setDefaultValue] = useState<string>('')
 
+  // delete function
   const delKeyFunc = async (keyId: string, projectId: string) => {
     try {
       const res = await fetchDeleteKv(keyId, projectId)
@@ -39,14 +44,17 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
     }
   }
 
+  // close update form
+  const closeUpdateForm = () => setIsOpenUpdate(false)
+
   return (
     <TableContainer>
       <Table aria-label="key value sets">
         <TableHead>
           <TableRow>
-            <TableCell>key</TableCell>
-            <TableCell>value</TableCell>
-            <TableCell></TableCell>
+            <TableCell>Key</TableCell>
+            <TableCell>Value</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -64,11 +72,28 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                   >
                     Delete
                   </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setUpdateKey(kv.kv_key)
+                      setDefaultValue(kv.kv_value)
+                      setIsOpenUpdate(true)
+                    }}
+                  >
+                    Edit
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
         </TableBody>
       </Table>
+      <KvUpdateForm
+        kvKey={updateKey}
+        kvValue={defaultValue}
+        projectId={projectId}
+        isOpen={isOpenUpdate}
+        onClose={closeUpdateForm}
+      />
     </TableContainer>
   )
 }
