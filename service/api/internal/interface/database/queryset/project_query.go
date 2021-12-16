@@ -47,9 +47,5 @@ const (
 		"SET is_deleted = true " +
 		"WHERE id = $1"
 
-	// KvDeactivateQuery = "UPDATE kvs " +
-	// 	"SET is_valid = false, updated_by = $1 " +
-	// 	"WHERE project_id = $2 AND env_key = $3 AND is_valid = true"
-
 	// @TODO: add query list of slug
 )

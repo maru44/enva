@@ -27,7 +27,7 @@ func main() {
 	router.Handle("/test/user/", base.BaseMiddleware(keySet, base.GiveUserMiddleware(http.HandlerFunc(base.UserTestView))))
 
 	/* key value */
-	router.Handle("/kv", base.BaseMiddleware(keySet, base.GiveUserMiddleware(http.HandlerFunc(kv.ListView))))
+	router.Handle("/kv", base.BaseMiddleware(keySet, base.GetOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.ListView)))))
 	router.Handle("/kv/create", base.BaseMiddleware(keySet, base.PostOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.CreateView)))))
 	router.Handle("/kv/update", base.BaseMiddleware(keySet, base.PutOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.UpdateView)))))
 	router.Handle("/kv/delete", base.BaseMiddleware(keySet, base.DeleteOnlyMiddleware(base.LoginRequiredMiddleware(http.HandlerFunc(kv.DeleteView)))))
