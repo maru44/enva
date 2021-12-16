@@ -14,31 +14,35 @@ type pmf struct {
 	Func   func(http.ResponseWriter, *http.Request)
 }
 
+const (
+	anyMethod    = "ANY"
+	upsertMethod = "UPSERT"
+)
+
 var (
 	router        = http.NewServeMux()
 	middlewareMap = map[string]func(http.Handler) http.Handler{}
+
+	jp   = infra.NewJwtParser()
+	base = controllers.NewBaseController(jp)
 )
 
 func main() {
-	jp := infra.NewJwtParser()
 	sql := infra.NewSqlHandler()
 
-	base := controllers.NewBaseController(jp)
 	kv := controllers.NewKvController(sql)
 	project := controllers.NewProjectController(sql)
-
-	keySet, err := base.GetKeySet()
-	if err != nil {
-		panic(err)
-	}
 
 	middlewareMap["login"] = base.LoginRequiredMiddleware
 	middlewareMap["user"] = base.GiveUserMiddleware
 
-	router.Handle("/", base.BaseMiddleware(keySet, http.HandlerFunc(base.NotFoundView)))
-	router.Handle("/test/user/", base.BaseMiddleware(keySet, base.GiveUserMiddleware(http.HandlerFunc(base.UserTestView))))
+	// no middleware
+	sv(nil, []pmf{s("/", anyMethod, base.NotFoundView)})
 
-	/* key value */
+	// get user from ctx
+	sv([]string{"user"}, []pmf{s("/test/user", anyMethod, base.UserTestView)})
+
+	// login required
 	sv([]string{"login"},
 		[]pmf{
 			/* kv */
@@ -62,33 +66,7 @@ func main() {
 	}
 }
 
-func serving(path string, middlewares []func(http.Handler) http.Handler, conFunc func(http.ResponseWriter, *http.Request)) {
-	jp := infra.NewJwtParser()
-
-	base := controllers.NewBaseController(jp)
-
-	keySet, err := base.GetKeySet()
-	if err != nil {
-		panic(err)
-	}
-
-	// if no middlewares
-	if middlewares == nil {
-		router.Handle(path, base.BaseMiddleware(keySet, http.HandlerFunc(conFunc)))
-	}
-
-	countMiddleware := len(middlewares)
-	f := middlewares[countMiddleware-1](http.HandlerFunc(conFunc))
-
-	for i := countMiddleware - 2; i >= 0; i-- {
-		f = middlewares[i](f)
-	}
-	router.Handle(path, base.BaseMiddleware(keySet, f))
-}
-
 func sv(middlewares []string, ps []pmf) {
-	jp := infra.NewJwtParser()
-	base := controllers.NewBaseController(jp)
 	keySet, err := base.GetKeySet()
 	if err != nil {
 		panic(err)
@@ -98,11 +76,12 @@ func sv(middlewares []string, ps []pmf) {
 		for _, p := range ps {
 			router.Handle(p.Path, base.BaseMiddleware(keySet, http.HandlerFunc(p.Func)))
 		}
+		return
 	}
 
 	countMiddleware := len(middlewares)
 	for _, p := range ps {
-		mmF := base.GetOnlyMiddleware
+		mmF := base.AnyMethodMiddleware
 		switch p.Method {
 		case http.MethodGet:
 			mmF = base.GetOnlyMiddleware
@@ -112,11 +91,13 @@ func sv(middlewares []string, ps []pmf) {
 			mmF = base.PutOnlyMiddleware
 		case http.MethodDelete:
 			mmF = base.DeleteOnlyMiddleware
-		case "UPSERT":
+		case upsertMethod:
 			// mm = base.Upsert
-		case "Any":
-			// mm = base.
+			// @TODO make upsert middleware
+		case anyMethod:
+			mmF = base.AnyMethodMiddleware
 		default:
+			mmF = base.GetOnlyMiddleware
 		}
 
 		f := middlewareMap[middlewares[countMiddleware-1]](http.HandlerFunc(p.Func))
@@ -126,6 +107,7 @@ func sv(middlewares []string, ps []pmf) {
 
 		router.Handle(p.Path, base.BaseMiddleware(keySet, mmF(f)))
 	}
+	return
 }
 
 func s(path string, method string, fun func(http.ResponseWriter, *http.Request)) pmf {

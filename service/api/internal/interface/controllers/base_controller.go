@@ -144,6 +144,17 @@ func (con *BaseController) GetOnlyMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func (con *BaseController) AnyMethodMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			response(w, r, nil, nil)
+			return
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
 func (con *BaseController) GiveUserMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie(domain.JwtCookieKeyIdToken)
