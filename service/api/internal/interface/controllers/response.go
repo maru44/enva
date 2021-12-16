@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"reflect"
@@ -36,6 +37,10 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 
 	if config.IsEnvDevelopment {
 		log.Println(err)
+
+		if perror, ok := perr.IsPerror(err); ok {
+			fmt.Println("stack traces:\n", perror.Traces())
+		}
 	}
 
 	data, _ := json.Marshal(mess)

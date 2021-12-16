@@ -93,15 +93,15 @@ func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var input domain.KvInputWithProjectID
-	json.NewDecoder(r.Body).Decode(&input)
+	projectID := r.URL.Query().Get(QueryParamsProjectID)
+	kvId := r.URL.Query().Get(QueryParamsKvID)
 
-	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
 
-	affected, err := con.in.Delete(ctx, input)
+	affected, err := con.in.Delete(ctx, domain.KvID(kvId), domain.ProjectID(projectID))
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return

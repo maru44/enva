@@ -41,6 +41,6 @@ type (
 		DetailValid(context.Context, KvKey, ProjectID) (*Kv, error)
 		Create(context.Context, KvInputWithProjectID) (*KvID, error)
 		Update(context.Context, KvInputWithProjectID) (*KvID, error)
-		Delete(context.Context, KvInputWithProjectID) (int, error)
+		Delete(context.Context, KvID, ProjectID) (int, error) // @TODO fix arg type
 	}
 )

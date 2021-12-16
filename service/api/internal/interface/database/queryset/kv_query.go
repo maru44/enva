@@ -24,4 +24,8 @@ const (
 	KvDeactivateQuery = "UPDATE kvs " +
 		"SET is_valid = false, updated_by = $1 " +
 		"WHERE project_id = $2 AND env_key = $3 AND is_valid = true"
+
+	KvDeactivateByIdQuery = "UPDATE kvs " +
+		"SET is_valid = false, updated_by = $1 " +
+		"WHERE project_id = $2 AND id = $3 AND is_valid = true"
 )
