@@ -1,4 +1,5 @@
 export type Kv = {
+  id: string
   kv_key: string
   kv_value: string
 }

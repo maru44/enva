@@ -1,10 +1,9 @@
-import { Box, Card } from '@mui/material'
+import { Box } from '@mui/material'
 import React from 'react'
 import useSWR from 'swr'
 import { kvsResponseBody } from '../../../http/body/kv'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
-import { sortKvs } from '../../../utils/kv'
-import { KvUpsertForm } from '../form/kv/create'
+import { KvListTable } from '../form/kv/listTable'
 
 export type KvListProps = {
   projectId: string
@@ -20,14 +19,9 @@ export const KvList: React.FC<KvListProps> = ({ projectId }) => {
 
   return (
     <Box>
-      {data &&
-        data.data &&
-        sortKvs(data.data).map((kv, i) => (
-          <Card key={i}>
-            {kv.kv_key} = {kv.kv_value}
-            <KvUpsertForm projectId={projectId} env_key={kv.kv_key} />
-          </Card>
-        ))}
+      {data && (
+        <KvListTable kvs={data.data} projectId={projectId}></KvListTable>
+      )}
     </Box>
   )
 }

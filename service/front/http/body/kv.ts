@@ -8,3 +8,7 @@ export type kvsResponseBody = {
 export type kvCreateResponseBody = {
   data: string
 } & errorResponseBody
+
+export type kvDeleteResponseBody = {
+  data: string
+} & errorResponseBody

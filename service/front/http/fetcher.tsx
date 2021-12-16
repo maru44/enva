@@ -2,10 +2,6 @@ import { NextPageContext } from 'next'
 import { parseCookies } from 'nookies'
 import { ApiUrl, IsDevelopment, ThisUrl } from '../config/env'
 
-// export enum GetBodyTypeEnum {
-//   PROJECT_LIST_USER = 'Project[]',
-// }
-
 export const GetPath: { [key: string]: string } = {
   PROJECT_LIST_USER: '/project/list/user',
   PROJECT_LIST_ORG: '/project/list/org',
@@ -23,7 +19,7 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 export const fetchBaseApi = async (
   path: string,
   method: HttpMethod,
-  body: { [key: string]: any },
+  body?: { [key: string]: any },
   headers?: { [key: string]: string }
 ): Promise<Response> => {
   return fetch(`${ApiUrl}${path}`, {

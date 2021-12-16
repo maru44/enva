@@ -16,6 +16,7 @@ export type KvUpsertProps = {
 // if env_key is exists >> update method is executed
 export const KvUpsertForm = ({ projectId, env_key }: KvUpsertProps) => {
   const { mutate } = useSWRConfig()
+  
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const t = e.currentTarget
