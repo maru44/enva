@@ -3,6 +3,9 @@ package domain
 import (
 	"context"
 	"time"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/maru44/perr"
 )
 
 type (
@@ -44,3 +47,10 @@ type (
 		Delete(context.Context, KvID, ProjectID) (int, error) // @TODO fix arg type
 	}
 )
+
+func (in *KvInput) Validate() error {
+	if err := validation.Validate(in.Key, validation.Required, validation.Length(1, 1024)); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	return nil
+}

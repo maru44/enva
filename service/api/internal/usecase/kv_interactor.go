@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/maru44/ichigo/service/api/pkg/domain"
+	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type KvInteractor struct {

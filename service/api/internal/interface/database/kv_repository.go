@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/maru44/ichigo/service/api/internal/interface/database/queryset"
-	"github.com/maru44/ichigo/service/api/pkg/domain"
+	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
 
@@ -104,6 +104,8 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 		tx.Rollback()
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
+	// if affected == 0
+	// it is no probrem create new valid key
 
 	// create new kv
 	var id string

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/maru44/ichigo/service/api/internal/config"
+	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/perr"
 )
 

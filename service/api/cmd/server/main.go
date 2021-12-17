@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/maru44/ichigo/service/api/internal/infra"
-	"github.com/maru44/ichigo/service/api/internal/interface/controllers"
+	"github.com/maru44/enva/service/api/internal/infra"
+	"github.com/maru44/enva/service/api/internal/interface/controllers"
 )
 
 type pmf struct {

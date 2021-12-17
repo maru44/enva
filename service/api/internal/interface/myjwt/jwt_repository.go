@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/maru44/ichigo/service/api/pkg/domain"
+	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
 

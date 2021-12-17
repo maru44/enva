@@ -2,7 +2,7 @@ package infra
 
 import (
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/maru44/ichigo/service/api/internal/interface/myjwt"
+	"github.com/maru44/enva/service/api/internal/interface/myjwt"
 )
 
 type (

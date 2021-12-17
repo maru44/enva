@@ -24,7 +24,6 @@ export const KvUpdateForm: React.FC<props> = ({
   const [val, setVal] = useState<string>(kvValue)
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget.value)
     setVal(e.currentTarget.value)
   }
 

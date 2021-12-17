@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/maru44/ichigo/service/api/internal/interface/database"
-	"github.com/maru44/ichigo/service/api/internal/usecase"
-	"github.com/maru44/ichigo/service/api/pkg/domain"
+	"github.com/maru44/enva/service/api/internal/interface/database"
+	"github.com/maru44/enva/service/api/internal/usecase"
+	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
 
