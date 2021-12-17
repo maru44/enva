@@ -49,7 +49,7 @@ type (
 )
 
 func (in *KvInput) Validate() error {
-	if err := validation.Validate(in.Key, validation.Required, validation.Length(1, 1024)); err != nil {
+	if err := validation.Validate(in.Key, validation.Required, validation.RuneLength(1, 1024)); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
 	return nil

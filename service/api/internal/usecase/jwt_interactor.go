@@ -8,24 +8,24 @@ import (
 )
 
 type JwtInteractor struct {
-	jr JwtRepository
+	repo IJwtRepository
 }
 
-func NewJwtInteractor(jr JwtRepository) domain.JwtIntectactor {
+func NewJwtInteractor(jr IJwtRepository) domain.JwtIntectactor {
 	return &JwtInteractor{
-		jr: jr,
+		repo: jr,
 	}
 }
 
-type JwtRepository interface {
+type IJwtRepository interface {
 	Evaluate(context.Context, string) (*jwt.Token, error)
 	GetUserByJwt(context.Context, string) (*domain.User, error)
 }
 
 func (in *JwtInteractor) GetUserByJwt(ctx context.Context, idToken string) (*domain.User, error) {
-	return in.jr.GetUserByJwt(ctx, idToken)
+	return in.repo.GetUserByJwt(ctx, idToken)
 }
 
 func (in *JwtInteractor) Evaluate(ctx context.Context, idToken string) (*jwt.Token, error) {
-	return in.jr.Evaluate(ctx, idToken)
+	return in.repo.Evaluate(ctx, idToken)
 }

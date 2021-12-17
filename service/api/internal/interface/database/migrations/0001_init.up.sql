@@ -30,11 +30,14 @@ CREATE TABLE orgs (
 -- );
 
 -- cli password
-CREATE TABLE cli_passwords (
+
+-- if user is deleted >> is_valid must be changed to false
+CREATE TABLE cli_users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     email VARCHAR(255) NOT NULL,
     username VARCHAR(63) NOT NULL,
     password TEXT,
+    is_valid BOOLEAN NOT NULL DEFAULT TRUE,
 
     PRIMARY KEY (id)
 );
