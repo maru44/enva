@@ -34,7 +34,8 @@ CREATE TABLE orgs (
 -- if user is deleted >> is_valid must be changed to false
 CREATE TABLE cli_users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    cognito_id UNIQUE VARCHAR(255) NOT NULL,
+    email UNIQUE VARCHAR(255) NOT NULL,
     username VARCHAR(63) NOT NULL,
     password VARCHAR(512),
     is_valid BOOLEAN NOT NULL DEFAULT TRUE,

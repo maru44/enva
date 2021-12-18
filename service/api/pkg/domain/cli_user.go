@@ -9,10 +9,17 @@ import (
 )
 
 type (
+	CliUser struct {
+		CognitoID string
+		Email     string
+		Username  string
+	}
+
 	CliUserCreateInput struct {
-		Email    string
-		Username string
-		Password string
+		CognitoID string
+		Email     string
+		Username  string
+		Password  string
 	}
 
 	CliUserValidateInput struct {
@@ -26,11 +33,22 @@ type (
 		Validate(context.Context, *CliUserValidateInput) error
 		Exists(context.Context) error
 		Delete(context.Context) error
+
+		GetUser(context.Context, *CliUserValidateInput) (*User, error)
 	}
 )
 
+func (c *CliUser) ToUser() *User {
+	return &User{
+		ID:       c.CognitoID,
+		Email:    c.Email,
+		UserName: c.Username,
+	}
+}
+
 func (c *CliUserCreateInput) Validate() error {
 	if err := validation.ValidateStruct(c,
+		validation.Field(&c.CognitoID, validation.Required),
 		validation.Field(&c.Password, validation.Required, validation.RuneLength(31, 255)),
 		validation.Field(&c.Email, validation.Required, is.Email, validation.RuneLength(1, 255)),
 		// validation.Field(&c.Username, validation.Required, validation.RuneLength(1, 255)),
@@ -53,9 +71,10 @@ func (c *CliUserValidateInput) Validate() error {
 
 func CreateAndValidateCliUserCraeteInput(user User, hashed string) (*CliUserCreateInput, error) {
 	input := &CliUserCreateInput{
-		Email:    user.Email,
-		Password: hashed,
-		Username: user.UserName,
+		CognitoID: user.ID,
+		Email:     user.Email,
+		Password:  hashed,
+		Username:  user.UserName,
 	}
 
 	if err := input.Validate(); err != nil {

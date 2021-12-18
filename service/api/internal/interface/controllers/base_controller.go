@@ -54,7 +54,7 @@ func (con *BaseController) UserTestView(w http.ResponseWriter, r *http.Request) 
 }
 
 /********************************
-    Middle ware
+    Middleware
 ********************************/
 
 func (con *BaseController) BaseMiddleware(keySet jwk.Set, next http.Handler) http.Handler {
@@ -167,7 +167,7 @@ func (con *BaseController) GiveUserMiddleware(next http.Handler) http.Handler {
 			}
 
 			// set user to context
-			r = con.setUserToContext(r, *user)
+			r = setUserToContext(r, *user)
 
 			next.ServeHTTP(w, r)
 		}
@@ -193,12 +193,12 @@ func (con *BaseController) LoginRequiredMiddleware(next http.Handler) http.Handl
 			return
 		}
 
-		r = con.setUserToContext(r, *user)
+		r = setUserToContext(r, *user)
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (con *BaseController) setUserToContext(r *http.Request, u domain.User) *http.Request {
+func setUserToContext(r *http.Request, u domain.User) *http.Request {
 	ctx := context.WithValue(
 		r.Context(),
 		domain.CtxUserKey,

@@ -21,4 +21,8 @@ const (
 	CliUserGetPasswordByEmailOrPassword = "SELECT password " +
 		"FROM cli_users " +
 		"WHERE (email = $1 OR username = $1) AND is_valid = true"
+
+	CliUserGet = "SELECT cognito_id, email, username, password " +
+		"FROM cli_users " +
+		"WHERE (email = $1 OR username = $1) AND is_valid = true"
 )

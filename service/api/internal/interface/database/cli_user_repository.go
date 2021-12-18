@@ -118,3 +118,30 @@ func (repo *CliUserRepository) Exists(ctx context.Context) error {
 func (repo *CliUserRepository) Delete(ctx context.Context) error {
 	return nil
 }
+
+func (repo *CliUserRepository) GetUser(ctx context.Context, input *domain.CliUserValidateInput) (*domain.User, error) {
+	row := repo.QueryRowContext(ctx,
+		queryset.CliUserGet,
+		input.EmailOrUsername,
+	)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		dbPass string
+		c      = domain.CliUser{}
+	)
+	if err := row.Scan(
+		&c.CognitoID, &c.Email, &c.Username,
+		&dbPass,
+	); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	if err := repo.Check(dbPass, input.Password); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	return c.ToUser(), nil
+}

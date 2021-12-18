@@ -73,3 +73,26 @@ func (con *CliUserController) ExistsView(w http.ResponseWriter, r *http.Request)
 	response(w, r, nil, map[string]interface{}{"data": "exists"})
 	return
 }
+
+/********************************
+    Middle ware
+********************************/
+
+func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		input := &domain.CliUserValidateInput{}
+		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+			return
+		}
+
+		user, err := con.in.GetUser(r.Context(), input)
+		if err != nil {
+			response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+			return
+		}
+
+		r = setUserToContext(r, *user)
+		next.ServeHTTP(w, r)
+	})
+}

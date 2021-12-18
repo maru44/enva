@@ -22,6 +22,8 @@ type ICliUserRepository interface {
 	Validate(context.Context, *domain.CliUserValidateInput) error
 	Exists(context.Context) error
 	Delete(context.Context) error
+
+	GetUser(context.Context, *domain.CliUserValidateInput) (*domain.User, error)
 }
 
 /***********************************************
@@ -46,4 +48,8 @@ func (in *CliUserInteractor) Exists(ctx context.Context) error {
 
 func (in *CliUserInteractor) Delete(ctx context.Context) error {
 	return in.repo.Delete(ctx)
+}
+
+func (in *CliUserInteractor) GetUser(ctx context.Context, input *domain.CliUserValidateInput) (*domain.User, error) {
+	return in.repo.GetUser(ctx, input)
 }
