@@ -39,7 +39,10 @@ func main() {
 	middlewareMap["user"] = base.GiveUserMiddleware
 
 	// no middlewares
-	sv([]pmf{s("/", anyMethod, base.NotFoundView)})
+	sv([]pmf{
+		s("/", anyMethod, base.NotFoundView),
+		s("/cli/user/validate", http.MethodPost, cliU.ValidateView),
+	})
 
 	// get user from ctx
 	sv([]pmf{s("/test/user", anyMethod, base.UserTestView)}, "user")
@@ -63,9 +66,8 @@ func main() {
 
 			/* cli_users */
 			s("/cli/user", http.MethodGet, cliU.ExistsView),
-			s("/cli/user/create", http.MethodPost, cliU.CreateView),
-			s("/cli/user/update", http.MethodPut, cliU.UpdateView),
-			s("/cli/user/validate", http.MethodPost, cliU.ValidateView),
+			s("/cli/user/create", http.MethodGet, cliU.CreateView),
+			s("/cli/user/update", http.MethodGet, cliU.UpdateView),
 		},
 		"login",
 	)

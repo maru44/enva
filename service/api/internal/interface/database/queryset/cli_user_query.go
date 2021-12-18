@@ -1,7 +1,7 @@
 package queryset
 
 const (
-	CliUserInsertQuery = "INSET INTO " +
+	CliUserInsertQuery = "INSERT INTO " +
 		"cli_users(email, username, password) " +
 		"VALUES($1, $2, $3) " +
 		"RETURNING id"
@@ -20,5 +20,5 @@ const (
 
 	CliUserGetPasswordByEmailOrPassword = "SELECT password " +
 		"FROM cli_users " +
-		"WHERE email = $1 AND username = $1 AND is_valid = true"
+		"WHERE (email = $1 OR username = $1) AND is_valid = true"
 )

@@ -30,10 +30,10 @@ type (
 )
 
 func (c *CliUserCreateInput) Validate() error {
-	if err := validation.ValidateStruct(&c,
+	if err := validation.ValidateStruct(c,
 		validation.Field(&c.Password, validation.Required, validation.RuneLength(31, 255)),
 		validation.Field(&c.Email, validation.Required, is.Email, validation.RuneLength(1, 255)),
-		validation.Field(&c.Username, validation.Required, validation.RuneLength(1, 255)),
+		// validation.Field(&c.Username, validation.Required, validation.RuneLength(1, 255)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -41,7 +41,7 @@ func (c *CliUserCreateInput) Validate() error {
 }
 
 func (c *CliUserValidateInput) Validate() error {
-	if err := validation.ValidateStruct(&c,
+	if err := validation.ValidateStruct(c,
 		validation.Field(&c.Password, validation.Required, validation.RuneLength(31, 255)),
 		validation.Field(&c.EmailOrUsername, validation.Required, validation.RuneLength(1, 255)),
 	); err != nil {
@@ -54,8 +54,8 @@ func (c *CliUserValidateInput) Validate() error {
 func CreateAndValidateCliUserCraeteInput(user User, hashed string) (*CliUserCreateInput, error) {
 	input := &CliUserCreateInput{
 		Email:    user.Email,
-		Username: user.UserName,
 		Password: hashed,
+		Username: user.UserName,
 	}
 
 	if err := input.Validate(); err != nil {

@@ -6,11 +6,17 @@ export const GetPath: { [key: string]: string } = {
   PROJECT_LIST_USER: '/project/list/user',
   PROJECT_LIST_ORG: '/project/list/org',
   PROJECT_DETAIl: '/project/detail',
+  PROJECT_CREATE: '/project/create',
 
   KVS_BY_PROJECT: '/kv',
   KV_CREATE: '/kv/create',
   KV_UPDATE: '/kv/update',
   KV_DELETE: '/kv/delete',
+
+  CLI_USER: '/cli/user',
+  CLI_USER_CREATE: '/cli/user/create',
+  CLI_USER_UPDATE: '/cli/user/update',
+  CLI_USER_VALIDATE: '/cli/user/validate',
 } as const
 export type GetPath = typeof GetPath[keyof typeof GetPath]
 
