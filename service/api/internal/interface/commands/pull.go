@@ -84,6 +84,7 @@ func overWriteEnv(body resBody) error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	for _, d := range body.Data {
 		if _, err := file.WriteString(outputFunc(d)); err != nil {

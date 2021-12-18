@@ -30,6 +30,7 @@ func fileOpen() (*os.File, func(kv domain.KvValid) string, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	defer file.Close()
 
 	ext := filepath.Ext(s.EnvFileName)
 	ft, ok := fileTypeMap[ext]
