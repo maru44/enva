@@ -24,10 +24,10 @@ type (
 		UpdatedAt time.Time `json:"updated_at"`
 	}
 
-	// KvValid struct {
-	// 	Key   KvKey   `json:"key"`
-	// 	Value KvValue `json:"value"`
-	// }
+	KvValid struct {
+		Key   KvKey   `json:"kv_key"`
+		Value KvValue `json:"kv_value"`
+	}
 
 	KvInput struct {
 		Key   KvKey   `json:"kv_key"`
@@ -35,9 +35,8 @@ type (
 	}
 
 	KvInputWithProjectID struct {
-		ProjectID   ProjectID `json:"project_id"`
-		ProjectSlug string    `json:"project_slug"`
-		Input       KvInput   `json:"input"`
+		ProjectID ProjectID `json:"project_id"`
+		Input     KvInput   `json:"input"`
 	}
 
 	IKvInteractor interface {
@@ -48,6 +47,14 @@ type (
 		Delete(context.Context, KvID, ProjectID) (int, error) // @TODO fix arg type
 	}
 )
+
+func (k *KvKey) String() string {
+	return string(*k)
+}
+
+func (v *KvValue) String() string {
+	return string(*v)
+}
 
 func (in *KvInput) Validate() error {
 	if err := validation.Validate(in.Key, validation.Required, validation.RuneLength(1, 1024)); err != nil {

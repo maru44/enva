@@ -8,7 +8,7 @@ const (
 
 	CliUserUpdateQuery = "UPDATE cli_users " +
 		"SET password = $1, is_valid = true " +
-		"WHERE email = $1"
+		"WHERE email = $2"
 
 	CliUserDeactivateQuery = "UPDATE cli_users " +
 		"SET is_valid = false " +

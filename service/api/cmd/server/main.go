@@ -32,11 +32,13 @@ func main() {
 	pass := &infra.Password{}
 
 	kv := controllers.NewKvController(sql)
+	cliKv := controllers.NewCliKvController(sql)
 	project := controllers.NewProjectController(sql)
 	cliU := controllers.NewCliUserController(sql, pass)
 
 	middlewareMap["login"] = base.LoginRequiredMiddleware
 	middlewareMap["user"] = base.GiveUserMiddleware
+	middlewareMap["loginCli"] = cliU.LoginRequiredMiddleware
 
 	// no middlewares
 	sv([]pmf{
@@ -70,6 +72,17 @@ func main() {
 			s("/cli/user/update", http.MethodGet, cliU.UpdateView),
 		},
 		"login",
+	)
+
+	sv(
+		[]pmf{
+			/* cli_kv */
+			s("/cli/kv", http.MethodPost, cliKv.ListView),
+			s("/cli/kv/create", http.MethodPost, cliKv.CreateView),
+			s("/cli/kv/update", http.MethodPut, cliKv.UpdateView),
+			s("/cli/kv/delete", http.MethodDelete, cliKv.DeleteView),
+		},
+		"loginCli",
 	)
 
 	if err := http.ListenAndServe(":8080", router); err != nil {

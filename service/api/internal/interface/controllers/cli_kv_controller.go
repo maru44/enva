@@ -11,13 +11,13 @@ import (
 	"github.com/maru44/perr"
 )
 
-type KvController struct {
+type CliKvController struct {
 	in  domain.IKvInteractor
 	pIn domain.IProjectInteractor
 }
 
-func NewKvController(sql database.ISqlHandler) *KvController {
-	return &KvController{
+func NewCliKvController(sql database.ISqlHandler) *CliKvController {
+	return &CliKvController{
 		in: usecase.NewKvInteractor(
 			&database.KvRepository{
 				ISqlHandler: sql,
@@ -31,16 +31,17 @@ func NewKvController(sql database.ISqlHandler) *KvController {
 	}
 }
 
-func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
+func (con *CliKvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	projectID := r.URL.Query().Get(QueryParamsProjectID)
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 
-	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
+	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
 
-	kvs, err := con.in.ListValid(ctx, domain.ProjectID(projectID))
+	kvs, err := con.in.ListValid(ctx, *projectID)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -49,16 +50,19 @@ func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
+func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
 
-	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
+	input.ProjectID = *projectID
 
 	id, err := con.in.Create(ctx, input)
 	if err != nil {
@@ -70,16 +74,19 @@ func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
+func (con *CliKvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
 
-	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
+	input.ProjectID = *projectID
 
 	id, err := con.in.Update(ctx, input)
 	if err != nil {
@@ -90,18 +97,19 @@ func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
+func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	projectID := r.URL.Query().Get(QueryParamsProjectID)
 	kvId := r.URL.Query().Get(QueryParamsKvID)
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 
-	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
+	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
 
-	affected, err := con.in.Delete(ctx, domain.KvID(kvId), domain.ProjectID(projectID))
+	affected, err := con.in.Delete(ctx, domain.KvID(kvId), *projectID)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
@@ -111,19 +119,19 @@ func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (con *KvController) userAccessToProject(ctx context.Context, projectID domain.ProjectID) error {
+func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug string) (*domain.ProjectID, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
 	// find parent project
-	p, err := con.pIn.GetByID(ctx, projectID)
+	p, err := con.pIn.GetBySlug(ctx, projectSlug)
 	if err != nil {
-		return perr.Wrap(err, perr.NotFound, "Project is not found")
+		return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
 	}
 
 	// validate user can access to project
 	if err := p.ValidateUserGet(user); err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	return nil
+	return &p.ID, nil
 }
