@@ -10,6 +10,8 @@ import (
 	"github.com/maru44/perr"
 )
 
+// @TODO sql and pass is not needed
+
 type (
 	createCommandHandler func(sql database.ISqlHandler, pass password.IPassword) domain.ICommandInteractor
 )

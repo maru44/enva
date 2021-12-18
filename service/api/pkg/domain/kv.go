@@ -35,8 +35,9 @@ type (
 	}
 
 	KvInputWithProjectID struct {
-		ProjectID ProjectID `json:"project_id"`
-		Input     KvInput   `json:"input"`
+		ProjectID   ProjectID `json:"project_id"`
+		ProjectSlug string    `json:"project_slug"`
+		Input       KvInput   `json:"input"`
 	}
 
 	IKvInteractor interface {

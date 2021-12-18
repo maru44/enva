@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"fmt"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -70,6 +71,7 @@ func (c *CliUserValidateInput) Validate() error {
 }
 
 func CreateAndValidateCliUserCraeteInput(user User, hashed string) (*CliUserCreateInput, error) {
+	fmt.Println("user id", user.ID)
 	input := &CliUserCreateInput{
 		CognitoID: user.ID,
 		Email:     user.Email,

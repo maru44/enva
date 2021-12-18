@@ -34,8 +34,9 @@ func NewKvController(sql database.ISqlHandler) *KvController {
 func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectID := r.URL.Query().Get(QueryParamsProjectID)
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 
-	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
+	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID), projectSlug); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
@@ -55,7 +56,7 @@ func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
 
-	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+	if err := con.userAccessToProject(ctx, input.ProjectID, input.ProjectSlug); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
@@ -76,7 +77,7 @@ func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 	var input domain.KvInputWithProjectID
 	json.NewDecoder(r.Body).Decode(&input)
 
-	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
+	if err := con.userAccessToProject(ctx, input.ProjectID, input.ProjectSlug); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
@@ -94,9 +95,10 @@ func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	projectID := r.URL.Query().Get(QueryParamsProjectID)
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 	kvId := r.URL.Query().Get(QueryParamsKvID)
 
-	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
+	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID), projectSlug); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
@@ -111,13 +113,23 @@ func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (con *KvController) userAccessToProject(ctx context.Context, projectID domain.ProjectID) error {
+func (con *KvController) userAccessToProject(ctx context.Context, projectID domain.ProjectID, projectSlug string) error {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	p := &domain.Project{}
 
 	// find parent project
-	p, err := con.pIn.GetByID(ctx, projectID)
-	if err != nil {
-		return perr.Wrap(err, perr.NotFound, "Project is not found")
+	if projectSlug == "" {
+		pp, err := con.pIn.GetByID(ctx, projectID)
+		if err != nil {
+			return perr.Wrap(err, perr.NotFound, "Project is not found")
+		}
+		p = pp
+	} else {
+		pp, err := con.pIn.GetBySlug(ctx, projectSlug)
+		if err != nil {
+			return perr.Wrap(err, perr.NotFound, "Project is not found")
+		}
+		p = pp
 	}
 
 	// validate user can access to project

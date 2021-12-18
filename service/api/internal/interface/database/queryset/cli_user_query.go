@@ -2,8 +2,8 @@ package queryset
 
 const (
 	CliUserInsertQuery = "INSERT INTO " +
-		"cli_users(email, username, password) " +
-		"VALUES($1, $2, $3) " +
+		"cli_users(cognito_id, email, username, password) " +
+		"VALUES($1, $2, $3, $4) " +
 		"RETURNING id"
 
 	CliUserUpdateQuery = "UPDATE cli_users " +

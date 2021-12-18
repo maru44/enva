@@ -34,7 +34,7 @@ func (repo *CliUserRepository) Create(ctx context.Context) (string, error) {
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.CliUserInsertQuery,
-		input.Email, input.Username, input.Password,
+		input.CognitoID, input.Email, input.Username, input.Password,
 	).Scan(&id); err != nil {
 		return "", perr.Wrap(err, perr.BadRequest)
 	}
