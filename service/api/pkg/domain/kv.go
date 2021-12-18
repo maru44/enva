@@ -62,3 +62,11 @@ func (in *KvInput) Validate() error {
 	}
 	return nil
 }
+
+func MapFromKv(ks []KvValid) map[KvKey]KvValue {
+	ret := make(map[KvKey]KvValue, len(ks))
+	for _, k := range ks {
+		ret[k.Key] = k.Value
+	}
+	return ret
+}
