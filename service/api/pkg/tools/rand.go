@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-const slugLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+const SlugLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
 
 func GenRandSlug(n int) string {
 	b := make([]byte, n)
 	rand.Seed(time.Now().UnixNano())
 	for i := range b {
-		b[i] = slugLetters[rand.Intn(len(slugLetters))]
+		b[i] = SlugLetters[rand.Intn(len(SlugLetters))]
 	}
 	return string(b)
 }

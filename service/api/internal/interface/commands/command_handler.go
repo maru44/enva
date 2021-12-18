@@ -2,13 +2,11 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
-	"github.com/maru44/perr"
 )
-
-// @TODO sql and pass is not needed
 
 type (
 	createCommandHandler func() domain.ICommandInteractor
@@ -19,7 +17,9 @@ var Commands = map[string]createCommandHandler{}
 func Run(ctx context.Context, taskName string, opts ...string) error {
 	createCommands, ok := Commands[taskName]
 	if !ok {
-		return perr.New("No such command", perr.BadRequest)
+		err := errors.New("No such command")
+		fmt.Println(err)
+		return err
 	}
 
 	c := createCommands()
