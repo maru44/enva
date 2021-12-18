@@ -17,28 +17,33 @@ func NewCliUserInteractor(cr ICliUserRepository) domain.ICliUserInteractor {
 }
 
 type ICliUserRepository interface {
-	Create(context.Context, *domain.CliUserCreateInput) (string, error)
-	Update(context.Context, *domain.CliUserCreateInput) (string, error)
+	Create(context.Context) (string, error)
+	Update(context.Context) (string, error)
 	Validate(context.Context, *domain.CliUserValidateInput) error
-	Delete(context.Context, string) error // 2nd arg is email or username
+	Exists(context.Context) error
+	Delete(context.Context) error
 }
 
 /***********************************************
     implementation of cliuser interactor methods
 ************************************************/
 
-func (in *CliUserInteractor) Create(ctx context.Context, input *domain.CliUserCreateInput) (string, error) {
-	return in.repo.Create(ctx, input)
+func (in *CliUserInteractor) Create(ctx context.Context) (string, error) {
+	return in.repo.Create(ctx)
 }
 
-func (in *CliUserInteractor) Update(ctx context.Context, input *domain.CliUserCreateInput) (string, error) {
-	return in.repo.Update(ctx, input)
+func (in *CliUserInteractor) Update(ctx context.Context) (string, error) {
+	return in.repo.Update(ctx)
 }
 
 func (in *CliUserInteractor) Validate(ctx context.Context, input *domain.CliUserValidateInput) error {
 	return in.repo.Validate(ctx, input)
 }
 
-func (in *CliUserInteractor) Delete(ctx context.Context, emailOrUsername string) error {
-	return in.repo.Delete(ctx, emailOrUsername)
+func (in *CliUserInteractor) Exists(ctx context.Context) error {
+	return in.repo.Exists(ctx)
+}
+
+func (in *CliUserInteractor) Delete(ctx context.Context) error {
+	return in.repo.Delete(ctx)
 }

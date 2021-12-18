@@ -16,15 +16,16 @@ type (
 	}
 
 	CliUserValidateInput struct {
-		EmailOrUsername string
-		Password        string
+		EmailOrUsername string `json:"email_or_username"`
+		Password        string `json:"password"`
 	}
 
 	ICliUserInteractor interface {
-		Create(context.Context, *CliUserCreateInput) (string, error)
-		Update(context.Context, *CliUserCreateInput) (string, error)
+		Create(context.Context) (string, error)
+		Update(context.Context) (string, error)
 		Validate(context.Context, *CliUserValidateInput) error
-		Delete(context.Context, string) error // 2nd arg is email or username
+		Exists(context.Context) error
+		Delete(context.Context) error
 	}
 )
 
@@ -48,4 +49,18 @@ func (c *CliUserValidateInput) Validate() error {
 	}
 
 	return nil
+}
+
+func CreateAndValidateCliUserCraeteInput(user User, hashed string) (*CliUserCreateInput, error) {
+	input := &CliUserCreateInput{
+		Email:    user.Email,
+		Username: user.UserName,
+		Password: hashed,
+	}
+
+	if err := input.Validate(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	return input, nil
 }

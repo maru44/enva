@@ -36,13 +36,16 @@ CREATE TABLE cli_users (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     email VARCHAR(255) NOT NULL,
     username VARCHAR(63) NOT NULL,
-    password TEXT,
+    password VARCHAR(512),
     is_valid BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id)
 );
-CREATE INDEX ON cli_passwords (email);
-CREATE INDEX ON cli_passwords (username);
+CREATE INDEX ON cli_users (email);
+CREATE INDEX ON cli_users (username);
 
 -- relation org and users
 CREATE TABLE rel_org_members (
@@ -94,5 +97,6 @@ CREATE TABLE kvs (
 );
 CREATE INDEX ON kvs (env_key, project_id, is_valid);
 CREATE INDEX ON kvs (project_id, is_valid);
+CREATE UNIQUE INDEX valid_project_kvs ON kvs (env_key, project_id) WHERE (is_valid = true);
 
 COMMIT;

@@ -29,21 +29,23 @@ var (
 
 func main() {
 	sql := infra.NewSqlHandler()
+	pass := &infra.Password{}
 
 	kv := controllers.NewKvController(sql)
 	project := controllers.NewProjectController(sql)
+	cliU := controllers.NewCliUserController(sql, pass)
 
 	middlewareMap["login"] = base.LoginRequiredMiddleware
 	middlewareMap["user"] = base.GiveUserMiddleware
 
-	// no middleware
-	sv(nil, []pmf{s("/", anyMethod, base.NotFoundView)})
+	// no middlewares
+	sv([]pmf{s("/", anyMethod, base.NotFoundView)})
 
 	// get user from ctx
-	sv([]string{"user"}, []pmf{s("/test/user", anyMethod, base.UserTestView)})
+	sv([]pmf{s("/test/user", anyMethod, base.UserTestView)}, "user")
 
 	// login required
-	sv([]string{"login"},
+	sv(
 		[]pmf{
 			/* kv */
 			s("/kv", http.MethodGet, kv.ListView),
@@ -58,7 +60,14 @@ func main() {
 			s("/project/detail", http.MethodGet, project.ProjectDetailView),
 			s("/project/create", http.MethodPost, project.CreateView),
 			s("/project/delete", http.MethodDelete, project.DeleteView),
+
+			/* cli_users */
+			s("/cli/user", http.MethodGet, cliU.ExistsView),
+			s("/cli/user/create", http.MethodPost, cliU.CreateView),
+			s("/cli/user/update", http.MethodPut, cliU.UpdateView),
+			s("/cli/user/validate", http.MethodPost, cliU.ValidateView),
 		},
+		"login",
 	)
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
@@ -66,7 +75,7 @@ func main() {
 	}
 }
 
-func sv(middlewares []string, ps []pmf) {
+func sv(ps []pmf, middlewares ...string) {
 	keySet, err := base.GetKeySet()
 	if err != nil {
 		panic(err)
@@ -81,7 +90,7 @@ func sv(middlewares []string, ps []pmf) {
 
 	countMiddleware := len(middlewares)
 	for _, p := range ps {
-		mmF := base.AnyMethodMiddleware
+		mmF := base.GetOnlyMiddleware
 		switch p.Method {
 		case http.MethodGet:
 			mmF = base.GetOnlyMiddleware
@@ -96,8 +105,6 @@ func sv(middlewares []string, ps []pmf) {
 			// @TODO make upsert middleware
 		case anyMethod:
 			mmF = base.AnyMethodMiddleware
-		default:
-			mmF = base.GetOnlyMiddleware
 		}
 
 		f := middlewareMap[middlewares[countMiddleware-1]](http.HandlerFunc(p.Func))
