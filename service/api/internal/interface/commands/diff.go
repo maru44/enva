@@ -76,9 +76,9 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 	}
 
 	if diffs != nil {
-		fmt.Print("There are ", len(diffs), "differences.\n\n")
+		fmt.Print("There are ", len(diffs), " differences.\n\n")
 		for _, d := range diffs {
-			fmt.Println(d.Key, ":\n", "r: ", d.RemoteValue, "  l: ", d.LocalValue)
+			fmt.Printf("\t%s:\n\t\tr: %s\n\t\tl: %s\n", d.Key, d.RemoteValue, d.LocalValue)
 		}
 		fmt.Print("\n")
 	}
@@ -86,7 +86,7 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 	if listOnlyLocal != nil {
 		fmt.Println("Local Only: ")
 		for _, kv := range listOnlyLocal {
-			fmt.Printf("%s (%s)\n", kv.Key, kv.Value)
+			fmt.Printf("\t%s (%s)\n", kv.Key, kv.Value)
 		}
 		fmt.Print("\n")
 	}
@@ -94,7 +94,7 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 	if listOnlyRemote != nil {
 		fmt.Println("Remote Only: ")
 		for _, kv := range listOnlyRemote {
-			fmt.Printf("%s (%s)\n", kv.Key, kv.Value)
+			fmt.Printf("\t%s (%s)\n", kv.Key, kv.Value)
 		}
 		fmt.Print("\n")
 	}
