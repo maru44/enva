@@ -51,5 +51,6 @@ func (c *edit) Explain() string {
 	return `
 	Edit remote and local value.
 	Two args is needed. First arg is key, second arg is value.
-	ex) enva edit [key] [value]`
+	ex) enva edit [key] [value]
+`
 }

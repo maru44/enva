@@ -50,5 +50,6 @@ func (c *delete) Explain() string {
 	return `
 	Remove remote and local key-value set.
 	An arg is needed.
-	ex) enva delete [key]`
+	ex) enva delete [key]
+`
 }

@@ -58,7 +58,8 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 
 func (c *set) Explain() string {
 	return `
-	create enva.json (only if enva.json does not exists)`
+	create enva.json (only if enva.json does not exists)
+`
 }
 
 func (c *set) inputSettingsInfo() (projectSlug string, fileName string, orgId string, err error) {

@@ -18,15 +18,19 @@ func init() {
 }
 
 func (c *help) Run(ctx context.Context, opts ...string) error {
+	fmt.Print("\n\n\n\n\n")
 	for name, in := range Commands {
 		fmt.Print(name)
 		f := in()
 		fmt.Println(f.Explain())
 	}
+	fmt.Print("\n\n")
 	return nil
 }
 
 func (c *help) Explain() string {
 	return `
-	Output explain how to use this cli.`
+	Help! I need somebody.
+	Help! Not just anybody.
+`
 }

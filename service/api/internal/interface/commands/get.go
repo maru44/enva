@@ -79,5 +79,6 @@ func (c *get) Explain() string {
 	Get remote key-value sets and output in command line.
 	If count of args is larger than 1, get the value of keys designated in args.
 	ex1) enva get
-	ex2) enva get [key1] [key2]`
+	ex2) enva get [key1] [key2]
+`
 }
