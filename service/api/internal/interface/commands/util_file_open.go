@@ -40,7 +40,7 @@ func fileWriteFromResponse(body kvListBody) error {
 	return nil
 }
 
-func fileWriteToUpdateKv(key, value string) error {
+func fileReadAndUpdateKv(key, value string) error {
 	s, err := readSettings()
 	if err != nil {
 		return err

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -40,7 +41,7 @@ func fetchCreateKv(ctx context.Context, key, value string) (*kvCreateBody, error
 
 	input := domain.KvInputWithProjectID{
 		Input: domain.KvInput{
-			Key:   domain.KvKey(key),
+			Key:   domain.KvKey(strings.Trim(key, "\"")),
 			Value: domain.KvValue(value),
 		},
 	}

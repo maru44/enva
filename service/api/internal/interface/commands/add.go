@@ -39,7 +39,7 @@ func (c *add) Run(ctx context.Context, opts ...string) error {
 		return err
 	}
 
-	if err := fileWriteToUpdateKv(key, value); err != nil {
+	if err := fileReadAndUpdateKv(key, value); err != nil {
 		return err
 	}
 
