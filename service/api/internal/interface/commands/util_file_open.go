@@ -9,13 +9,6 @@ import (
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
-var (
-	fileOutputMap = map[string]func(kv domain.KvValid) string{
-		".envrc":  outputDirenv,
-		".tfvars": outputTfval,
-	}
-)
-
 func fileWriteFromResponse(body kvListBody) error {
 	s, err := readSettings()
 	if err != nil {
@@ -34,9 +27,9 @@ func fileWriteFromResponse(body kvListBody) error {
 	defer file.Close()
 
 	ext := filepath.Ext(s.EnvFileName)
-	f, ok := fileOutputMap[ext]
+	f, ok := fileWriteMap[ext]
 	if !ok {
-		f = outputNormal
+		f = writeNormal
 	}
 
 	for _, d := range body.Data {
@@ -60,9 +53,9 @@ func fileWriteToUpdateKv(key, value string) error {
 
 	// to read
 	ext := filepath.Ext(s.EnvFileName)
-	f, ok := fileInputMap[ext]
+	f, ok := fileReadMap[ext]
 	if !ok {
-		f = inputNormal
+		f = readNormal
 	}
 
 	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
@@ -108,9 +101,9 @@ func fileWriteToUpdateKv(key, value string) error {
 	defer file.Close()
 
 	/* write file by created kvs */
-	fw, ok := fileOutputMap[ext]
+	fw, ok := fileWriteMap[ext]
 	if !ok {
-		fw = outputNormal
+		fw = writeNormal
 	}
 
 	for _, d := range kvs {
@@ -139,9 +132,9 @@ func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 	defer file.Close()
 
 	ext := filepath.Ext(s.EnvFileName)
-	f, ok := fileInputMap[ext]
+	f, ok := fileReadMap[ext]
 	if !ok {
-		f = inputNormal
+		f = readNormal
 	}
 
 	scanner := bufio.NewScanner(file)

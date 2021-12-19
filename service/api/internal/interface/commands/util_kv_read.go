@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -10,12 +9,12 @@ import (
 // for read file
 
 var (
-	fileInputMap = map[string]func(string) *domain.KvValid{
-		".envrc": inputDirenv,
+	fileReadMap = map[string]func(string) *domain.KvValid{
+		".envrc": readDirenv,
 	}
 )
 
-func inputNormal(str string) *domain.KvValid {
+func readNormal(str string) *domain.KvValid {
 	if str == "" {
 		return nil
 	}
@@ -38,7 +37,7 @@ func inputNormal(str string) *domain.KvValid {
 	}
 }
 
-func inputDirenv(str string) *domain.KvValid {
+func readDirenv(str string) *domain.KvValid {
 	if str == "" {
 		return nil
 	}
@@ -47,9 +46,6 @@ func inputDirenv(str string) *domain.KvValid {
 	if len(sp) != 2 {
 		return nil
 	}
-
-	fmt.Println("raw", sp[1])
-	fmt.Println("str", string(sp[1]))
 
 	key := strings.TrimLeft(sp[0], "export ")
 	removeR := strings.TrimRight(sp[1], "\n")

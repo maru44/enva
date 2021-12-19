@@ -8,17 +8,24 @@ import (
 	"github.com/maru44/enva/service/api/pkg/tools"
 )
 
-func outputNormal(kv domain.KvValid) string {
+var (
+	fileWriteMap = map[string]func(kv domain.KvValid) string{
+		".envrc":  writeDirenv,
+		".tfvars": writeTfval,
+	}
+)
+
+func writeNormal(kv domain.KvValid) string {
 	value := soroundedQuotes(kv.Value.String())
 	return fmt.Sprintf("%s=%s\n", kv.Key, value)
 }
 
-func outputDirenv(kv domain.KvValid) string {
+func writeDirenv(kv domain.KvValid) string {
 	value := soroundedQuotes(kv.Value.String())
 	return fmt.Sprintf("export %s=%s\n", kv.Key, value)
 }
 
-func outputTfval(kv domain.KvValid) string {
+func writeTfval(kv domain.KvValid) string {
 	value := escapeDoubleQuotes(kv.Value.String())
 	return fmt.Sprintf("%s=\"%s\"\n", kv.Key, value)
 }
