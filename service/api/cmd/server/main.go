@@ -82,7 +82,7 @@ func main() {
 			s("/cli/kv/detail", http.MethodGet, cliKv.DetailView),
 			s("/cli/kv/create", http.MethodPost, cliKv.CreateView),
 			s("/cli/kv/update", http.MethodPut, cliKv.UpdateView),
-			s("/cli/kv/delete", http.MethodPost, cliKv.DeleteView),
+			s("/cli/kv/delete", http.MethodDelete, cliKv.DeleteView),
 		},
 		"cli", "loginCli",
 	)

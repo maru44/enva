@@ -114,6 +114,65 @@ func fileReadAndUpdateKv(key, value string) error {
 	return nil
 }
 
+func fileReadAndDeleteKv(key string) error {
+	s, err := readSettings()
+	if err != nil {
+		return err
+	}
+
+	path, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	// to read
+	ext := filepath.Ext(s.EnvFileName)
+	f, ok := fileReadMap[ext]
+	if !ok {
+		f = readNormal
+	}
+
+	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
+	if err != nil {
+		return err
+	}
+	defer fileRead.Close()
+
+	var kvs []domain.KvValid
+
+	// crete kvs from file
+	scanner := bufio.NewScanner(fileRead)
+	for scanner.Scan() {
+		kv := f(scanner.Text())
+		if kv != nil {
+			if kv.Key != domain.KvKey(key) {
+				kvs = append(kvs, *kv)
+			}
+		}
+	}
+
+	fileRead.Close()
+
+	file, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	/* write file by created kvs */
+	fw, ok := fileWriteMap[ext]
+	if !ok {
+		fw = writeNormal
+	}
+
+	for _, d := range kvs {
+		if _, err := file.WriteString(fw(d)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 	s, err := readSettings()
 	if err != nil {

@@ -124,7 +124,7 @@ func (con *CliKvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	kvId := r.URL.Query().Get(QueryParamsKvID)
+	key := r.URL.Query().Get(QueryParamsKvKey)
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 
 	projectID, err := con.userAccessToProject(ctx, projectSlug)
@@ -133,7 +133,7 @@ func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	affected, err := con.in.Delete(ctx, domain.KvID(kvId), *projectID)
+	affected, err := con.in.DeleteByKey(ctx, domain.KvKey(key), *projectID)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return

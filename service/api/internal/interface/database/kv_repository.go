@@ -152,3 +152,25 @@ func (repo *KvRepository) Delete(ctx context.Context, kvID domain.KvID, projectI
 	}
 	return affected, nil
 }
+
+func (repo *KvRepository) DeleteByKey(ctx context.Context, key domain.KvKey, projectID domain.ProjectID) (int, error) {
+	user := ctx.Value(domain.CtxUserKey).(domain.User)
+
+	// deactivate existing kv
+	exe, err := repo.ExecContext(
+		ctx,
+		queryset.KvDeactivateQuery,
+		user.ID, projectID, key,
+	)
+	if err != nil {
+		return 0, perr.Wrap(err, perr.BadRequest)
+	}
+
+	affected, err := exe.RowsAffected()
+	if err != nil {
+		return 0, perr.Wrap(err, perr.BadRequest)
+	} else if affected == 0 {
+		return 0, perr.New("No result", perr.BadRequest)
+	}
+	return affected, nil
+}

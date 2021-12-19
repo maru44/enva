@@ -23,6 +23,7 @@ type IKvRepository interface {
 	Create(context.Context, domain.KvInput, domain.ProjectID) (*domain.KvID, error)
 	Update(context.Context, domain.KvInput, domain.ProjectID) (*domain.KvID, error)
 	Delete(context.Context, domain.KvID, domain.ProjectID) (int, error)
+	DeleteByKey(context.Context, domain.KvKey, domain.ProjectID) (int, error)
 }
 
 /***********************************************
@@ -47,4 +48,8 @@ func (in KvInteractor) Update(ctx context.Context, input domain.KvInputWithProje
 
 func (in KvInteractor) Delete(ctx context.Context, kvID domain.KvID, projectID domain.ProjectID) (int, error) {
 	return in.repo.Delete(ctx, kvID, projectID)
+}
+
+func (in KvInteractor) DeleteByKey(ctx context.Context, key domain.KvKey, projectID domain.ProjectID) (int, error) {
+	return in.repo.DeleteByKey(ctx, key, projectID)
 }
