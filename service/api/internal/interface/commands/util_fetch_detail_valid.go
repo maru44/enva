@@ -13,16 +13,12 @@ import (
 )
 
 type (
-	errorBody struct {
-		Error string `json:"error"`
-	}
-
-	kvListBody struct {
-		Data []domain.KvValid `json:"data"`
+	kvDetailBody struct {
+		Data domain.KvValid `json:"data"`
 	}
 )
 
-func fetchListValid(ctx context.Context) (*kvListBody, error) {
+func fetchDetailValid(ctx context.Context, key string, inputJson []byte) (*kvDetailBody, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -36,22 +32,12 @@ func fetchListValid(ctx context.Context) (*kvListBody, error) {
 		// @TODO get by org
 		// url =
 	}
-	url = fmt.Sprintf("%s/cli/kv?projectSlug=%s", config.API_URL, s.ProjectSlug)
-
-	input, err := inputEmailPassword()
-	if err != nil {
-		return nil, err
-	}
-
-	inputJ, err := json.Marshal(input)
-	if err != nil {
-		return nil, err
-	}
+	url = fmt.Sprintf("%s/cli/kv/detail?key=%s&projectSlug=%s", config.API_URL, key, s.ProjectSlug)
 
 	req, err := http.NewRequest(
 		http.MethodPost,
 		url,
-		bytes.NewBuffer(inputJ),
+		bytes.NewBuffer(inputJson),
 	)
 	if err != nil {
 		return nil, err
@@ -67,7 +53,7 @@ func fetchListValid(ctx context.Context) (*kvListBody, error) {
 
 	switch res.StatusCode {
 	case 200:
-		body := &kvListBody{}
+		body := &kvDetailBody{}
 		if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 			return nil, err
 		}

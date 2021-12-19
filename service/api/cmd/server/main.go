@@ -78,9 +78,10 @@ func main() {
 		[]pmf{
 			/* cli_kv */
 			s("/cli/kv", http.MethodPost, cliKv.ListView),
+			s("/cli/kv/detail", http.MethodPost, cliKv.DetailView),
 			s("/cli/kv/create", http.MethodPost, cliKv.CreateView),
 			s("/cli/kv/update", http.MethodPut, cliKv.UpdateView),
-			s("/cli/kv/delete", http.MethodDelete, cliKv.DeleteView),
+			s("/cli/kv/delete", http.MethodPost, cliKv.DeleteView),
 		},
 		"loginCli",
 	)

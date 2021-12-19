@@ -40,8 +40,6 @@ func (repo *KvRepository) ListValid(ctx context.Context, projectID domain.Projec
 }
 
 func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, projectID domain.ProjectID) (*domain.Kv, error) {
-	// user := ctx.Value(domain.CtxUserKey).(domain.User)
-
 	row := repo.QueryRowContext(ctx, queryset.ValidKvDetail, key, projectID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)

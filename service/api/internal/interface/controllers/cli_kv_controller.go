@@ -50,6 +50,26 @@ func (con *CliKvController) ListView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (con *CliKvController) DetailView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	key := r.URL.Query().Get(QueryParamsKvKey)
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+
+	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+
+	kv, err := con.in.DetailValid(ctx, domain.KvKey(key), *projectID)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+	response(w, r, nil, map[string]interface{}{"data": kv})
+	return
+}
+
 func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 

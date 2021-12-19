@@ -11,7 +11,7 @@ const (
 	QueryParamsSlug = "slug"
 
 	QueryParamsKvID  = "kvId"
-	QueryParamsKvKey = "kvKey"
+	QueryParamsKvKey = "key"
 )
 
 var (
