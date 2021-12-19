@@ -106,12 +106,13 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	if _, err := exe.RowsAffected(); err != nil {
+	if affected, err := exe.RowsAffected(); err != nil {
 		tx.Rollback()
 		return nil, perr.Wrap(err, perr.BadRequest)
+	} else if err == nil && affected == 0 {
+		// @INFO if want to upsert remove this condition
+		return nil, perr.New("the key does not exists in this project", perr.NotFound, "the key does not exists in this project")
 	}
-	// if affected == 0
-	// it is no probrem create new valid key
 
 	// create new kv
 	var id string

@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -111,8 +110,6 @@ func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Ha
 			EmailOrUsername: iPassArr[0],
 			Password:        iPassArr[1],
 		}
-
-		fmt.Println("middle", input)
 
 		user, err := con.in.GetUser(r.Context(), input)
 		if err != nil {
