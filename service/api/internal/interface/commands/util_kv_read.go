@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -24,11 +25,16 @@ func inputNormal(str string) *domain.KvValid {
 		return nil
 	}
 
-	removedR := strings.TrimRight(sp[1], "\n")
+	removedR := strings.TrimRight(string(sp[1]), "\n")
+	trimed := strings.Trim(removedR, "\"")
+
+	val := strings.ReplaceAll(trimed, "\\\\", "バックスラッシュ")
+	val = strings.ReplaceAll(val, "\\", "")
+	val = strings.ReplaceAll(val, "バックスラッシュ", "\\\\")
 
 	return &domain.KvValid{
 		Key:   domain.KvKey(sp[0]),
-		Value: domain.KvValue(strings.Trim(removedR, "\"")),
+		Value: domain.KvValue(val),
 	}
 }
 
@@ -42,12 +48,20 @@ func inputDirenv(str string) *domain.KvValid {
 		return nil
 	}
 
+	fmt.Println("raw", sp[1])
+	fmt.Println("str", string(sp[1]))
+
 	key := strings.TrimLeft(sp[0], "export ")
-	val := strings.TrimRight(sp[1], "\n")
+	removeR := strings.TrimRight(sp[1], "\n")
+	trimed := strings.Trim(removeR, "\"")
+
+	val := strings.ReplaceAll(trimed, "\\\\", "バックスラッシュ")
+	val = strings.ReplaceAll(val, "\\", "")
+	val = strings.ReplaceAll(val, "バックスラッシュ", "\\\\")
 
 	return &domain.KvValid{
 		Key:   domain.KvKey(key),
-		Value: domain.KvValue(strings.Trim(val, "\"")),
+		Value: domain.KvValue(val),
 	}
 }
 
