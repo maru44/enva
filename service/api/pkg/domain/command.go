@@ -11,5 +11,6 @@ type (
 
 	ICommandInteractor interface {
 		Run(context.Context, ...string) error
+		Explain() string
 	}
 )

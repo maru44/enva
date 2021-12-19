@@ -45,3 +45,10 @@ func (c *delete) Run(ctx context.Context, opts ...string) error {
 	fmt.Printf("%s is deleted!\n", key)
 	return nil
 }
+
+func (c *delete) Explain() string {
+	return `
+	Remove remote and local key-value set.
+	An arg is needed.
+	ex) enva delete [key]`
+}

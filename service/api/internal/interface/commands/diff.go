@@ -101,3 +101,8 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 
 	return nil
 }
+
+func (c *diff) Explain() string {
+	return `
+	Get the difference between remote and local key-values and output in command line`
+}

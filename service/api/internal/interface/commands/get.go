@@ -8,16 +8,16 @@ import (
 )
 
 type (
-	kvList struct{}
+	get struct{}
 )
 
 func init() {
 	Commands["get"] = func() domain.ICommandInteractor {
-		return &kvList{}
+		return &get{}
 	}
 }
 
-func (c *kvList) Run(ctx context.Context, opts ...string) error {
+func (c *get) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -72,4 +72,12 @@ func (c *kvList) Run(ctx context.Context, opts ...string) error {
 	}
 
 	return nil
+}
+
+func (c *get) Explain() string {
+	return `
+	Get remote key-value sets and output in command line.
+	If count of args is larger than 1, get the value of keys designated in args.
+	ex1) enva get
+	ex2) enva get [key1] [key2]`
 }

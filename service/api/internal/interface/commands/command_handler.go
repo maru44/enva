@@ -19,6 +19,7 @@ func Run(ctx context.Context, taskName string, opts ...string) error {
 	if !ok {
 		err := errors.New("No such command")
 		fmt.Println(err)
+		fmt.Println("\nIf you want to know commands, execute `enva help` command.")
 		return err
 	}
 

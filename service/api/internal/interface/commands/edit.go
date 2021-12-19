@@ -46,3 +46,10 @@ func (c *edit) Run(ctx context.Context, opts ...string) error {
 	fmt.Printf("%s = %s is updated!\n", key, value)
 	return nil
 }
+
+func (c *edit) Explain() string {
+	return `
+	Edit remote and local value.
+	Two args is needed. First arg is key, second arg is value.
+	ex) enva edit [key] [value]`
+}
