@@ -53,7 +53,10 @@ func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var input domain.KvInputWithProjectID
-	json.NewDecoder(r.Body).Decode(&input)
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
 
 	if err := con.userAccessToProject(ctx, input.ProjectID); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)

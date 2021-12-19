@@ -38,6 +38,7 @@ func main() {
 
 	middlewareMap["login"] = base.LoginRequiredMiddleware
 	middlewareMap["user"] = base.GiveUserMiddleware
+	middlewareMap["cli"] = cliU.BaseMiddleware
 	middlewareMap["loginCli"] = cliU.LoginRequiredMiddleware
 
 	// no middlewares
@@ -74,16 +75,16 @@ func main() {
 		"login",
 	)
 
-	sv(
+	svCli(
 		[]pmf{
 			/* cli_kv */
-			s("/cli/kv", http.MethodPost, cliKv.ListView),
-			s("/cli/kv/detail", http.MethodPost, cliKv.DetailView),
+			s("/cli/kv", http.MethodGet, cliKv.ListView),
+			s("/cli/kv/detail", http.MethodGet, cliKv.DetailView),
 			s("/cli/kv/create", http.MethodPost, cliKv.CreateView),
 			s("/cli/kv/update", http.MethodPut, cliKv.UpdateView),
 			s("/cli/kv/delete", http.MethodPost, cliKv.DeleteView),
 		},
-		"loginCli",
+		"cli", "loginCli",
 	)
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
@@ -129,6 +130,43 @@ func sv(ps []pmf, middlewares ...string) {
 		}
 
 		router.Handle(p.Path, base.BaseMiddleware(keySet, mmF(f)))
+	}
+	return
+}
+
+func svCli(ps []pmf, middlewares ...string) {
+	if middlewares == nil {
+		for _, p := range ps {
+			router.Handle(p.Path, http.HandlerFunc(p.Func))
+		}
+		return
+	}
+
+	countMiddleware := len(middlewares)
+	for _, p := range ps {
+		mmF := base.GetOnlyMiddleware
+		switch p.Method {
+		case http.MethodGet:
+			mmF = base.GetOnlyMiddleware
+		case http.MethodPost:
+			mmF = base.PostOnlyMiddleware
+		case http.MethodPut:
+			mmF = base.PutOnlyMiddleware
+		case http.MethodDelete:
+			mmF = base.DeleteOnlyMiddleware
+		case upsertMethod:
+			// mm = base.Upsert
+			// @TODO make upsert middleware
+		case anyMethod:
+			mmF = base.AnyMethodMiddleware
+		}
+
+		f := middlewareMap[middlewares[countMiddleware-1]](http.HandlerFunc(p.Func))
+		for i := countMiddleware - 2; i >= 0; i-- {
+			f = middlewareMap[middlewares[i]](f)
+		}
+
+		router.Handle(p.Path, mmF(f))
 	}
 	return
 }

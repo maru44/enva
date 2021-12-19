@@ -35,7 +35,7 @@ type (
 	}
 
 	KvInputWithProjectID struct {
-		ProjectID ProjectID `json:"project_id"`
+		ProjectID ProjectID `json:"project_id,omitempty"`
 		Input     KvInput   `json:"input"`
 	}
 

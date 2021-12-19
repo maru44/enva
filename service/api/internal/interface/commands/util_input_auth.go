@@ -5,11 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
-func inputEmailPassword() (*domain.CliUserValidateInput, error) {
+func inputEmailPassword() (string, string, error) {
 	var email, password string
 
 	fmt.Print("email or username: ")
@@ -24,11 +22,8 @@ func inputEmailPassword() (*domain.CliUserValidateInput, error) {
 			scan.Scan()
 			password = scan.Text()
 
-			return &domain.CliUserValidateInput{
-				EmailOrUsername: email,
-				Password:        password,
-			}, nil
+			return email, password, nil
 		}
-		return nil, errors.New("Email or Username must not be blank")
+		return "", "", errors.New("Email or Username must not be blank")
 	}
 }

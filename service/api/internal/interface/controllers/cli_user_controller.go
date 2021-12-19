@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/internal/interface/database"
 	"github.com/maru44/enva/service/api/internal/interface/password"
 	"github.com/maru44/enva/service/api/internal/usecase"
@@ -78,13 +82,37 @@ func (con *CliUserController) ExistsView(w http.ResponseWriter, r *http.Request)
     Middle ware
 ********************************/
 
+func (con *CliUserController) BaseMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(
+			r.Context(),
+			domain.CtxAccessKey,
+			domain.CtxAccess{
+				Method: r.Method,
+				URL:    r.URL.Path,
+			},
+		)
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		input := &domain.CliUserValidateInput{}
-		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-			response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		iPass := r.Header.Get("Authorization")
+		iPassArr := strings.SplitN(iPass, config.CLI_HEADER_SEP, 2)
+		if len(iPassArr) != 2 {
+			response(w, r, perr.New(perr.Forbidden.Error(), perr.Forbidden), nil)
 			return
 		}
+
+		input := &domain.CliUserValidateInput{
+			EmailOrUsername: iPassArr[0],
+			Password:        iPassArr[1],
+		}
+
+		fmt.Println("middle", input)
 
 		user, err := con.in.GetUser(r.Context(), input)
 		if err != nil {

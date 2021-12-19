@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -25,11 +24,7 @@ func (c *kvList) Run(ctx context.Context, opts ...string) error {
 	// with keys
 	if opts != nil {
 		// auth input
-		input, err := inputEmailPassword()
-		if err != nil {
-			return err
-		}
-		inputJ, err := json.Marshal(input)
+		email, password, err := inputEmailPassword()
 		if err != nil {
 			return err
 		}
@@ -38,7 +33,7 @@ func (c *kvList) Run(ctx context.Context, opts ...string) error {
 		errs := map[string]error{}
 
 		for _, o := range opts {
-			body, err := fetchDetailValid(ctx, o, inputJ)
+			body, err := fetchDetailValid(ctx, o, email, password)
 			if err != nil {
 				errs[o] = err
 				continue

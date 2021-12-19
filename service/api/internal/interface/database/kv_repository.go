@@ -59,6 +59,10 @@ func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, pro
 func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
 
+	if err := input.Validate(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
 	// if key exists >> return error
 	var preId string
 	row := repo.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
@@ -81,6 +85,10 @@ func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, proj
 
 func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
+
+	if err := input.Validate(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {

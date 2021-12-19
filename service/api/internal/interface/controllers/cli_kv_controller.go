@@ -75,7 +75,11 @@ func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 	var input domain.KvInputWithProjectID
-	json.NewDecoder(r.Body).Decode(&input)
+
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
 
 	projectID, err := con.userAccessToProject(ctx, projectSlug)
 	if err != nil {

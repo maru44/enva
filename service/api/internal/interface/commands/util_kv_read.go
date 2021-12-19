@@ -6,6 +6,8 @@ import (
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
+// for read file
+
 var (
 	fileInputMap = map[string]func(string) *domain.KvValid{
 		".envrc": inputDirenv,

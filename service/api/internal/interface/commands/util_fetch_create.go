@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -12,12 +13,12 @@ import (
 )
 
 type (
-	kvDetailBody struct {
-		Data domain.KvValid `json:"data"`
+	kvCreateBody struct {
+		Id string `json:"id"`
 	}
 )
 
-func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDetailBody, error) {
+func fetchCreateKv(ctx context.Context, key, value string) (*kvCreateBody, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -26,16 +27,32 @@ func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDeta
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/cli/kv/detail?key=%s&projectSlug=%s", config.API_URL, key, s.ProjectSlug)
+	url := fmt.Sprintf("%s/cli/kv/create?projectSlug=%s", config.API_URL, s.ProjectSlug)
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
 	}
 
+	email, password, err := inputEmailPassword()
+	if err != nil {
+		return nil, err
+	}
+
+	input := domain.KvInputWithProjectID{
+		Input: domain.KvInput{
+			Key:   domain.KvKey(key),
+			Value: domain.KvValue(value),
+		},
+	}
+	inputJ, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
 	req, err := http.NewRequest(
-		http.MethodGet,
+		http.MethodPost,
 		url,
-		nil,
+		bytes.NewBuffer(inputJ),
 	)
 	if err != nil {
 		return nil, err
@@ -52,7 +69,7 @@ func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDeta
 
 	switch res.StatusCode {
 	case 200:
-		body := &kvDetailBody{}
+		body := &kvCreateBody{}
 		if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 			return nil, err
 		}

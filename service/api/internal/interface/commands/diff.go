@@ -34,7 +34,7 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 
 	remoteData := domain.MapFromKv(body.Data)
 
-	localDataRaw, err := fileReadToKvs()
+	localDataRaw, err := fileReadAndCreateKvs()
 	localData := domain.MapFromKv(localDataRaw)
 	if err != nil {
 		return err

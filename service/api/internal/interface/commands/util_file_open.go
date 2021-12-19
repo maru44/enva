@@ -47,33 +47,81 @@ func fileWriteFromResponse(body kvListBody) error {
 	return nil
 }
 
-func fileOpenToWrite() (*os.File, func(kv domain.KvValid) string, error) {
+func fileWriteToUpdateKv(key, value string) error {
 	s, err := readSettings()
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	path, err := os.Getwd()
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
+
+	// to read
+	ext := filepath.Ext(s.EnvFileName)
+	f, ok := fileInputMap[ext]
+	if !ok {
+		f = inputNormal
+	}
+
+	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
+	if err != nil {
+		return err
+	}
+	defer fileRead.Close()
+
+	var (
+		kvs             []domain.KvValid
+		isExistsAlready bool
+	)
+	// crete kvs from file
+	scanner := bufio.NewScanner(fileRead)
+	for scanner.Scan() {
+		kv := f(scanner.Text())
+		if kv != nil {
+			if kv.Key == domain.KvKey(key) {
+				kvs = append(kvs, domain.KvValid{
+					Key:   kv.Key,
+					Value: domain.KvValue(value),
+				})
+				isExistsAlready = true
+				continue
+			}
+			kvs = append(kvs, *kv)
+		}
+	}
+
+	// if new key
+	if !isExistsAlready {
+		kvs = append(kvs, domain.KvValid{
+			Key:   domain.KvKey(key),
+			Value: domain.KvValue(value),
+		})
+	}
+	fileRead.Close()
 
 	file, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 	defer file.Close()
 
-	ext := filepath.Ext(s.EnvFileName)
-	f, ok := fileOutputMap[ext]
+	/* write file by created kvs */
+	fw, ok := fileOutputMap[ext]
 	if !ok {
-		f = outputNormal
+		fw = outputNormal
 	}
 
-	return file, f, nil
+	for _, d := range kvs {
+		if _, err := file.WriteString(fw(d)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func fileReadToKvs() ([]domain.KvValid, error) {
+func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 	s, err := readSettings()
 	if err != nil {
 		return nil, err

@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -31,32 +30,27 @@ func fetchListValid(ctx context.Context) (*kvListBody, error) {
 		return nil, err
 	}
 
-	var url string
+	url := fmt.Sprintf("%s/cli/kv?projectSlug=%s", config.API_URL, s.ProjectSlug)
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
 	}
-	url = fmt.Sprintf("%s/cli/kv?projectSlug=%s", config.API_URL, s.ProjectSlug)
 
-	input, err := inputEmailPassword()
-	if err != nil {
-		return nil, err
-	}
-
-	inputJ, err := json.Marshal(input)
+	email, password, err := inputEmailPassword()
 	if err != nil {
 		return nil, err
 	}
 
 	req, err := http.NewRequest(
-		http.MethodPost,
+		http.MethodGet,
 		url,
-		bytes.NewBuffer(inputJ),
+		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", email+config.CLI_HEADER_SEP+password)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
