@@ -8,9 +8,10 @@ CMD_DIR:=cmd/
 SERVERROOT:=server
 
 # test dirs
-TEST_USECASE:=./internal/usecase/test
-TEST_REPOSITORY:=./internal/interface/database/test
+TEST_USECASE:=./internal/usecase
+TEST_REPOSITORY:=./internal/interface/database
 TEST_CONTROLLER:=./internal/interface/controllers
+TEST_INFRA:=./internal/infra
 
 # args for build or run
 t:=$(SERVERROOT)
@@ -26,4 +27,4 @@ exe:
 	@./$(BIN_DIR)$(SERVERROOT)/$(BIN_NAME) &
 
 test:
-	@go test $(TEST_REPOSITORY) $(TEST_CONTROLLER) $(TEST_USECASE)
+	@go test $(TEST_REPOSITORY) $(TEST_CONTROLLER) $(TEST_USECASE) $(TEST_INFRA)
