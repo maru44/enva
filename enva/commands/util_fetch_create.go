@@ -12,7 +12,7 @@ import (
 
 type (
 	kvCreateBody struct {
-		Id string `json:"id"`
+		Id string `json:"data"`
 	}
 )
 
