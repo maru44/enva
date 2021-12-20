@@ -55,7 +55,7 @@ func fileReadAndUpdateKv(key, value string) error {
 	ext := filepath.Ext(s.EnvFileName)
 	f, ok := fileReadMap[ext]
 	if !ok {
-		f = readNormal
+		f = readOneLineNormal
 	}
 
 	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
@@ -129,7 +129,7 @@ func fileReadAndDeleteKv(key string) error {
 	ext := filepath.Ext(s.EnvFileName)
 	f, ok := fileReadMap[ext]
 	if !ok {
-		f = readNormal
+		f = readOneLineNormal
 	}
 
 	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
@@ -193,7 +193,7 @@ func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 	ext := filepath.Ext(s.EnvFileName)
 	f, ok := fileReadMap[ext]
 	if !ok {
-		f = readNormal
+		f = readOneLineNormal
 	}
 
 	scanner := bufio.NewScanner(file)

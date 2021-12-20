@@ -52,7 +52,7 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 			continue
 		}
 
-		if lv == domain.KvValue(escapeDoubleQuotes(v.String())) {
+		if lv == v {
 			continue
 		}
 

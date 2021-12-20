@@ -10,12 +10,17 @@ import (
 
 var (
 	fileReadMap = map[string]func(string) *domain.KvValid{
-		".envrc": readDirenv,
+		".envrc":  readOneLineDirenv,
+		".tfvars": readOneLineTfvals,
 	}
 )
 
-func readNormal(str string) *domain.KvValid {
+func readOneLineNormal(str string) *domain.KvValid {
 	if str == "" {
+		return nil
+	}
+
+	if strings.HasPrefix(str, "#") {
 		return nil
 	}
 
@@ -37,8 +42,12 @@ func readNormal(str string) *domain.KvValid {
 	}
 }
 
-func readDirenv(str string) *domain.KvValid {
+func readOneLineDirenv(str string) *domain.KvValid {
 	if str == "" {
+		return nil
+	}
+
+	if strings.HasPrefix(str, "#") {
 		return nil
 	}
 
@@ -57,6 +66,33 @@ func readDirenv(str string) *domain.KvValid {
 
 	return &domain.KvValid{
 		Key:   domain.KvKey(key),
+		Value: domain.KvValue(val),
+	}
+}
+
+func readOneLineTfvals(str string) *domain.KvValid {
+	if str == "" {
+		return nil
+	}
+
+	if strings.HasPrefix(str, "#") || strings.HasPrefix(str, "//") {
+		return nil
+	}
+
+	sp := splitEqual(str)
+	if len(sp) != 2 {
+		return nil
+	}
+
+	removedR := strings.TrimRight(string(sp[1]), "\n")
+	trimed := strings.Trim(removedR, "\"")
+
+	val := strings.ReplaceAll(trimed, "\\\\", "バックスラッシュ")
+	val = strings.ReplaceAll(val, "\\", "")
+	val = strings.ReplaceAll(val, "バックスラッシュ", "\\\\")
+
+	return &domain.KvValid{
+		Key:   domain.KvKey(sp[0]),
 		Value: domain.KvValue(val),
 	}
 }
