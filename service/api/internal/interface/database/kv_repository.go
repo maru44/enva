@@ -96,7 +96,7 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 	}
 
 	// deactivate existing kv
-	exe, err := repo.ExecContext(
+	exe, err := tx.ExecContext(
 		ctx,
 		queryset.KvDeactivateQuery,
 		user.ID, projectID, input.Key,
@@ -116,7 +116,7 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 
 	// create new kv
 	var id string
-	if err := repo.QueryRowContext(
+	if err := tx.QueryRowContext(
 		ctx,
 		queryset.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,

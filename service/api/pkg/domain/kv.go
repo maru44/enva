@@ -47,6 +47,10 @@ type (
 		Delete(context.Context, KvID, ProjectID) (int, error)
 		DeleteByKey(context.Context, KvKey, ProjectID) (int, error)
 	}
+
+	ICliKvInteractor interface {
+		BulkInsert(context.Context, ProjectID, []KvInput) error
+	}
 )
 
 func (k *KvKey) String() string {
@@ -55,6 +59,13 @@ func (k *KvKey) String() string {
 
 func (v *KvValue) String() string {
 	return string(*v)
+}
+
+func (kv *KvValid) ToInput() *KvInput {
+	return &KvInput{
+		Key:   kv.Key,
+		Value: kv.Value,
+	}
 }
 
 func (in *KvInput) Validate() error {

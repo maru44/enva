@@ -23,7 +23,7 @@ func (c *add) Run(ctx context.Context, opts ...string) error {
 	defer cancel()
 
 	if opts == nil {
-		return errors.New("Need two args key and value")
+		return errors.New("Need two arguments (key and value)")
 	}
 
 	if len(opts) > 2 {

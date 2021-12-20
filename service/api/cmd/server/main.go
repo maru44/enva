@@ -81,6 +81,7 @@ func main() {
 			s("/cli/kv", http.MethodGet, cliKv.ListView),
 			s("/cli/kv/detail", http.MethodGet, cliKv.DetailView),
 			s("/cli/kv/create", http.MethodPost, cliKv.CreateView),
+			s("/cli/kv/create/bulk", http.MethodPost, cliKv.BulkInsertView),
 			s("/cli/kv/update", http.MethodPut, cliKv.UpdateView),
 			s("/cli/kv/delete", http.MethodDelete, cliKv.DeleteView),
 		},

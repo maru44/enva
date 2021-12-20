@@ -11,10 +11,13 @@ import (
 	"github.com/maru44/perr"
 )
 
-type CliKvController struct {
-	in  domain.IKvInteractor
-	pIn domain.IProjectInteractor
-}
+type (
+	CliKvController struct {
+		in  domain.IKvInteractor
+		pIn domain.IProjectInteractor
+		cIn domain.ICliKvInteractor
+	}
+)
 
 func NewCliKvController(sql database.ISqlHandler) *CliKvController {
 	return &CliKvController{
@@ -25,6 +28,11 @@ func NewCliKvController(sql database.ISqlHandler) *CliKvController {
 		),
 		pIn: usecase.NewProjectInteractor(
 			&database.ProjectReposotory{
+				ISqlHandler: sql,
+			},
+		),
+		cIn: usecase.NewCliKvInteractor(
+			&database.CliKvRepository{
 				ISqlHandler: sql,
 			},
 		),
@@ -95,6 +103,44 @@ func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
+	return
+}
+
+func (con *CliKvController) BulkInsertView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+	var inputs []domain.KvInput
+
+	if err := json.NewDecoder(r.Body).Decode(&inputs); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+
+	// if there are any key value sets
+	// it is not validated
+	kvs, err := con.in.ListValid(ctx, *projectID)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+	if kvs != nil {
+		response(w, r, perr.New(perr.BadRequest.Error(), perr.BadRequest, "Key Value sets already exists"), nil)
+		return
+	}
+
+	if err := con.cIn.BulkInsert(ctx, *projectID, inputs); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": "success"})
 	return
 }
 
