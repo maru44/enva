@@ -7,8 +7,12 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useReducer } from 'react'
 import { useSWRConfig } from 'swr'
+import {
+  initialKvListState,
+  kvListReducer,
+} from '../../../../hooks/kvs/useListTable'
 import { kvDeleteResponseBody } from '../../../../http/body/kv'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchDeleteKv } from '../../../../http/kv'
@@ -23,9 +27,7 @@ type props = {
 
 export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
   const { mutate } = useSWRConfig()
-  const [isOpenUpdate, setIsOpenUpdate] = useState<boolean>(false)
-  const [updateKey, setUpdateKey] = useState<string>('')
-  const [defaultValue, setDefaultValue] = useState<string>('')
+  const [state, dispatch] = useReducer(kvListReducer, initialKvListState)
 
   // delete function
   const delKeyFunc = async (keyId: string, projectId: string) => {
@@ -43,9 +45,6 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
       console.log(e)
     }
   }
-
-  // close update form
-  const closeUpdateForm = () => setIsOpenUpdate(false)
 
   return (
     <TableContainer>
@@ -75,9 +74,11 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                   <Button
                     type="button"
                     onClick={() => {
-                      setUpdateKey(kv.kv_key)
-                      setDefaultValue(kv.kv_value)
-                      setIsOpenUpdate(true)
+                      dispatch({
+                        type: 'open',
+                        updateKey: kv.kv_key,
+                        updateDefaultValue: kv.kv_value,
+                      })
                     }}
                   >
                     Edit
@@ -88,11 +89,11 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
         </TableBody>
       </Table>
       <KvUpdateForm
-        kvKey={updateKey}
-        kvValue={defaultValue}
+        kvKey={state.updateKey}
+        kvValue={state.updateDefaultValue}
         projectId={projectId}
-        isOpen={isOpenUpdate}
-        onClose={closeUpdateForm}
+        isOpen={state.isOpenUpdate}
+        onClose={() => dispatch({ type: 'close' })}
       />
     </TableContainer>
   )
