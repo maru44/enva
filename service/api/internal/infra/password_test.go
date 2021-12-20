@@ -1,4 +1,4 @@
-package infra_test
+package infra
 
 import (
 	"testing"
