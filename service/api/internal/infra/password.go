@@ -15,7 +15,7 @@ func (p *Password) Check(hashed, raw string) error {
 }
 
 func (p *Password) Generate(raw string) (string, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(raw), 16)
+	hashed, err := bcrypt.GenerateFromPassword([]byte(raw), 8)
 	if err != nil {
 		return "", perr.Wrap(err, perr.InternalServerError)
 	}
