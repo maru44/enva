@@ -2,9 +2,9 @@ package commands
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
@@ -15,12 +15,16 @@ func fileWriteFromResponse(body kvListBody) error {
 		return err
 	}
 
-	path, err := os.Getwd()
-	if err != nil {
-		return err
+	fileName := s.EnvFileName
+	if !strings.HasPrefix(fileName, ".") && !strings.HasPrefix(fileName, "/") && !strings.HasPrefix(fileName, "~") {
+		path, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		fileName = path + "/" + fileName
 	}
 
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -46,9 +50,13 @@ func fileReadAndUpdateKv(key, value string) error {
 		return err
 	}
 
-	path, err := os.Getwd()
-	if err != nil {
-		return err
+	fileName := s.EnvFileName
+	if !strings.HasPrefix(fileName, ".") && !strings.HasPrefix(fileName, "/") && !strings.HasPrefix(fileName, "~") {
+		path, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		fileName = path + "/" + fileName
 	}
 
 	// to read
@@ -58,7 +66,7 @@ func fileReadAndUpdateKv(key, value string) error {
 		f = readOneLineNormal
 	}
 
-	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
+	fileRead, err := os.OpenFile(fileName, os.O_RDONLY, 0600)
 	if err != nil {
 		return err
 	}
@@ -94,7 +102,7 @@ func fileReadAndUpdateKv(key, value string) error {
 	}
 	fileRead.Close()
 
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -120,9 +128,13 @@ func fileReadAndDeleteKv(key string) error {
 		return err
 	}
 
-	path, err := os.Getwd()
-	if err != nil {
-		return err
+	fileName := s.EnvFileName
+	if !strings.HasPrefix(fileName, ".") && !strings.HasPrefix(fileName, "/") && !strings.HasPrefix(fileName, "~") {
+		path, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+		fileName = path + "/" + fileName
 	}
 
 	// to read
@@ -132,7 +144,7 @@ func fileReadAndDeleteKv(key string) error {
 		f = readOneLineNormal
 	}
 
-	fileRead, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
+	fileRead, err := os.OpenFile(fileName, os.O_RDONLY, 0600)
 	if err != nil {
 		return err
 	}
@@ -153,7 +165,7 @@ func fileReadAndDeleteKv(key string) error {
 
 	fileRead.Close()
 
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
@@ -179,12 +191,16 @@ func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 		return nil, err
 	}
 
-	path, err := os.Getwd()
-	if err != nil {
-		return nil, err
+	fileName := s.EnvFileName
+	if !strings.HasPrefix(fileName, ".") && !strings.HasPrefix(fileName, "/") && !strings.HasPrefix(fileName, "~") {
+		path, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		fileName = path + "/" + fileName
 	}
 
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s", path, s.EnvFileName), os.O_RDONLY, 0600)
+	file, err := os.OpenFile(fileName, os.O_RDONLY, 0600)
 	if err != nil {
 		return nil, err
 	}

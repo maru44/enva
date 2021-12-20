@@ -22,7 +22,7 @@ func (c *get) Run(ctx context.Context, opts ...string) error {
 	defer cancel()
 
 	// without keys
-	if opts == nil || len(opts) == 0 {
+	if len(opts) == 0 {
 		body, err := fetchListValid(ctx)
 		if err != nil {
 			return err

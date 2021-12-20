@@ -22,10 +22,6 @@ func (c *delete) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if opts == nil {
-		return errors.New("Need one an arg")
-	}
-
 	if len(opts) > 1 {
 		return errors.New("Too many arguments")
 	} else if len(opts) < 1 {

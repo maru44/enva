@@ -71,7 +71,7 @@ func (c *set) inputSettingsInfo() (projectSlug string, fileName string, orgId st
 		projectSlug = scan.Text()
 
 		if projectSlug != "" {
-			fmt.Print("filepath (must be relatively and not start with / or .)\nfilepath: ")
+			fmt.Print("filepath: ")
 			scan := bufio.NewScanner(os.Stdin)
 			scan.Scan()
 			fileName = scan.Text()
