@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
@@ -12,7 +13,11 @@ type (
 	createCommandHandler func() domain.ICommandInteractor
 )
 
-var Commands = map[string]createCommandHandler{}
+var (
+	Commands = map[string]createCommandHandler{}
+
+	ApiUrl = os.Getenv("CLI_API_URL")
+)
 
 func Run(ctx context.Context, taskName string, opts ...string) error {
 	createCommands, ok := Commands[taskName]

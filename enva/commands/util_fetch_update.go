@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -28,7 +27,7 @@ func fetchUpdateKv(ctx context.Context, key, value string) (*kvUpdateBody, error
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/cli/kv/update?projectSlug=%s", config.API_URL, s.ProjectSlug)
+	url := fmt.Sprintf("%s/cli/kv/update?projectSlug=%s", ApiUrl, s.ProjectSlug)
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
@@ -59,7 +58,7 @@ func fetchUpdateKv(ctx context.Context, key, value string) (*kvUpdateBody, error
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", email+config.CLI_HEADER_SEP+password)
+	req.Header.Set("Authorization", email+domain.CLI_HEADER_SEP+password)
 
 	client := &http.Client{}
 	res, err := client.Do(req)

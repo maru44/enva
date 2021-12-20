@@ -85,3 +85,7 @@ func CreateAndValidateCliUserCraeteInput(user User, hashed string) (*CliUserCrea
 
 	return input, nil
 }
+
+const (
+	CLI_HEADER_SEP = "=+=+=+="
+)

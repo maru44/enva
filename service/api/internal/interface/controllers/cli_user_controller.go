@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/internal/interface/database"
 	"github.com/maru44/enva/service/api/internal/interface/password"
 	"github.com/maru44/enva/service/api/internal/usecase"
@@ -100,7 +99,7 @@ func (con *CliUserController) BaseMiddleware(next http.Handler) http.Handler {
 func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		iPass := r.Header.Get("Authorization")
-		iPassArr := strings.SplitN(iPass, config.CLI_HEADER_SEP, 2)
+		iPassArr := strings.SplitN(iPass, domain.CLI_HEADER_SEP, 2)
 		if len(iPassArr) != 2 {
 			response(w, r, perr.New(perr.Forbidden.Error(), perr.Forbidden), nil)
 			return

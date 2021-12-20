@@ -24,6 +24,4 @@ var (
 
 	COGNITO_KEYS_URL = fmt.Sprintf("https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json", os.Getenv("COGNITO_REGION"), os.Getenv("COGNITO_USERPOOL_ID"))
 	COGNITO_SECRET   = os.Getenv("COGNITO_SECRET")
-
-	CLI_HEADER_SEP = "=+=+=+="
 )

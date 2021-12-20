@@ -13,3 +13,5 @@ export POSTGRES_MAX_IDLE_CONNECTIONS="2"
 export COGNITO_REGION=
 export COGNITO_USERPOOL_ID=
 export COGNITO_SECRET=
+
+export CLI_API_URL="http://localhost:8080"

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/maru44/enva/service/api/internal/config"
+	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
@@ -25,7 +25,7 @@ func fetchDeleteKv(ctx context.Context, key string) (*kvDeleteBody, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/cli/kv/delete?projectSlug=%s&key=%s", config.API_URL, s.ProjectSlug, key)
+	url := fmt.Sprintf("%s/cli/kv/delete?projectSlug=%s&key=%s", ApiUrl, s.ProjectSlug, key)
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
@@ -45,7 +45,7 @@ func fetchDeleteKv(ctx context.Context, key string) (*kvDeleteBody, error) {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", email+config.CLI_HEADER_SEP+password)
+	req.Header.Set("Authorization", email+domain.CLI_HEADER_SEP+password)
 
 	client := &http.Client{}
 	res, err := client.Do(req)

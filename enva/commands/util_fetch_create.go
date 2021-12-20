@@ -1,23 +1,24 @@
 package commands
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
-	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
-	kvDetailBody struct {
-		Data domain.KvValid `json:"data"`
+	kvCreateBody struct {
+		Id string `json:"id"`
 	}
 )
 
-func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDetailBody, error) {
+func fetchCreateKv(ctx context.Context, key, value string) (*kvCreateBody, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -26,22 +27,38 @@ func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDeta
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/cli/kv/detail?key=%s&projectSlug=%s", config.API_URL, key, s.ProjectSlug)
+	url := fmt.Sprintf("%s/cli/kv/create?projectSlug=%s", ApiUrl, s.ProjectSlug)
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
 	}
 
+	email, password, err := inputEmailPassword()
+	if err != nil {
+		return nil, err
+	}
+
+	input := domain.KvInputWithProjectID{
+		Input: domain.KvInput{
+			Key:   domain.KvKey(strings.Trim(key, "\"")),
+			Value: domain.KvValue(value),
+		},
+	}
+	inputJ, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+
 	req, err := http.NewRequest(
-		http.MethodGet,
+		http.MethodPost,
 		url,
-		nil,
+		bytes.NewBuffer(inputJ),
 	)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", email+config.CLI_HEADER_SEP+password)
+	req.Header.Set("Authorization", email+domain.CLI_HEADER_SEP+password)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -52,7 +69,7 @@ func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDeta
 
 	switch res.StatusCode {
 	case 200:
-		body := &kvDetailBody{}
+		body := &kvCreateBody{}
 		if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 			return nil, err
 		}
