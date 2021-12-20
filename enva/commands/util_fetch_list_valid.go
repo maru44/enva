@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -29,7 +28,7 @@ func fetchListValid(ctx context.Context) (*kvListBody, error) {
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/cli/kv?projectSlug=%s", ApiUrl, s.ProjectSlug)
+	path := "/cli/kv?projectSlug=" + s.ProjectSlug
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
@@ -40,16 +39,10 @@ func fetchListValid(ctx context.Context) (*kvListBody, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(
-		http.MethodGet,
-		url,
-		nil,
-	)
+	req, err := request(path, http.MethodGet, nil, email, password)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", email+domain.CLI_HEADER_SEP+password)
 
 	client := &http.Client{}
 	res, err := client.Do(req)

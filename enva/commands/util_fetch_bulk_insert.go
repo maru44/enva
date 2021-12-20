@@ -1,11 +1,9 @@
 package commands
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -26,7 +24,7 @@ func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput) (*kvBulkIn
 		return nil, err
 	}
 
-	url := fmt.Sprintf("%s/cli/kv/create/bulk?projectSlug=%s", ApiUrl, s.ProjectSlug)
+	path := "/cli/kv/create/bulk?projectSlug=" + s.ProjectSlug
 	if s.OrgSlug != nil {
 		// @TODO get by org
 		// url =
@@ -42,16 +40,10 @@ func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput) (*kvBulkIn
 		return nil, err
 	}
 
-	req, err := http.NewRequest(
-		http.MethodPost,
-		url,
-		bytes.NewBuffer(inputJ),
-	)
+	req, err := request(path, http.MethodPost, inputJ, email, password)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", email+domain.CLI_HEADER_SEP+password)
 
 	client := &http.Client{}
 	res, err := client.Do(req)
