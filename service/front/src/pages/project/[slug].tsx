@@ -20,16 +20,14 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   if (error) console.log(error)
 
   return (
-    <Box>
-      <Box>
-        {data && data.data && (
-          <Box>
-            <Typography variant="h3">{data.data.name}</Typography>
-            <KvList projectId={data.data.id} />
-            <KvUpsertForm projectId={data.data.id} />
-          </Box>
-        )}
-      </Box>
+    <Box width="100%">
+      {data && data.data && (
+        <Box>
+          <Typography variant="h3">{data.data.name}</Typography>
+          <KvList projectId={data.data.id} />
+          <KvUpsertForm projectId={data.data.id} />
+        </Box>
+      )}
     </Box>
   )
 }
