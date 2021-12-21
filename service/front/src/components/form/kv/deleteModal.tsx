@@ -1,4 +1,5 @@
 import { Box, Button, Dialog, DialogTitle, Grid } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { mutate } from 'swr'
 import { kvDeleteResponseBody } from '../../../../http/body/kv'
 import { GetPath } from '../../../../http/fetcher'
@@ -32,20 +33,37 @@ export const KvDeleteModal: React.FC<props> = ({
     } catch (e) {
       // @
     }
+    onClose()
   }
+
+  const classes = useStyles()
 
   return (
     <Dialog onClose={onClose} open={isOpen}>
-      <Box m={3}>
-        <DialogTitle>
-          Are you sure to delete <b>{kvKey}</b>?
-        </DialogTitle>
-        <Grid>
-          <Button onClick={onDelete} type="button">
-            Delete
-          </Button>
+      <Grid container className={classes.dialogContainer} p={3}>
+        <Grid sm={2} />
+        <Grid lg={8} sm={8}>
+          <DialogTitle>
+            Are you sure to delete <br />
+            <b>{kvKey}</b>?
+          </DialogTitle>
+          <Grid mt={2} justifyContent="space-between" container>
+            <Button onClick={onClose} type="button" variant="contained">
+              Close
+            </Button>
+            <Button onClick={onDelete} type="button" variant="contained">
+              Delete
+            </Button>
+          </Grid>
         </Grid>
-      </Box>
+      </Grid>
     </Dialog>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  dialogContainer: {
+    maxWidth: '600px',
+    width: '80vw',
+  },
+}))

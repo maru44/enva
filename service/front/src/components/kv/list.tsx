@@ -3,7 +3,7 @@ import React from 'react'
 import useSWR from 'swr'
 import { kvsResponseBody } from '../../../http/body/kv'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
-import { KvListTable } from '../form/kv/listTable'
+import { KvListTable } from './listTable'
 
 export type KvListProps = {
   projectId: string

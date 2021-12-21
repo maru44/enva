@@ -1,9 +1,18 @@
-import { Box, Button, Dialog, DialogTitle, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  FormControl,
+  Grid,
+  TextField,
+} from '@mui/material'
 import React, { useState } from 'react'
 import { mutate } from 'swr'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchUpdateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
+import makeStyles from '@mui/styles/makeStyles'
 
 type props = {
   kvKey: string
@@ -51,20 +60,59 @@ export const KvUpdateForm: React.FC<props> = ({
     }
   }
 
+  const classes = useStyles()
+
   return (
-    <Dialog onClose={onClose} open={isOpen}>
-      <Box m={3}>
-        <DialogTitle>Edit: {kvKey}</DialogTitle>
-        <TextField
-          type="text"
-          defaultValue={kvValue}
-          placeholder="value"
-          onChange={onChange}
-        />
-        <Button onClick={update} type="button">
-          Update
-        </Button>
-      </Box>
+    <Dialog
+      onClose={() => {
+        onClose()
+        setVal(kvValue)
+      }}
+      open={isOpen}
+    >
+      <Grid container className={classes.dialogContainer}>
+        <Grid sm={2} />
+        <Grid lg={8} sm={8}>
+          <DialogTitle>Edit: {kvKey}</DialogTitle>
+          <Box mt={2}>
+            <FormControl fullWidth>
+              <TextField
+                type="text"
+                defaultValue={kvValue}
+                placeholder="value"
+                onChange={onChange}
+              />
+            </FormControl>
+          </Box>
+          <Grid container justifyContent="space-between" mt={2} mb={2}>
+            <Button
+              onClick={() => {
+                onClose()
+                setVal(kvValue)
+              }}
+              variant="contained"
+              type="button"
+            >
+              Close
+            </Button>
+            <Button
+              onClick={update}
+              variant="contained"
+              type="button"
+              disabled={!val || kvValue === val}
+            >
+              Update
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
     </Dialog>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  dialogContainer: {
+    maxWidth: '600px',
+    width: '80vw',
+  },
+}))
