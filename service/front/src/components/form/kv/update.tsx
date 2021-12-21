@@ -13,6 +13,7 @@ import { GetPath } from '../../../../http/fetcher'
 import { fetchUpdateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
 import makeStyles from '@mui/styles/makeStyles'
+import theme from '../../../theme/theme'
 
 type props = {
   kvKey: string
@@ -60,7 +61,7 @@ export const KvUpdateForm: React.FC<props> = ({
     }
   }
 
-  const classes = useStyles()
+  const classes = useStyles(theme)
 
   return (
     <Dialog
@@ -92,6 +93,7 @@ export const KvUpdateForm: React.FC<props> = ({
               }}
               variant="contained"
               type="button"
+              className={classes.subButton}
             >
               Close
             </Button>
@@ -110,9 +112,12 @@ export const KvUpdateForm: React.FC<props> = ({
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   dialogContainer: {
     maxWidth: '600px',
     width: '80vw',
+  },
+  subButton: {
+    backgroundColor: theme.palette.grey[700],
   },
 }))

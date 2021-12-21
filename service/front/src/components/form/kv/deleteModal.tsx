@@ -4,6 +4,7 @@ import { mutate } from 'swr'
 import { kvDeleteResponseBody } from '../../../../http/body/kv'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchDeleteKv } from '../../../../http/kv'
+import theme from '../../../theme/theme'
 
 type props = {
   kvId: string
@@ -36,7 +37,7 @@ export const KvDeleteModal: React.FC<props> = ({
     onClose()
   }
 
-  const classes = useStyles()
+  const classes = useStyles(theme)
 
   return (
     <Dialog onClose={onClose} open={isOpen}>
@@ -48,7 +49,12 @@ export const KvDeleteModal: React.FC<props> = ({
             <b>{kvKey}</b>?
           </DialogTitle>
           <Grid mt={2} justifyContent="space-between" container>
-            <Button onClick={onClose} type="button" variant="contained">
+            <Button
+              onClick={onClose}
+              type="button"
+              variant="contained"
+              className={classes.subButton}
+            >
               Close
             </Button>
             <Button onClick={onDelete} type="button" variant="contained">
@@ -61,9 +67,12 @@ export const KvDeleteModal: React.FC<props> = ({
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   dialogContainer: {
     maxWidth: '600px',
     width: '80vw',
+  },
+  subButton: {
+    backgroundColor: theme.palette.grey[700],
   },
 }))
