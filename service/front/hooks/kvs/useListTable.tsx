@@ -1,35 +1,56 @@
 type kvListState = {
   isOpenUpdate: boolean
-  updateKey: string
+  targetKey: string
   updateDefaultValue: string
+  deleteId: string
+  isOpenDelete: boolean
 }
 
 type kvListAction =
   | {
-      type: 'close'
+      type: 'closeUpdate'
     }
   | {
-      type: 'open'
-      updateKey: string
+      type: 'closeDelete'
+    }
+  | {
+      type: 'openUpdate'
+      targetKey: string
       updateDefaultValue: string
+    }
+  | {
+      type: 'openDelete'
+      targetKey: string
+      deleteId: string
     }
 
 export const initialKvListState: kvListState = {
   isOpenUpdate: false,
-  updateKey: '',
+  targetKey: '',
   updateDefaultValue: '',
+  isOpenDelete: false,
+  deleteId: '',
 }
 
 export const kvListReducer = (state: kvListState, action: kvListAction) => {
   switch (action.type) {
-    case 'close':
+    case 'closeUpdate':
       return { ...state, isOpenUpdate: false }
-    case 'open':
+    case 'closeDelete':
+      return { ...state, isOpenDelete: false }
+    case 'openUpdate':
       return {
         ...state,
         isOpenUpdate: true,
-        updateKey: action.updateKey,
+        targetKey: action.targetKey,
         updateDefaultValue: action.updateDefaultValue,
+      }
+    case 'openDelete':
+      return {
+        ...state,
+        isOpenDelete: true,
+        targetKey: action.targetKey,
+        deleteId: action.deleteId,
       }
   }
 }

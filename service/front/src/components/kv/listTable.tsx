@@ -8,17 +8,14 @@ import {
   TableRow,
 } from '@mui/material'
 import React, { useReducer } from 'react'
-import { useSWRConfig } from 'swr'
 import {
   initialKvListState,
   kvListReducer,
-} from '../../../../hooks/kvs/useListTable'
-import { kvDeleteResponseBody } from '../../../../http/body/kv'
-import { GetPath } from '../../../../http/fetcher'
-import { fetchDeleteKv } from '../../../../http/kv'
-import { Kv } from '../../../../types/kv'
-import { sortKvs } from '../../../../utils/kv'
-import { KvUpdateForm } from './update'
+} from '../../../hooks/kvs/useListTable'
+import { Kv } from '../../../types/kv'
+import { sortKvs } from '../../../utils/kv'
+import { KvDeleteModal } from '../form/kv/deleteModal'
+import { KvUpdateForm } from '../form/kv/update'
 
 type props = {
   kvs: Kv[]
@@ -26,25 +23,7 @@ type props = {
 }
 
 export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
-  const { mutate } = useSWRConfig()
   const [state, dispatch] = useReducer(kvListReducer, initialKvListState)
-
-  // delete function
-  const delKeyFunc = async (keyId: string, projectId: string) => {
-    try {
-      const res = await fetchDeleteKv(keyId, projectId)
-      const ret: kvDeleteResponseBody = await res.json()
-
-      switch (res.status) {
-        case 200:
-          mutate(`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`)
-        default:
-      }
-    } catch (e) {
-      // @TODO 500
-      console.log(e)
-    }
-  }
 
   return (
     <TableContainer>
@@ -66,7 +45,11 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                   <Button
                     type="button"
                     onClick={() => {
-                      delKeyFunc(kv.id, projectId)
+                      dispatch({
+                        type: 'openDelete',
+                        targetKey: kv.kv_key,
+                        deleteId: kv.id,
+                      })
                     }}
                   >
                     Delete
@@ -75,8 +58,8 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                     type="button"
                     onClick={() => {
                       dispatch({
-                        type: 'open',
-                        updateKey: kv.kv_key,
+                        type: 'openUpdate',
+                        targetKey: kv.kv_key,
                         updateDefaultValue: kv.kv_value,
                       })
                     }}
@@ -89,12 +72,19 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
         </TableBody>
       </Table>
       <KvUpdateForm
-        kvKey={state.updateKey}
+        kvKey={state.targetKey}
         kvValue={state.updateDefaultValue}
         projectId={projectId}
         isOpen={state.isOpenUpdate}
-        onClose={() => dispatch({ type: 'close' })}
+        onClose={() => dispatch({ type: 'closeUpdate' })}
       />
+      <KvDeleteModal
+        kvId={state.deleteId}
+        projectId={projectId}
+        kvKey={state.targetKey}
+        isOpen={state.isOpenDelete}
+        onClose={() => dispatch({ type: 'closeDelete' })}
+      ></KvDeleteModal>
     </TableContainer>
   )
 }

@@ -10,7 +10,6 @@ type props = {
   kvValue: string
   projectId: string
   isOpen: boolean
-  //   onClose: React.Dispatch<React.SetStateAction<boolean>>
   onClose: () => void
 }
 
