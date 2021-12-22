@@ -1,4 +1,11 @@
-import { Box, Button, Dialog, DialogTitle, Grid } from '@mui/material'
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  Grid,
+  Typography,
+} from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { mutate } from 'swr'
 import { kvDeleteResponseBody } from '../../../../http/body/kv'
@@ -44,11 +51,11 @@ export const KvDeleteModal: React.FC<props> = ({
       <Grid container className={classes.dialogContainer} p={3}>
         <Grid sm={2} />
         <Grid lg={8} sm={8}>
-          <DialogTitle>
+          <Typography variant="h5">
             Are you sure to delete <br />
             <b>{kvKey}</b>?
-          </DialogTitle>
-          <Grid mt={2} justifyContent="space-between" container>
+          </Typography>
+          <Grid mt={4} justifyContent="space-between" container>
             <Button
               onClick={onClose}
               type="button"
@@ -57,7 +64,12 @@ export const KvDeleteModal: React.FC<props> = ({
             >
               Close
             </Button>
-            <Button onClick={onDelete} type="button" variant="contained">
+            <Button
+              onClick={onDelete}
+              type="button"
+              variant="contained"
+              color="warning"
+            >
               Delete
             </Button>
           </Grid>

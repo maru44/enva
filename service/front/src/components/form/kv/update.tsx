@@ -6,6 +6,7 @@ import {
   FormControl,
   Grid,
   TextField,
+  Typography,
 } from '@mui/material'
 import React, { useState } from 'react'
 import { mutate } from 'swr'
@@ -71,10 +72,10 @@ export const KvUpdateForm: React.FC<props> = ({
       }}
       open={isOpen}
     >
-      <Grid container className={classes.dialogContainer}>
+      <Grid container className={classes.dialogContainer} p={3}>
         <Grid sm={2} />
         <Grid lg={8} sm={8}>
-          <DialogTitle>Edit: {kvKey}</DialogTitle>
+          <Typography variant="h5">Edit: {kvKey}</Typography>
           <Box mt={2}>
             <FormControl fullWidth>
               <TextField
@@ -85,7 +86,7 @@ export const KvUpdateForm: React.FC<props> = ({
               />
             </FormControl>
           </Box>
-          <Grid container justifyContent="space-between" mt={2} mb={2}>
+          <Grid container justifyContent="space-between" mt={2}>
             <Button
               onClick={() => {
                 onClose()

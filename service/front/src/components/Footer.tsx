@@ -10,6 +10,7 @@ export const Footer: React.FC = () => {
       pt={1}
       pb={1}
       pl={2}
+      mt={2}
     >
       <Grid item>
         <Typography>&copy; 2021 maru</Typography>

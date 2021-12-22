@@ -1,4 +1,4 @@
-import { Box, Card, Typography } from '@mui/material'
+import { Box, Card, Container, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
@@ -20,15 +20,15 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   if (error) console.log(error)
 
   return (
-    <Box width="100%">
+    <Container>
       {data && data.data && (
         <Box>
-          <Typography variant="h3">{data.data.name}</Typography>
+          <Typography variant="h4">{data.data.name}</Typography>
           <KvList projectId={data.data.id} />
           <KvUpsertForm projectId={data.data.id} />
         </Box>
       )}
-    </Box>
+    </Container>
   )
 }
 
