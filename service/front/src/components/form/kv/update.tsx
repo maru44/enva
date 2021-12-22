@@ -68,7 +68,7 @@ export const KvUpdateForm: React.FC<props> = ({
     <Dialog
       onClose={() => {
         onClose()
-        setVal(kvValue)
+        setVal('')
       }}
       open={isOpen}
     >
@@ -90,7 +90,7 @@ export const KvUpdateForm: React.FC<props> = ({
             <Button
               onClick={() => {
                 onClose()
-                setVal(kvValue)
+                setVal('')
               }}
               variant="contained"
               type="button"

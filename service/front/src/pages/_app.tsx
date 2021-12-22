@@ -14,7 +14,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     <RecoilRoot>
       <ThemeProvider theme={theme}>
         <Container maxWidth={false}>
-          {/* <Component {...pageProps} /> */}
           <BaseLayout main={<Component {...pageProps} />} />
         </Container>
       </ThemeProvider>

@@ -25,7 +25,6 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
         <Box>
           <Typography variant="h4">{data.data.name}</Typography>
           <KvList projectId={data.data.id} />
-          <KvUpsertForm projectId={data.data.id} />
         </Box>
       )}
     </Container>

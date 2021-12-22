@@ -20,6 +20,7 @@ import {
 import { Kv } from '../../../types/kv'
 import { sortKvs } from '../../../utils/kv'
 import theme from '../../theme/theme'
+import { KvInsertTableRow } from '../form/kv/createTablerow'
 import { KvDeleteModal } from '../form/kv/deleteModal'
 import { KvUpdateForm } from '../form/kv/update'
 
@@ -38,10 +39,10 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
       <Table aria-label="key value sets">
         <TableHead>
           <TableRow>
-            <TableCell>
+            <TableCell width="30%">
               <Typography variant="subtitle1">Key</Typography>
             </TableCell>
-            <TableCell>
+            <TableCell width="45%">
               <Typography variant="subtitle1">Value</Typography>
             </TableCell>
             <TableCell></TableCell>
@@ -51,7 +52,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
           {kvs &&
             sortKvs(kvs).map((kv, i) => (
               <TableRow key={i}>
-                <TableCell width="20%">
+                <TableCell>
                   <Typography
                     className={clsx(classes.breakCell)}
                     variant="inherit"
@@ -59,7 +60,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                     {kv.kv_key}
                   </Typography>
                 </TableCell>
-                <TableCell width="55%">
+                <TableCell>
                   <Typography
                     className={clsx(classes.breakCell)}
                     variant="inherit"
@@ -80,6 +81,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                           })
                         }}
                         variant="contained"
+                        color="secondary"
                       >
                         Edit
                       </Button>
@@ -104,6 +106,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                 </TableCell>
               </TableRow>
             ))}
+          <KvInsertTableRow projectId={projectId} />
         </TableBody>
       </Table>
       <KvUpdateForm

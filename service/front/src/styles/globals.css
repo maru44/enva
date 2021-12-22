@@ -14,3 +14,18 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.hrefBox {
+  cursor: pointer;
+  position: relative;
+}
+.hrefBox:hover {
+  opacity: 0.6;
+}
+.hrefBoxIn {
+  left: 0;
+  top: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
