@@ -1,4 +1,5 @@
 import { Box, Button, TableCell, TableRow, TextField } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import React, { useRef } from 'react'
 import { useSWRConfig } from 'swr'
 import { kvCreateResponseBody } from '../../../../http/body/kv'
@@ -48,17 +49,18 @@ export const KvInsertTableRow = ({ projectId }: KvUpsertProps) => {
     }
   }
 
+  const classes = useStyles()
+
   return (
     <TableRow>
-      <TableCell colSpan={3} width="100%">
-        <form onSubmit={submit} style={{ width: '100%' }}>
+      <TableCell colSpan={3} width="100%" sx={{ padding: 0 }}>
+        <form onSubmit={submit}>
           <Box
             display="flex"
             flexDirection="row"
             justifyContent="space-between"
-            width="100%"
           >
-            <Box width="30%" pr={3}>
+            <Box width="30%" p={2}>
               <TextField
                 name="kv_key"
                 variant="outlined"
@@ -68,7 +70,7 @@ export const KvInsertTableRow = ({ projectId }: KvUpsertProps) => {
                 inputRef={refKey}
               />
             </Box>
-            <Box width="45%">
+            <Box width="70%" p={2}>
               <TextField
                 name="kv_value"
                 label="value"
@@ -77,10 +79,17 @@ export const KvInsertTableRow = ({ projectId }: KvUpsertProps) => {
                 inputRef={refValue}
               />
             </Box>
-            <Box height={24} flex={1} pl={3} pt={1}>
-              <Button type="submit" variant="contained">
-                CREATE
-              </Button>
+            <Box flex={1} p={2}>
+              <Box height={24} pt={1}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="success"
+                  className={classes.createButton}
+                >
+                  CREATE
+                </Button>
+              </Box>
             </Box>
           </Box>
         </form>
@@ -88,3 +97,9 @@ export const KvInsertTableRow = ({ projectId }: KvUpsertProps) => {
     </TableRow>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  createButton: {
+    width: 96,
+  },
+}))

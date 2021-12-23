@@ -1,6 +1,6 @@
 import {
   Box,
-  Button,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -23,6 +23,7 @@ import theme from '../../theme/theme'
 import { KvInsertTableRow } from '../form/kv/createTablerow'
 import { KvDeleteModal } from '../form/kv/deleteModal'
 import { KvUpdateForm } from '../form/kv/update'
+import { Delete, Edit } from '@material-ui/icons'
 
 type props = {
   kvs: Kv[]
@@ -35,17 +36,21 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
   const classes = useStyles(theme)
 
   return (
-    <TableContainer component={Paper} className={clsx(classes.tableContainer)}>
+    <TableContainer
+      component={Paper}
+      className={clsx(classes.tableContainer)}
+      variant="outlined"
+    >
       <Table aria-label="key value sets">
         <TableHead>
           <TableRow>
             <TableCell width="30%">
               <Typography variant="subtitle1">Key</Typography>
             </TableCell>
-            <TableCell width="45%">
+            <TableCell width="70%">
               <Typography variant="subtitle1">Value</Typography>
             </TableCell>
-            <TableCell></TableCell>
+            <TableCell width={100}></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -71,8 +76,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                 <TableCell>
                   <Box display="flex" flexDirection="row">
                     <Box>
-                      <Button
-                        type="button"
+                      <IconButton
                         onClick={() => {
                           dispatch({
                             type: 'openUpdate',
@@ -80,27 +84,22 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                             updateDefaultValue: kv.kv_value,
                           })
                         }}
-                        variant="contained"
-                        color="secondary"
                       >
-                        Edit
-                      </Button>
+                        <Edit />
+                      </IconButton>
                     </Box>
                     <Box ml={2}>
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          dispatch({
-                            type: 'openDelete',
-                            targetKey: kv.kv_key,
-                            deleteId: kv.id,
-                          })
-                        }}
-                        variant="contained"
-                        color="warning"
-                      >
-                        Delete
-                      </Button>
+                      <IconButton>
+                        <Delete
+                          onClick={() => {
+                            dispatch({
+                              type: 'openDelete',
+                              targetKey: kv.kv_key,
+                              deleteId: kv.id,
+                            })
+                          }}
+                        />
+                      </IconButton>
                     </Box>
                   </Box>
                 </TableCell>
@@ -129,7 +128,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
 
 const useStyles = makeStyles((theme) => ({
   tableContainer: {
-    backgroundColor: theme.palette.grey[200],
+    // backgroundColor: theme.palette.grey[200],
     marginTop: theme.spacing(2),
   },
   breakCell: {
