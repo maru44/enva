@@ -15,11 +15,9 @@ export const BaseLayout: React.FC<props> = ({ main }) => {
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
       <Header />
-      <Box className={clsx(classes.main)}>
-        <Container>
-          <Grid container>{main}</Grid>
-        </Container>
-      </Box>
+      <Container className={clsx(classes.main)}>
+        <Grid container>{main}</Grid>
+      </Container>
       <Footer />
     </Box>
   )

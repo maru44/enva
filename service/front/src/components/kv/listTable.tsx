@@ -50,7 +50,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
             <TableCell width="70%">
               <Typography variant="subtitle1">Value</Typography>
             </TableCell>
-            <TableCell width={100}></TableCell>
+            <TableCell width={128}></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
