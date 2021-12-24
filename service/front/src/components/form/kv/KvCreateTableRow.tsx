@@ -1,12 +1,20 @@
-import { Box, Button, TableCell, TableRow, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  TableCell,
+  TableRow,
+  TextField,
+  Tooltip,
+} from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useSnackbar } from 'notistack'
-import React, { useRef } from 'react'
+import React, { useState } from 'react'
 import { useSWRConfig } from 'swr'
 import { kvCreateResponseBody } from '../../../../http/body/kv'
 import { fetcher, GetPath } from '../../../../http/fetcher'
 import { fetchCreateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
+import { isSlug } from '../../../../utils/slug'
 
 export type KvUpsertProps = {
   projectId: string
@@ -17,20 +25,17 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
   const { mutate } = useSWRConfig()
   const snack = useSnackbar()
 
-  const refKey = useRef<HTMLInputElement>(null)
-  const refValue = useRef<HTMLInputElement>(null)
+  const [key, setKey] = useState<string>('')
+  const [value, setValue] = useState<string>('')
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const t = e.currentTarget
-    const k = t.kv_key.value
-    const v = t.kv_value.value
 
     const input: KvInput = {
       project_id: projectId,
       input: {
-        kv_key: k,
-        kv_value: v,
+        kv_key: key,
+        kv_value: value,
       },
     }
     const res = await fetcher(fetchCreateKv(input))
@@ -39,12 +44,8 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
       const id = ret['data']
       mutate(`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`)
 
-      if (refKey.current) {
-        refKey.current.value = ''
-      }
-      if (refValue.current) {
-        refValue.current.value = ''
-      }
+      setKey('')
+      setValue('')
     } else {
       const message = ret['error']
       snack.enqueueSnackbar(message, { variant: 'error' })
@@ -63,14 +64,25 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
             justifyContent="space-between"
           >
             <Box width="30%" p={2}>
-              <TextField
-                name="kv_key"
-                variant="outlined"
-                label="key"
-                required
-                fullWidth
-                inputRef={refKey}
-              />
+              <Tooltip
+                title="must be slug"
+                disableHoverListener
+                arrow
+                placement="bottom"
+                open={key !== '' && !isSlug(key)}
+              >
+                <TextField
+                  name="kv_key"
+                  variant="outlined"
+                  label="key"
+                  required
+                  fullWidth
+                  value={key}
+                  onChange={(e) => {
+                    setKey(e.currentTarget.value)
+                  }}
+                />
+              </Tooltip>
             </Box>
             <Box width="70%" p={2}>
               <TextField
@@ -78,7 +90,10 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
                 label="value"
                 variant="outlined"
                 fullWidth
-                inputRef={refValue}
+                value={value}
+                onChange={(e) => {
+                  setValue(e.currentTarget.value)
+                }}
               />
             </Box>
             <Box flex={1} p={2}>
@@ -88,6 +103,7 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
                   variant="contained"
                   color="success"
                   className={classes.createButton}
+                  disabled={!key || !isSlug(key)}
                 >
                   CREATE
                 </Button>

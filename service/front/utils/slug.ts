@@ -6,3 +6,9 @@ export const slugify = (str: string): string => {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+export const isSlug = (str: string): boolean => {
+  const regexExp = /^[a-z0-9-_]+$/gi
+
+  return regexExp.test(str)
+}
