@@ -50,9 +50,9 @@ func (c *CliUser) ToUser() *User {
 func (c *CliUserCreateInput) Validate() error {
 	if err := validation.ValidateStruct(c,
 		validation.Field(&c.CognitoID, validation.Required),
-		validation.Field(&c.Password, validation.Required, validation.RuneLength(31, 255)),
-		validation.Field(&c.Email, validation.Required, is.Email, validation.RuneLength(1, 255)),
-		// validation.Field(&c.Username, validation.Required, validation.RuneLength(1, 255)),
+		validation.Field(&c.Password, validation.Required, validation.Length(31, 255)),
+		validation.Field(&c.Email, validation.Required, is.Email, validation.Length(1, 255)),
+		// validation.Field(&c.Username, validation.Required, validation.Length(1, 255)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -61,8 +61,8 @@ func (c *CliUserCreateInput) Validate() error {
 
 func (c *CliUserValidateInput) Validate() error {
 	if err := validation.ValidateStruct(c,
-		validation.Field(&c.Password, validation.Required, validation.RuneLength(31, 255)),
-		validation.Field(&c.EmailOrUsername, validation.Required, validation.RuneLength(1, 255)),
+		validation.Field(&c.Password, validation.Required, validation.Length(31, 255)),
+		validation.Field(&c.EmailOrUsername, validation.Required, validation.Length(1, 255)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}

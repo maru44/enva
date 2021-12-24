@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"regexp"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -69,7 +70,11 @@ func (kv *KvValid) ToInput() *KvInput {
 }
 
 func (in *KvInput) Validate() error {
-	if err := validation.Validate(in.Key, validation.Required, validation.RuneLength(1, 1024)); err != nil {
+	if err := validation.Validate(in.Key,
+		validation.Required,
+		validation.Length(1, 1024),
+		validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`)),
+	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
 	return nil
