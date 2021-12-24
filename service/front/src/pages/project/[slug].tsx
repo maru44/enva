@@ -5,8 +5,7 @@ import useSWR from 'swr'
 import { projectResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
-import { KvUpsertForm } from '../../components/form/kv/create'
-import { KvList } from '../../components/kv/list'
+import { KvList } from '../../components/kv/KvList'
 
 const ProjectDetail: NextPage<PageProps> = (props) => {
   const router = useRouter()

@@ -1,5 +1,6 @@
 import { Box, Button, TableCell, TableRow, TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles'
+import { useSnackbar } from 'notistack'
 import React, { useRef } from 'react'
 import { useSWRConfig } from 'swr'
 import { kvCreateResponseBody } from '../../../../http/body/kv'
@@ -12,8 +13,9 @@ export type KvUpsertProps = {
 }
 
 // if env_key is exists >> update method is executed
-export const KvInsertTableRow = ({ projectId }: KvUpsertProps) => {
+export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
   const { mutate } = useSWRConfig()
+  const snack = useSnackbar()
 
   const refKey = useRef<HTMLInputElement>(null)
   const refValue = useRef<HTMLInputElement>(null)
@@ -45,7 +47,7 @@ export const KvInsertTableRow = ({ projectId }: KvUpsertProps) => {
       }
     } else {
       const message = ret['error']
-      console.log(message) // @TODO fix
+      snack.enqueueSnackbar(message, { variant: 'error' })
     }
   }
 

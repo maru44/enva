@@ -1,6 +1,5 @@
 import { Box, Container, Grid } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import clsx from 'clsx'
 import { ReactNode } from 'react'
 import theme from '../theme/theme'
 import { Footer } from './Footer'
@@ -15,7 +14,7 @@ export const BaseLayout: React.FC<props> = ({ main }) => {
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
       <Header />
-      <Container className={clsx(classes.main)}>
+      <Container className={classes.main}>
         <Grid container>{main}</Grid>
       </Container>
       <Footer />

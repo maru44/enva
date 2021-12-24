@@ -24,7 +24,7 @@ type props = {
   onClose: () => void
 }
 
-export const KvUpdateForm: React.FC<props> = ({
+export const KvUpdateModal: React.FC<props> = ({
   kvKey,
   kvValue,
   projectId,

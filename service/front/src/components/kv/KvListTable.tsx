@@ -20,9 +20,9 @@ import {
 import { Kv } from '../../../types/kv'
 import { sortKvs } from '../../../utils/kv'
 import theme from '../../theme/theme'
-import { KvInsertTableRow } from '../form/kv/createTablerow'
-import { KvDeleteModal } from '../form/kv/deleteModal'
-import { KvUpdateForm } from '../form/kv/update'
+import { KvCreateTableRow } from '../form/kv/KvCreateTableRow'
+import { KvDeleteModal } from '../form/kv/KvDeleteModal'
+import { KvUpdateModal } from '../form/kv/KvUpdateModal'
 import { Delete, Edit } from '@material-ui/icons'
 
 type props = {
@@ -105,10 +105,10 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
                 </TableCell>
               </TableRow>
             ))}
-          <KvInsertTableRow projectId={projectId} />
+          <KvCreateTableRow projectId={projectId} />
         </TableBody>
       </Table>
-      <KvUpdateForm
+      <KvUpdateModal
         kvKey={state.targetKey}
         kvValue={state.updateDefaultValue}
         projectId={projectId}
