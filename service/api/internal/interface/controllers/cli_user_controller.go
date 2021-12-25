@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -14,66 +13,18 @@ import (
 )
 
 type CliUserController struct {
-	in domain.ICliUserInteractor
+	in domain.IUserInteractor
 }
 
 func NewCliUserController(sql database.ISqlHandler, pass password.IPassword) *CliUserController {
 	return &CliUserController{
-		in: usecase.NewCliUserInteractor(
-			&database.CliUserRepository{
+		in: usecase.NewUserInteractor(
+			&database.UserRepository{
 				ISqlHandler: sql,
 				IPassword:   pass,
 			},
 		),
 	}
-}
-
-func (con *CliUserController) CreateView(w http.ResponseWriter, r *http.Request) {
-	pass, err := con.in.Create(r.Context())
-	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
-		return
-	}
-
-	response(w, r, nil, map[string]interface{}{"data": pass})
-	return
-}
-
-func (con *CliUserController) UpdateView(w http.ResponseWriter, r *http.Request) {
-	pass, err := con.in.Update(r.Context())
-	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
-		return
-	}
-
-	response(w, r, nil, map[string]interface{}{"data": pass})
-	return
-}
-
-func (con *CliUserController) ValidateView(w http.ResponseWriter, r *http.Request) {
-	input := &domain.CliUserValidateInput{}
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
-		return
-	}
-
-	if err := con.in.Validate(r.Context(), input); err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
-		return
-	}
-
-	response(w, r, nil, map[string]interface{}{"data": "valid user"})
-	return
-}
-
-func (con *CliUserController) ExistsView(w http.ResponseWriter, r *http.Request) {
-	if err := con.in.Exists(r.Context()); err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
-		return
-	}
-
-	response(w, r, nil, map[string]interface{}{"data": "exists"})
-	return
 }
 
 /********************************
@@ -105,12 +56,12 @@ func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Ha
 			return
 		}
 
-		input := &domain.CliUserValidateInput{
+		input := &domain.UserCliValidationInput{
 			EmailOrUsername: iPassArr[0],
-			Password:        iPassArr[1],
+			CliPassword:     iPassArr[1],
 		}
 
-		user, err := con.in.GetUser(r.Context(), input)
+		user, err := con.in.GetUserCli(r.Context(), input)
 		if err != nil {
 			response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 			return

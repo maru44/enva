@@ -34,6 +34,7 @@ func main() {
 	kv := controllers.NewKvController(sql)
 	cliKv := controllers.NewCliKvController(sql)
 	project := controllers.NewProjectController(sql)
+	user := controllers.NewUserController(sql, pass)
 	cliU := controllers.NewCliUserController(sql, pass)
 
 	middlewareMap["login"] = base.LoginRequiredMiddleware
@@ -44,7 +45,6 @@ func main() {
 	// no middlewares
 	sv([]pmf{
 		s("/", anyMethod, base.NotFoundView),
-		s("/cli/user/validate", http.MethodPost, cliU.ValidateView),
 	})
 
 	// get user from ctx
@@ -67,10 +67,12 @@ func main() {
 			s("/project/create", http.MethodPost, project.CreateView),
 			s("/project/delete", http.MethodDelete, project.DeleteView),
 
+			/* user */
+			s("/user/create", http.MethodGet, user.CreateView),
+
 			/* cli_users */
-			s("/cli/user", http.MethodGet, cliU.ExistsView),
-			s("/cli/user/create", http.MethodGet, cliU.CreateView),
-			s("/cli/user/update", http.MethodGet, cliU.UpdateView),
+			s("/cli/user", http.MethodGet, user.ExistsCliPasswordView),
+			s("/cli/user/update", http.MethodGet, user.UpdateCliPasswordView),
 		},
 		"login",
 	)

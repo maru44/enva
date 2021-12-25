@@ -13,10 +13,7 @@ import { NextPage } from 'next'
 import { useState } from 'react'
 import useSWR from 'swr'
 import { cliUserResponseBody } from '../../../../http/body/cliUser'
-import {
-  fetchCreateCliUser,
-  fetchUpdateCliUser,
-} from '../../../../http/cliUser'
+import { fetchUpdateCliUser } from '../../../../http/cliUser'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
 import { PageProps } from '../../../../types/page'
 
@@ -29,9 +26,9 @@ const CliPassword: NextPage<PageProps> = (props) => {
     fetcherGetFromApiUrl
   )
 
-  const gen = async (re: boolean) => {
+  const gen = async () => {
     try {
-      const res = re ? await fetchUpdateCliUser() : await fetchCreateCliUser()
+      const res = await fetchUpdateCliUser()
       const ret: cliUserResponseBody = await res.json()
 
       switch (res.status) {
@@ -43,6 +40,7 @@ const CliPassword: NextPage<PageProps> = (props) => {
       }
     } catch (e) {
       console.log(e)
+      // @TODO show snack
     }
   }
 
@@ -122,18 +120,14 @@ const CliPassword: NextPage<PageProps> = (props) => {
               type="button"
               variant="contained"
               onClick={() => {
-                gen(true)
+                gen()
                 setIsCopied(false)
               }}
             >
               Re Generate
             </Button>
           ) : (
-            <Button
-              type="button"
-              variant="contained"
-              onClick={() => gen(false)}
-            >
+            <Button type="button" variant="contained" onClick={() => gen()}>
               Generate
             </Button>
           )}

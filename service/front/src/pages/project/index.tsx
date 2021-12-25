@@ -35,6 +35,7 @@ const ProjectList: NextPage<PageProps> = (props) => {
     initialProjectListState
   )
 
+  // @TODO error handling
   if (error) console.log(error)
 
   const classes = useStyles(theme)

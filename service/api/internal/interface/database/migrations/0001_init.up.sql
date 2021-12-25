@@ -17,48 +17,34 @@ CREATE TABLE orgs (
 -- @TODO add username and email and cli password table
 -- OR make custome field to aws cognito
 
--- CREATE TABLE users (
---     id VARCHAR(127),
---     email VARCHAR(255),
---     username VARCHAR(31),
---     image_url VARCHAR(255),
---     is_valid BOOLEAN NOT NULL,
---     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
---     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-
---     PRIMARY KEY (id)
--- );
-
--- cli password
-
--- if user is deleted >> is_valid must be changed to false
-CREATE TABLE cli_users (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    cognito_id VARCHAR(255) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    username VARCHAR(63) NOT NULL,
-    password VARCHAR(512),
-    is_valid BOOLEAN NOT NULL DEFAULT TRUE,
-
+CREATE TABLE users (
+    id uuid NOT NULL,
+    email VARCHAR(255),
+    username VARCHAR(31),
+    image_url VARCHAR(255),
+    cli_password VARCHAR(511) DEFAULT NULL,
+    is_valid BOOLEAN NOT NULL DEFAULT true,
+    is_email_verified BOOLEAN NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id)
 );
-CREATE INDEX ON cli_users (email);
-CREATE INDEX ON cli_users (username);
+CREATE UNIQUE INDEX ON users (email);
+CREATE UNIQUE INDEX ON users (username);
 
 -- relation org and users
 CREATE TABLE rel_org_members (
     org_id uuid NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
-    user_id VARCHAR(127) NOT NULL,
-    user_type VARCHAR(15) NOT NULL DEFAULT 'user',
+    user_id uuid NOT NULL REFERENCES users (id),
+    user_type VARCHAR(15) NOT NULL DEFAULT 'user', -- 'owner', 'admin', 'user', 'guest'
     is_valid BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
-    PRIMARY KEY (org_id, user_id)
+    PRIMARY KEY (org_id, user_id),
+    CONSTRAINT slug_unique_every_user UNIQUE (org_id, user_id)
 );
 
 -- projects
@@ -75,11 +61,11 @@ CREATE TABLE projects (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
-    PRIMARY KEY (id),
-    CONSTRAINT slug_unique_every_user UNIQUE (slug, owner_user_id) WHERE (is_valid = true),
-    CONSTRAINT slug_unique_every_org UNIQUE (slug, owner_org_id) WHERE (is_valid = true)
+    PRIMARY KEY (id)
 );
 CREATE INDEX ON projects (owner_user_id);
+CREATE UNIQUE INDEX project_slug_owner_user ON projects (slug, owner_user_id) WHERE (is_valid = true);
+CREATE UNIQUE INDEX project_slug_owner_org_id ON projects (slug, owner_org_id) WHERE (is_valid = true);
 
 -- key value sets
 CREATE TABLE kvs (

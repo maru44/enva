@@ -15,10 +15,10 @@ export const GetPath: { [key: string]: string } = {
   KV_UPDATE: '/kv/update',
   KV_DELETE: '/kv/delete',
 
+  USER_CREATE: '/user/create',
+
   CLI_USER: '/cli/user',
-  CLI_USER_CREATE: '/cli/user/create',
   CLI_USER_UPDATE: '/cli/user/update',
-  CLI_USER_VALIDATE: '/cli/user/validate',
 } as const
 export type GetPath = typeof GetPath[keyof typeof GetPath]
 

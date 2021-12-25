@@ -27,7 +27,7 @@ const (
 
 func (uc *UserFromClaim) ToUser() *User {
 	return &User{
-		ID:              uc.CognitoUserName,
+		ID:              UserID(uc.CognitoUserName),
 		Email:           uc.Email,
 		IsEmailVerified: uc.EmailVerified,
 	}

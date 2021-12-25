@@ -8,6 +8,7 @@ import {
   getCookieOption,
 } from '../../../../../config/cookie'
 import { cognitoTokenResponse } from '../../../../../types/oauth'
+import { fetchBaseApi, GetPath } from '../../../../../http/fetcher'
 
 export default async function handler(
   req: NextApiRequest,
@@ -43,7 +44,9 @@ export default async function handler(
             getCookieOption(3600 * 24 * 7 * 3)
           ),
         ])
-        res.redirect('/')
+
+        res.redirect('/auth/create')
+
         return
       default:
         res.status(400).json(ret)

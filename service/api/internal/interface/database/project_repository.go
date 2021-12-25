@@ -5,6 +5,7 @@ import (
 
 	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
 	"github.com/maru44/enva/service/api/pkg/domain"
+	"github.com/maru44/enva/service/api/pkg/tools"
 	"github.com/maru44/perr"
 )
 
@@ -128,8 +129,9 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 	}
 
 	var (
-		p             *domain.Project = &domain.Project{}
-		userID, orgID *string
+		p      *domain.Project = &domain.Project{}
+		userID domain.UserID
+		orgID  *string
 	)
 	if err := row.Scan(
 		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
@@ -141,8 +143,8 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 	}
 
 	// set user
-	if userID != nil {
-		if *userID != user.ID {
+	if userID != "" {
+		if userID != user.ID {
 			return nil, perr.New(perr.NotFound.Error(), perr.NotFound)
 		}
 		p.OwnerUser = &user
@@ -207,7 +209,7 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 	if in.OrgID != nil {
 		ownerType = domain.OwnerTypeOrg
 	} else {
-		inputU = &user.ID
+		inputU = tools.StringPtr(user.ID.String())
 	}
 
 	if err := repo.QueryRowContext(
