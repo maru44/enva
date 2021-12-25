@@ -1,4 +1,6 @@
 import { callbackUrl } from '../config/aws'
+import { userResponseBody } from './body/user'
+import { fetchBaseApi, GetPath } from './fetcher'
 
 export const getCognitoToken = async (code: string, state: string) => {
   return await fetch(
@@ -28,4 +30,17 @@ export const refreshCognitoToken = async (refreshToken: string) => {
       },
     }
   )
+}
+
+export const fetchCurrentUser = async () => {
+  try {
+    const res = await fetchBaseApi(GetPath.USER, 'GET')
+    const ret: userResponseBody = await res.json()
+
+    if (res.status === 200) return ret.data
+
+    return null
+  } catch (e) {
+    return null
+  }
 }

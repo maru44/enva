@@ -15,6 +15,7 @@ export const GetPath: { [key: string]: string } = {
   KV_UPDATE: '/kv/update',
   KV_DELETE: '/kv/delete',
 
+  USER: '/user',
   USER_CREATE: '/user/create',
 
   CLI_USER: '/cli/user',

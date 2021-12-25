@@ -38,7 +38,10 @@ type (
 	}
 )
 
-func (o *Org) IsMember(u User) bool {
+func (o *Org) IsMember(u *User) bool {
+	if u == nil {
+		return false
+	}
 	if o.Users != nil {
 		for _, user := range o.Users {
 			if user.ID == u.ID {
@@ -50,7 +53,10 @@ func (o *Org) IsMember(u User) bool {
 	return o.IsAdmin(u)
 }
 
-func (o *Org) IsAdmin(u User) bool {
+func (o *Org) IsAdmin(u *User) bool {
+	if u == nil {
+		return false
+	}
 	if o.Admins != nil {
 		for _, user := range o.Admins {
 			if user.ID == u.ID {

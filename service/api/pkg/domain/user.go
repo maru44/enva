@@ -18,7 +18,7 @@ type (
 		Username        string    `json:"username"`
 		Email           string    `json:"email"`
 		ImageURL        *string   `json:"image_url"`
-		CliPassword     *string   `json:"password"`
+		CliPassword     *string   `json:"-"`
 		IsValid         bool      `json:"is_valid"`
 		IsEmailVerified bool      `json:"is_email_verified"`
 		UserType        *UserType `json:"user_type"`
@@ -105,6 +105,14 @@ func (u *UserCliValidationInput) Validate() error {
 	}
 
 	return nil
+}
+
+func UserFromCtx(ctx context.Context) *User {
+	user, ok := ctx.Value(CtxUserKey).(User)
+	if !ok {
+		return nil
+	}
+	return &user
 }
 
 const (

@@ -63,7 +63,11 @@ var (
 	ErrProjectSlugAlreadyExistsOrg  = errors.New("Slug duplicated: Project slug has already exists for organization") // 400
 )
 
-func (p *Project) ValidateUserGet(u User) error {
+func (p *Project) ValidateUserGet(u *User) error {
+	if u == nil {
+		return perr.New("unauthorized", perr.Unauthorized)
+	}
+
 	// user type
 	if p.OwnerOrg == nil {
 		if p.OwnerUser.ID == u.ID {

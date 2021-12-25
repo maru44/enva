@@ -14,7 +14,7 @@ type ProjectReposotory struct {
 }
 
 func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	rows, err := repo.QueryContext(ctx, queryset.ProjectListByUserQuery, user.ID)
 	if err != nil {
@@ -40,7 +40,7 @@ func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project
 
 		// set user
 		if userID != nil {
-			p.OwnerUser = &user
+			p.OwnerUser = user
 		}
 
 		// set org
@@ -93,7 +93,7 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 }
 
 func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	rows, err := repo.QueryContext(ctx, queryset.ProjectSlugListByUserQuery, user.ID)
 	if err != nil {
@@ -121,7 +121,7 @@ func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, er
 }
 
 func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*domain.Project, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	row := repo.QueryRowContext(ctx, queryset.ProjectDetailBySlugQuery, slug)
 	if err := row.Err(); err != nil {
@@ -147,7 +147,7 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 		if userID != user.ID {
 			return nil, perr.New(perr.NotFound.Error(), perr.NotFound)
 		}
-		p.OwnerUser = &user
+		p.OwnerUser = user
 	}
 
 	// set org
@@ -162,7 +162,7 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 }
 
 func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID) (*domain.Project, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	row := repo.QueryRowContext(ctx, queryset.ProjectDetailByIDQuery, id)
 	if err := row.Err(); err != nil {
@@ -184,7 +184,7 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 
 	// set user
 	if userID != nil {
-		p.OwnerUser = &user
+		p.OwnerUser = user
 	}
 
 	// set org
@@ -199,7 +199,7 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 }
 
 func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectInput) (*string, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 	var (
 		in           domain.ProjectInput
 		inputU, slug *string

@@ -1,13 +1,33 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
-import { RecoilRoot } from 'recoil'
+import { RecoilRoot, useRecoilState } from 'recoil'
 import { Box, Theme, ThemeProvider } from '@mui/material'
 import theme from '../theme/theme'
 import { BaseLayout } from '../components/BaseLayouts'
 import { SnackbarProvider } from 'notistack'
+import { currentUserState } from '../../hooks/useCurrentUser'
+import { useEffect } from 'react'
+import { fetchCurrentUser } from '../../http/auth'
 
 declare module '@mui/styles/defaultTheme' {
   interface DefaultTheme extends Theme {}
+}
+
+const AppInit = () => {
+  const [, setCurrentUser] = useRecoilState(currentUserState)
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const user = await fetchCurrentUser()
+        setCurrentUser(user)
+      } catch {
+        setCurrentUser(null)
+      }
+    })()
+  }, [setCurrentUser])
+
+  return null
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -20,6 +40,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </Box>
         </SnackbarProvider>
       </ThemeProvider>
+      <AppInit />
     </RecoilRoot>
   )
 }

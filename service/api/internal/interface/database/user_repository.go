@@ -34,7 +34,7 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 }
 
 func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 	input := &domain.UserInput{
 		ID:              user.ID.String(),
 		Email:           user.Email,
@@ -70,7 +70,7 @@ func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 }
 
 func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	// generate new password and its hash
 	rawPass := tools.GenRandSlug(48)

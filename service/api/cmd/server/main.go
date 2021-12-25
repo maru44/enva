@@ -68,6 +68,7 @@ func main() {
 			s("/project/delete", http.MethodDelete, project.DeleteView),
 
 			/* user */
+			s("/user", http.MethodGet, user.GetUserView),
 			s("/user/create", http.MethodGet, user.CreateView),
 
 			/* cli_users */

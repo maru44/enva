@@ -115,7 +115,7 @@ func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *KvController) userAccessToProject(ctx context.Context, projectID domain.ProjectID) error {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	// find parent project
 	p, err := con.pIn.GetByID(ctx, projectID)

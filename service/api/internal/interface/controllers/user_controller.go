@@ -25,9 +25,26 @@ func NewUserController(sql database.ISqlHandler, pass password.IPassword) *UserC
 	}
 }
 
+func (con *UserController) GetUserView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	ctxUser := domain.UserFromCtx(ctx)
+	if ctxUser == nil {
+		response(w, r, perr.New("no user in context", perr.BadRequest), nil)
+		return
+	}
+
+	user, err := con.in.GetByID(ctx, ctxUser.ID)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+	response(w, r, nil, map[string]interface{}{"data": user})
+	return
+}
+
 func (con *UserController) ExistsCliPasswordView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	cU := ctx.Value(domain.CtxUserKey).(domain.User)
+	cU := domain.UserFromCtx(ctx)
 
 	user, err := con.in.GetByID(ctx, cU.ID)
 	if err != nil {

@@ -57,7 +57,7 @@ func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, pro
 }
 
 func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	if err := input.Validate(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -84,7 +84,7 @@ func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, proj
 }
 
 func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, projectID domain.ProjectID) (*domain.KvID, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	if err := input.Validate(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -132,7 +132,7 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 }
 
 func (repo *KvRepository) Delete(ctx context.Context, kvID domain.KvID, projectID domain.ProjectID) (int, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	// deactivate existing kv
 	exe, err := repo.ExecContext(
@@ -154,7 +154,7 @@ func (repo *KvRepository) Delete(ctx context.Context, kvID domain.KvID, projectI
 }
 
 func (repo *KvRepository) DeleteByKey(ctx context.Context, key domain.KvKey, projectID domain.ProjectID) (int, error) {
-	user := ctx.Value(domain.CtxUserKey).(domain.User)
+	user := domain.UserFromCtx(ctx)
 
 	// deactivate existing kv
 	exe, err := repo.ExecContext(
