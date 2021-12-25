@@ -15,3 +15,11 @@ export const fetchProjectListByUser = async () => {
 
 export const fetchCreateProject = async (input: ProjectInput) =>
   await fetchBaseApi(GetPath.PROJECT_CREATE, 'POST', input)
+
+// export const fetchUpdateProject = async (input: ProjectInput) => {}
+
+export const fetchDeleteProject = async (projectId: string) =>
+  await fetchBaseApi(
+    `${GetPath.PROJECT_DELETE}/project/delete/?projectId=${projectId}`,
+    'DELETE'
+  )

@@ -1,6 +1,7 @@
-import { Box, Button, TextField } from '@mui/material'
+import { Box, Button, Grid, TextField, Typography, Paper } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import clsx from 'clsx'
+import { useRouter } from 'next/router'
+import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { fetcher } from '../../../../http/fetcher'
 import { fetchCreateProject } from '../../../../http/project'
@@ -13,6 +14,8 @@ export type ProjectCreateProps = {
 
 export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
   const [slug, setSlug] = useState<string>('')
+  const router = useRouter()
+  const snack = useSnackbar()
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -28,11 +31,11 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
     const res = await fetcher(fetchCreateProject(input))
     const ret = await res.json()
     if (res.status === 200) {
-      const id = ret['data']
-      console.log(id) // @TODO fix
+      const slug = ret['data']
+      router.push(`/project/${slug}`)
     } else {
       const message = ret['error']
-      console.log(message) // @TODO fix
+      snack.enqueueSnackbar(message, { variant: 'error' })
     }
   }
 
@@ -47,31 +50,49 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
   }
 
   return (
-    <Box>
-      <form onSubmit={submit}>
-        <Box display="flex" flexDirection="column">
-          <TextField
-            name="project_name"
-            variant="outlined"
-            label="Name"
-            required
-            onChange={(e) => {
-              setSlug(slugify(e.currentTarget.value))
-            }}
-            className={clsx(classes.textField)}
-          />
-          <TextField
-            name="description"
-            label="Description"
-            multiline
-            rows={6}
-            className={clsx(classes.textField)}
-          />
-          <Button type="submit" variant="outlined" disabled={!isPostable()}>
-            Create
-          </Button>
-        </Box>
-      </form>
+    <Box width="100%" component="form" onSubmit={submit}>
+      <Grid container>
+        <Grid item xs={0} sm={1} md={3} />
+        <Grid
+          component={Paper}
+          item
+          xs={12}
+          sm={10}
+          md={6}
+          display="flex"
+          flexDirection="column"
+          p={1}
+          variant="outlined"
+        >
+          <Typography variant="h5">New Project</Typography>
+          <Box mt={2}>
+            <TextField
+              name="project_name"
+              variant="outlined"
+              label="Name"
+              required
+              onChange={(e) => {
+                setSlug(slugify(e.currentTarget.value))
+              }}
+              fullWidth
+            />
+          </Box>
+          <Box mt={2}>
+            <TextField
+              name="description"
+              label="Description"
+              multiline
+              rows={6}
+              fullWidth
+            />
+          </Box>
+          <Box mt={2} textAlign="right">
+            <Button type="submit" variant="outlined" disabled={!isPostable()}>
+              Create
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   )
 }

@@ -21,9 +21,10 @@ import { Kv } from '../../../types/kv'
 import { sortKvs } from '../../../utils/kv'
 import theme from '../../theme/theme'
 import { KvCreateTableRow } from '../form/kv/KvCreateTableRow'
-import { KvDeleteModal } from '../form/kv/KvDeleteModal'
 import { KvUpdateModal } from '../form/kv/KvUpdateModal'
 import { Delete, Edit } from '@material-ui/icons'
+import { DeleteModal } from '../DeleteModal'
+import { GetPath } from '../../../http/fetcher'
 
 type props = {
   kvs: Kv[]
@@ -115,13 +116,18 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
         isOpen={state.isOpenUpdate}
         onClose={() => dispatch({ type: 'closeUpdate' })}
       />
-      <KvDeleteModal
-        kvId={state.deleteId}
-        projectId={projectId}
-        kvKey={state.targetKey}
+      <DeleteModal
+        url={`${GetPath.KV_DELETE}?kvId=${state.deleteId}&projectId=${projectId}`}
+        mutateKey={`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`}
         isOpen={state.isOpenDelete}
         onClose={() => dispatch({ type: 'closeDelete' })}
-      ></KvDeleteModal>
+        Message={
+          <Typography variant="h5">
+            Are you sure to delete <br />
+            <b>{state.targetKey}</b>?
+          </Typography>
+        }
+      />
     </TableContainer>
   )
 }

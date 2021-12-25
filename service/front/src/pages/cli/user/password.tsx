@@ -5,6 +5,7 @@ import {
   Grid,
   IconButton,
   TextField,
+  Paper,
   Tooltip,
   Typography,
 } from '@mui/material'
@@ -47,33 +48,39 @@ const CliPassword: NextPage<PageProps> = (props) => {
 
   return (
     <Grid container mt={2}>
-      <Grid item xs={12}>
+      <Grid xs={0} sm={2} md={3} />
+      <Grid
+        item
+        xs={12}
+        sm={8}
+        md={6}
+        component={Paper}
+        pt={2}
+        pb={2}
+        pl={1}
+        pr={1}
+        variant="outlined"
+      >
         <Typography variant="h5">Password For CLI</Typography>
-      </Grid>
-      <Grid item mt={2} xs={12}>
-        <Typography>This password can be used in only cli.</Typography>
-      </Grid>
-      <Grid item mt={4} xs={12}>
-        <Grid sm={6} md={4}>
+        <Box mt={2}>
+          <Typography>This password can be used in only cli.</Typography>
+        </Box>
+        <Box>
           {data && data.data && (
-            <Box>
-              <Typography>
-                Your password has been already generated.
-                <br />
-                If you forgot it. {`>>`}
-              </Typography>
-            </Box>
+            <Typography>
+              Your password has been already generated.
+              <br />
+              If you forgot it. {`>>`}
+            </Typography>
           )}
           {data && !data.data && (
             <Typography>
               If you want to use cli, you must generate password for cli.
             </Typography>
           )}
-        </Grid>
-      </Grid>
-      {pass && (
-        <Grid item mt={4} xs={12}>
-          <Grid sm={6} md={4}>
+        </Box>
+        {pass && (
+          <Box mt={4}>
             <Box mb={1}>
               <Typography variant="h6">new password</Typography>
               <Typography>Keep it secret.</Typography>
@@ -107,26 +114,30 @@ const CliPassword: NextPage<PageProps> = (props) => {
                 ),
               }}
             />
-          </Grid>
-        </Grid>
-      )}
-      <Grid mt={2} item xs={12} sm={6} md={4} textAlign="right">
-        {data && data.data ? (
-          <Button
-            type="button"
-            variant="contained"
-            onClick={() => {
-              gen(true)
-              setIsCopied(false)
-            }}
-          >
-            Re Generate
-          </Button>
-        ) : (
-          <Button type="button" variant="contained" onClick={() => gen(false)}>
-            Generate
-          </Button>
+          </Box>
         )}
+        <Box mt={2} textAlign="right">
+          {data && data.data ? (
+            <Button
+              type="button"
+              variant="contained"
+              onClick={() => {
+                gen(true)
+                setIsCopied(false)
+              }}
+            >
+              Re Generate
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="contained"
+              onClick={() => gen(false)}
+            >
+              Generate
+            </Button>
+          )}
+        </Box>
       </Grid>
     </Grid>
   )

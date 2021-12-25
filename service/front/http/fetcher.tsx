@@ -7,6 +7,8 @@ export const GetPath: { [key: string]: string } = {
   PROJECT_LIST_ORG: '/project/list/org',
   PROJECT_DETAIl: '/project/detail',
   PROJECT_CREATE: '/project/create',
+  PROJECT_DELETE: '/project/delete',
+  PROJECT_UPDATE: '/project/update',
 
   KVS_BY_PROJECT: '/kv',
   KV_CREATE: '/kv/create',

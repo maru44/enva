@@ -12,11 +12,15 @@ type props = {
 export const BaseLayout: React.FC<props> = ({ main }) => {
   const classes = useStyles(theme)
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh">
+    <Box
+      display="flex"
+      p={0}
+      width="100%"
+      flexDirection="column"
+      minHeight="100vh"
+    >
       <Header />
-      <Container className={classes.main}>
-        <Grid container>{main}</Grid>
-      </Container>
+      <Container className={classes.main}>{main}</Container>
       <Footer />
     </Box>
   )
@@ -26,5 +30,6 @@ const useStyles = makeStyles((theme) => ({
   main: {
     flex: 1,
     overflowX: 'hidden',
+    width: '100%',
   },
 }))
