@@ -24,6 +24,7 @@ import {
   projectListReducer,
 } from '../../../hooks/kvs/useListProject'
 import { useReducer } from 'react'
+import { ProjectListCard } from '../../components/project/ProjectListCard'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
@@ -38,59 +39,23 @@ const ProjectList: NextPage<PageProps> = (props) => {
   // @TODO error handling
   if (error) console.log(error)
 
-  const classes = useStyles(theme)
-
   return (
     <Box mt={2} width="100%">
       <Grid container rowSpacing={2} columnSpacing={2}>
         {data &&
           data.data &&
           data.data.map((p, i) => (
-            <Grid item md={4} xs={6} key={i}>
-              <Card
-                className={clsx(classes.card, 'hrefBox')}
-                component={Paper}
-                variant="outlined"
-              >
-                <Grid container pl={2} pr={2} pt={1} pb={1}>
-                  <Grid
-                    item
-                    xs={12}
-                    display="flex"
-                    flexDirection="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Grid item flex={1} overflow="hidden">
-                      <Typography variant="h6">{p.name}</Typography>
-                    </Grid>
-                    <Grid item width={40}>
-                      <Tooltip title="delete project" arrow>
-                        <IconButton
-                          className={classes.deleteIcon}
-                          onClick={() => {
-                            dispatch({
-                              type: 'openDelete',
-                              deleteId: p.id,
-                              targetKey: p.name,
-                            })
-                          }}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Link
-                  as={`/project/${p.slug}`}
-                  href={`/project/[slug]`}
-                  passHref
-                >
-                  <a className="hrefBoxIn"></a>
-                </Link>
-              </Card>
-            </Grid>
+            <ProjectListCard
+              project={p}
+              key={i}
+              startDeleteFunc={() =>
+                dispatch({
+                  type: 'openDelete',
+                  targetKey: p.name,
+                  deleteId: p.id,
+                })
+              }
+            />
           ))}
         {data && data.error && <Box>{data.error}</Box>}
         {!data && <Box>...Loading</Box>}
@@ -107,17 +72,5 @@ const ProjectList: NextPage<PageProps> = (props) => {
     </Box>
   )
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    // padding: theme.spacing(1),
-  },
-  card: {
-    height: theme.spacing(15),
-  },
-  deleteIcon: {
-    zIndex: 100,
-  },
-}))
 
 export default ProjectList

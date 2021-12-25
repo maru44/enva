@@ -5,11 +5,12 @@ export type ProjectInput = {
   org_id?: string
 }
 
-// @TODO UNION with 
+// @TODO UNION with
 export type Project = {
   id: string
   slug: string
   name: string
+  description: string
   owner_type: string
   is_valid: boolean
   is_deleted: boolean
