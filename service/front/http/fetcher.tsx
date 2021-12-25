@@ -30,7 +30,7 @@ export const fetchBaseApi = async (
   body?: { [key: string]: any },
   headers?: { [key: string]: string }
 ): Promise<Response> => {
-  const res = await fetch(`${ApiUrl}${path}`, {
+  const opt: RequestInit = {
     method: method,
     mode: 'cors',
     credentials: 'include',
@@ -38,7 +38,8 @@ export const fetchBaseApi = async (
       'Content-Type': 'application/json; charset=utf-8',
     },
     body: body && JSON.stringify(body),
-  })
+  }
+  const res = await fetch(`${ApiUrl}${path}`, opt)
 
   switch (res.status) {
     case 401:
@@ -47,16 +48,7 @@ export const fetchBaseApi = async (
         credentials: 'include',
       })
 
-      const res2 = await fetch(`${ApiUrl}${path}`, {
-        method: method,
-        mode: 'cors',
-        credentials: 'include',
-        headers: headers ?? {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-        body: body && JSON.stringify(body),
-      })
-
+      const res2 = await fetch(`${ApiUrl}${path}`, opt)
       return res2
     default:
       return res
