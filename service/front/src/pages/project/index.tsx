@@ -1,4 +1,12 @@
-import { Box, Card, Grid, Paper, Typography } from '@mui/material'
+import {
+  Box,
+  Card,
+  Grid,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { NextPage } from 'next'
 import useSWR from 'swr'
@@ -9,11 +17,22 @@ import { GetPath } from '../../../http/fetcher'
 import Link from 'next/link'
 import clsx from 'clsx'
 import theme from '../../theme/theme'
+import { Delete } from '@material-ui/icons'
+import { DeleteModal } from '../../components/DeleteModal'
+import {
+  initialProjectListState,
+  projectListReducer,
+} from '../../../hooks/kvs/useListProject'
+import { useReducer } from 'react'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
     GetPath.PROJECT_LIST_USER,
     fetcherGetFromApiUrl
+  )
+  const [state, dispatch] = useReducer(
+    projectListReducer,
+    initialProjectListState
   )
 
   if (error) console.log(error)
@@ -32,9 +51,36 @@ const ProjectList: NextPage<PageProps> = (props) => {
                 component={Paper}
                 variant="outlined"
               >
-                <Box pl={2} pr={2} pt={1} pb={1}>
-                  <Typography variant="h6">{p.name}</Typography>
-                </Box>
+                <Grid container pl={2} pr={2} pt={1} pb={1}>
+                  <Grid
+                    item
+                    xs={12}
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Grid item flex={1} overflow="hidden">
+                      <Typography variant="h6">{p.name}</Typography>
+                    </Grid>
+                    <Grid item width={40}>
+                      <Tooltip title="delete project" arrow>
+                        <IconButton
+                          className={classes.deleteIcon}
+                          onClick={() => {
+                            dispatch({
+                              type: 'openDelete',
+                              deleteId: p.id,
+                              targetKey: p.name,
+                            })
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
+                  </Grid>
+                </Grid>
                 <Link
                   as={`/project/${p.slug}`}
                   href={`/project/[slug]`}
@@ -48,6 +94,15 @@ const ProjectList: NextPage<PageProps> = (props) => {
         {data && data.error && <Box>{data.error}</Box>}
         {!data && <Box>...Loading</Box>}
       </Grid>
+      <DeleteModal
+        url={`${GetPath.PROJECT_DELETE}?projectId=${state.deleteId}`}
+        isOpen={state.isOpenDelete}
+        mutateKey={GetPath.PROJECT_LIST_USER}
+        Message={
+          <Typography variant="h5">Delete {state.targetKey}?</Typography>
+        }
+        onClose={() => dispatch({ type: 'closeDelete' })}
+      />
     </Box>
   )
 }
@@ -58,6 +113,9 @@ const useStyles = makeStyles((theme) => ({
   },
   card: {
     height: theme.spacing(15),
+  },
+  deleteIcon: {
+    zIndex: 100,
   },
 }))
 

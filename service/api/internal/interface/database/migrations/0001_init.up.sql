@@ -76,8 +76,8 @@ CREATE TABLE projects (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id),
-    CONSTRAINT slug_unique_every_user UNIQUE (slug, owner_user_id),
-    CONSTRAINT slug_unique_every_org UNIQUE (slug, owner_org_id)
+    CONSTRAINT slug_unique_every_user UNIQUE (slug, owner_user_id) WHERE (is_valid = true),
+    CONSTRAINT slug_unique_every_org UNIQUE (slug, owner_org_id) WHERE (is_valid = true)
 );
 CREATE INDEX ON projects (owner_user_id);
 

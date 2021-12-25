@@ -50,8 +50,10 @@ export async function fetcher(func: Promise<Response>): Promise<Response> {
         credentials: 'include',
       })
       const res2 = await func
+      console.log('retry')
       return res2
     default:
+      console.log('not retry')
       return res
   }
 }

@@ -75,6 +75,7 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
                 setSlug(slugify(e.currentTarget.value))
               }}
               fullWidth
+              inputProps={{ maxLength: 32 }}
             />
           </Box>
           <Box mt={2}>
