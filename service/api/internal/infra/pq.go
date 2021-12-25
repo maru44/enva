@@ -50,10 +50,7 @@ func NewSqlHandler() database.ISqlHandler {
 	conn.SetMaxIdleConns(config.POSTGRES_MAX_IDLE_CONNECTIONS)
 	conn.SetConnMaxLifetime(maxLifeTime)
 
-	sqlHandler := new(SqlHandler)
-	sqlHandler.Conn = conn
-
-	return sqlHandler
+	return &SqlHandler{Conn: conn}
 }
 
 /***************************

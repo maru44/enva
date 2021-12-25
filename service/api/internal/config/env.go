@@ -24,4 +24,7 @@ var (
 
 	COGNITO_KEYS_URL = fmt.Sprintf("https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json", os.Getenv("COGNITO_REGION"), os.Getenv("COGNITO_USERPOOL_ID"))
 	COGNITO_SECRET   = os.Getenv("COGNITO_SECRET")
+
+	REDIS_ADDR = os.Getenv("REDIS_ADDRESS")
+	REDIS_PASS = os.Getenv("REDIS_PASSWORD")
 )

@@ -1,23 +1,10 @@
-import {
-  Box,
-  Card,
-  Grid,
-  IconButton,
-  Paper,
-  Tooltip,
-  Typography,
-} from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import { Box, Grid, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import useSWR from 'swr'
 import { projectsResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
 import { GetPath } from '../../../http/fetcher'
-import Link from 'next/link'
-import clsx from 'clsx'
-import theme from '../../theme/theme'
-import { Delete } from '@material-ui/icons'
 import { DeleteModal } from '../../components/DeleteModal'
 import {
   initialProjectListState,
