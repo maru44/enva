@@ -30,7 +30,7 @@ export const fetchBaseApi = async (
   body?: { [key: string]: any },
   headers?: { [key: string]: string }
 ): Promise<Response> => {
-  return fetch(`${ApiUrl}${path}`, {
+  const res = await fetch(`${ApiUrl}${path}`, {
     method: method,
     mode: 'cors',
     credentials: 'include',
@@ -39,37 +39,33 @@ export const fetchBaseApi = async (
     },
     body: body && JSON.stringify(body),
   })
-}
 
-export async function fetcher(func: Promise<Response>): Promise<Response> {
-  const res = await func
   switch (res.status) {
     case 401:
       await fetch(`${ThisUrl}/api/auth/refresh`, {
         method: 'GET',
         credentials: 'include',
       })
-      const res2 = await func
-      console.log('retry')
+
+      const res2 = await fetch(`${ApiUrl}${path}`, {
+        method: method,
+        mode: 'cors',
+        credentials: 'include',
+        headers: headers ?? {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: body && JSON.stringify(body),
+      })
+
       return res2
     default:
-      console.log('not retry')
       return res
   }
 }
 
 export async function fetcherGetFromApiUrl(path: string) {
   try {
-    const fn = fetch(`${ApiUrl}${path}`, {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    })
-
-    const res = await fetcher(fn)
+    const res = await fetchBaseApi(path, 'GET')
     const ret = await res.json()
 
     return ret

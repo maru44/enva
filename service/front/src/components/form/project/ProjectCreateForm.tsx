@@ -3,7 +3,6 @@ import { makeStyles } from '@mui/styles'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import { fetcher } from '../../../../http/fetcher'
 import { fetchCreateProject } from '../../../../http/project'
 import { ProjectInput } from '../../../../types/project'
 import { slugify } from '../../../../utils/slug'
@@ -28,7 +27,7 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
       slug: slug,
       description: description,
     }
-    const res = await fetcher(fetchCreateProject(input))
+    const res = await fetchCreateProject(input)
     const ret = await res.json()
     if (res.status === 200) {
       const slug = ret['data']

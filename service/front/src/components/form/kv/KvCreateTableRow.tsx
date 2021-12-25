@@ -11,7 +11,7 @@ import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { useSWRConfig } from 'swr'
 import { kvCreateResponseBody } from '../../../../http/body/kv'
-import { fetcher, GetPath } from '../../../../http/fetcher'
+import { GetPath } from '../../../../http/fetcher'
 import { fetchCreateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
 import { isSlug } from '../../../../utils/slug'
@@ -38,7 +38,7 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
         kv_value: value,
       },
     }
-    const res = await fetcher(fetchCreateKv(input))
+    const res = await fetchCreateKv(input)
     const ret: kvCreateResponseBody = await res.json()
     if (res.status === 200) {
       const id = ret['data']
