@@ -16,6 +16,7 @@ type (
 		Email           string `json:"email"`
 		EmailVerified   bool   `json:"email_verified"`
 		CognitoUserName string `json:"cognito:username"`
+		Sub             string `json:"sub"`
 	}
 )
 
@@ -25,10 +26,11 @@ const (
 	JwtCookieKeyRefreshToken = "refresh_token"
 )
 
-func (uc *UserFromClaim) ToUser() *User {
+func (u *UserFromClaim) ToUser() *User {
 	return &User{
-		ID:              UserID(uc.CognitoUserName),
-		Email:           uc.Email,
-		IsEmailVerified: uc.EmailVerified,
+		ID:              UserID(u.Sub),
+		Email:           u.Email,
+		Username:        u.CognitoUserName,
+		IsEmailVerified: u.EmailVerified,
 	}
 }

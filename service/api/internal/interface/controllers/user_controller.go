@@ -29,12 +29,18 @@ func (con *UserController) ExistsCliPasswordView(w http.ResponseWriter, r *http.
 	ctx := r.Context()
 	cU := ctx.Value(domain.CtxUserKey).(domain.User)
 
-	if _, err := con.in.GetByID(ctx, cU.ID); err != nil {
+	user, err := con.in.GetByID(ctx, cU.ID)
+	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
 	}
 
-	response(w, r, nil, map[string]interface{}{"data": "exists"})
+	if user.CliPassword != nil {
+		response(w, r, nil, map[string]interface{}{"data": "exists"})
+		return
+	}
+
+	response(w, r, perr.New("Cli password not found", perr.BadRequest, "Cli password not found"), nil)
 	return
 }
 

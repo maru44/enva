@@ -8,7 +8,6 @@ import {
   getCookieOption,
 } from '../../../../../config/cookie'
 import { cognitoTokenResponse } from '../../../../../types/oauth'
-import { fetchBaseApi, GetPath } from '../../../../../http/fetcher'
 
 export default async function handler(
   req: NextApiRequest,

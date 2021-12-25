@@ -79,7 +79,7 @@ func (u *UserInput) Validate() error {
 	if err := validation.ValidateStruct(u,
 		validation.Field(&u.ID, validation.Required, is.UUID),
 		validation.Field(&u.Email, validation.Required, is.Email, validation.Length(1, 255)),
-		// validation.Field(&c.Username, validation.Required, validation.Length(1, 255)),
+		validation.Field(&u.Username, validation.Required, validation.Length(1, 255)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}

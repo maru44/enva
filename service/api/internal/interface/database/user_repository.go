@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
 	"github.com/maru44/enva/service/api/internal/interface/password"
@@ -36,9 +35,6 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 
 func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 	user := ctx.Value(domain.CtxUserKey).(domain.User)
-
-	fmt.Println("USER CTX", user)
-
 	input := &domain.UserInput{
 		ID:              user.ID.String(),
 		Email:           user.Email,
