@@ -5,10 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"syscall"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func inputEmailPassword() (string, string, error) {
-	var email, password string
+	var email string
 
 	fmt.Print("email or username: ")
 	for {
@@ -18,11 +21,14 @@ func inputEmailPassword() (string, string, error) {
 
 		if email != "" {
 			fmt.Print("cli password: ")
-			scan := bufio.NewScanner(os.Stdin)
-			scan.Scan()
-			password = scan.Text()
+			password, err := terminal.ReadPassword(syscall.Stdin)
+			if err != nil {
+				return "", "", err
+			}
 
-			return email, password, nil
+			fmt.Print("\n")
+
+			return email, string(password), nil
 		}
 		return "", "", errors.New("Email or Username must not be blank")
 	}
