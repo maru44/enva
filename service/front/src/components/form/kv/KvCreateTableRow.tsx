@@ -6,7 +6,6 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material'
-import { makeStyles } from '@mui/styles'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { useSWRConfig } from 'swr'
@@ -15,6 +14,7 @@ import { GetPath } from '../../../../http/fetcher'
 import { fetchCreateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
 import { isSlug } from '../../../../utils/slug'
+import styles from '../../../styles/kv.module.css'
 
 export type KvUpsertProps = {
   projectId: string
@@ -51,8 +51,6 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
       snack.enqueueSnackbar(message, { variant: 'error' })
     }
   }
-
-  const classes = useStyles()
 
   return (
     <TableRow>
@@ -101,8 +99,8 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
                 <Button
                   type="submit"
                   variant="contained"
-                  color="success"
-                  className={classes.createButton}
+                  color="primary"
+                  className={styles.createButton}
                   disabled={!key || !isSlug(key)}
                 >
                   CREATE
@@ -115,9 +113,3 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
     </TableRow>
   )
 }
-
-const useStyles = makeStyles(() => ({
-  createButton: {
-    width: 96,
-  },
-}))

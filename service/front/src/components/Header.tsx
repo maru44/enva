@@ -8,9 +8,16 @@ export const Header: React.FC = () => {
   const { isAuthChecking, currentUser } = useCurrentUser()
 
   return (
-    <Grid container justifyContent="space-between" spacing={3} pt={1} pb={1}>
+    <Grid
+      className="header"
+      container
+      justifyContent="space-between"
+      spacing={3}
+      pt={1}
+      pb={1}
+    >
       <Grid item>
-        <Typography variant="h4" pl={1}>
+        <Typography className="title" variant="h4" pl={1}>
           <Link href={currentUser ? '/project' : '/'} passHref>
             <a>Envassador</a>
           </Link>
@@ -21,14 +28,14 @@ export const Header: React.FC = () => {
           <Box display="flex" flexDirection="row">
             <Box mr={1}>
               <Link href="/user" passHref>
-                <IconButton>
+                <IconButton color="primary">
                   <AccountCircle />
                 </IconButton>
               </Link>
             </Box>
             <Box mr={1}>
               <Link href="/project/create" passHref>
-                <IconButton>
+                <IconButton color="primary">
                   <AddCircle />
                 </IconButton>
               </Link>

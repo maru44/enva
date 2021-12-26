@@ -1,0 +1,7 @@
+.tabs {
+  border-bottom: 1px solid #1f1f1f;
+}
+.tabs .selected {
+  color: #1f1f1f;
+  border-bottom: 3px solid #ff9800;
+}

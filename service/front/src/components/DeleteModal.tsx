@@ -1,5 +1,4 @@
 import { Box, Button, Dialog, Grid } from '@mui/material'
-import { makeStyles } from '@mui/styles'
 import { useSnackbar } from 'notistack'
 import { ReactNode } from 'react'
 import { mutate } from 'swr'
@@ -25,7 +24,6 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
   onClose,
 }) => {
   const snack = useSnackbar()
-  const classes = useStyles(theme)
 
   const onDelete = async () => {
     try {
@@ -53,7 +51,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
 
   return (
     <Dialog onClose={onClose} open={isOpen}>
-      <Grid container className={classes.dialogContainer} p={3}>
+      <Grid container className="dialogContainer" p={3}>
         <Grid sm={2} />
         <Grid xs={8}>
           {Message}
@@ -63,7 +61,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
                 onClick={onClose}
                 type="button"
                 variant="contained"
-                className={classes.subButton}
+                className="subButton"
               >
                 Close
               </Button>
@@ -84,13 +82,3 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
     </Dialog>
   )
 }
-
-const useStyles = makeStyles((theme) => ({
-  dialogContainer: {
-    maxWidth: '600px',
-    width: '80vw',
-  },
-  subButton: {
-    backgroundColor: theme.palette.grey[700],
-  },
-}))

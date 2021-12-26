@@ -7,11 +7,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { makeStyles } from '@mui/styles'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { Project } from '../../../types/project'
 import theme from '../../theme/theme'
+import styles from '../../styles/project.module.css'
 
 type props = {
   project: Project
@@ -22,12 +22,10 @@ export const ProjectListCard: React.FC<props> = ({
   project,
   startDeleteFunc,
 }) => {
-  const classes = useStyles(theme)
-
   return (
     <Grid item md={4} xs={6}>
       <Card
-        className={clsx(classes.card, 'hrefBox')}
+        className={clsx(styles.card, 'hrefBox')}
         component={Paper}
         variant="outlined"
       >
@@ -46,7 +44,7 @@ export const ProjectListCard: React.FC<props> = ({
             <Grid item width={40}>
               <Tooltip title="delete project" arrow>
                 <IconButton
-                  className={classes.deleteIcon}
+                  className={styles.deleteIcon}
                   onClick={startDeleteFunc}
                 >
                   <Delete />
@@ -67,12 +65,3 @@ export const ProjectListCard: React.FC<props> = ({
     </Grid>
   )
 }
-
-const useStyles = makeStyles((theme) => ({
-  card: {
-    height: theme.spacing(17),
-  },
-  deleteIcon: {
-    zIndex: 100,
-  },
-}))

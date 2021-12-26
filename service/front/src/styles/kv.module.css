@@ -1,0 +1,7 @@
+.createButton {
+  width: 96px;
+}
+
+.breakCell {
+  word-break: break-all;
+}

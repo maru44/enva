@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Dialog,
-  DialogTitle,
   FormControl,
   Grid,
   TextField,
@@ -13,7 +12,6 @@ import { mutate } from 'swr'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchUpdateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
-import makeStyles from '@mui/styles/makeStyles'
 import theme from '../../../theme/theme'
 
 type props = {
@@ -62,8 +60,6 @@ export const KvUpdateModal: React.FC<props> = ({
     }
   }
 
-  const classes = useStyles(theme)
-
   return (
     <Dialog
       onClose={() => {
@@ -72,7 +68,7 @@ export const KvUpdateModal: React.FC<props> = ({
       }}
       open={isOpen}
     >
-      <Grid container className={classes.dialogContainer} p={3}>
+      <Grid container className="dialogContainer" p={3}>
         <Grid sm={2} />
         <Grid lg={8} sm={8}>
           <Typography variant="h5">Edit: {kvKey}</Typography>
@@ -94,7 +90,7 @@ export const KvUpdateModal: React.FC<props> = ({
               }}
               variant="contained"
               type="button"
-              className={classes.subButton}
+              className="subButton"
             >
               Close
             </Button>
@@ -112,13 +108,3 @@ export const KvUpdateModal: React.FC<props> = ({
     </Dialog>
   )
 }
-
-const useStyles = makeStyles((theme) => ({
-  dialogContainer: {
-    maxWidth: '600px',
-    width: '80vw',
-  },
-  subButton: {
-    backgroundColor: theme.palette.grey[700],
-  },
-}))

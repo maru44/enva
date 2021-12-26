@@ -1,5 +1,4 @@
 import { Box, Button, Grid, TextField, Typography, Paper } from '@mui/material'
-import { makeStyles } from '@mui/styles'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
@@ -37,8 +36,6 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
       snack.enqueueSnackbar(message, { variant: 'error' })
     }
   }
-
-  const classes = useStyle()
 
   const isPostable = (): boolean => {
     if (!slug) return false
@@ -96,9 +93,3 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
     </Box>
   )
 }
-
-const useStyle = makeStyles(() => ({
-  textField: {
-    marginBottom: 8,
-  },
-}))

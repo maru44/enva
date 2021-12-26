@@ -1,7 +1,5 @@
 import { Box, Container, Grid } from '@mui/material'
-import { makeStyles } from '@mui/styles'
 import { ReactNode } from 'react'
-import theme from '../theme/theme'
 import { Footer } from './Footer'
 import { Header } from './Header'
 
@@ -10,7 +8,6 @@ type props = {
 }
 
 export const BaseLayout: React.FC<props> = ({ main }) => {
-  const classes = useStyles()
   return (
     <Box
       display="flex"
@@ -18,18 +15,11 @@ export const BaseLayout: React.FC<props> = ({ main }) => {
       width="100%"
       flexDirection="column"
       minHeight="100vh"
+      className="main"
     >
       <Header />
-      <Container className={classes.main}>{main}</Container>
+      <Container className="main">{main}</Container>
       <Footer />
     </Box>
   )
 }
-
-const useStyles = makeStyles(() => ({
-  main: {
-    flex: 1,
-    overflowX: 'hidden',
-    width: '100%',
-  },
-}))

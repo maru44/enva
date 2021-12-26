@@ -1,5 +1,4 @@
-import { Box, Grid, Typography } from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import { Grid } from '@mui/material'
 import { NextPage } from 'next'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { PageProps } from '../../../types/page'
@@ -7,6 +6,7 @@ import { ProjectCreateForm } from '../../components/form/project/ProjectCreateFo
 
 const ProjectCreate: NextPage<PageProps> = (props) => {
   useRequireLogin()
+
   return (
     <Grid container mt={2}>
       <Grid xs={12} item>
@@ -15,11 +15,5 @@ const ProjectCreate: NextPage<PageProps> = (props) => {
     </Grid>
   )
 }
-
-const useStyle = makeStyles(() => ({
-  root: {
-    // padding: theme.spacing(1),
-  },
-}))
 
 export default ProjectCreate
