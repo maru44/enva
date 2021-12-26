@@ -29,7 +29,7 @@ const (
 		"is_valid, is_deleted, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE slug = $1 AND is_deleted = false"
+		"WHERE slug = $1 AND owner_user_id = $2 AND is_deleted = false"
 
 	ProjectDetailByIDQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +

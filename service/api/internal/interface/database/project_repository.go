@@ -123,7 +123,7 @@ func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, er
 func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*domain.Project, error) {
 	user := domain.UserFromCtx(ctx)
 
-	row := repo.QueryRowContext(ctx, queryset.ProjectDetailBySlugQuery, slug)
+	row := repo.QueryRowContext(ctx, queryset.ProjectDetailBySlugQuery, slug, user.ID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}

@@ -61,7 +61,7 @@ func main() {
 
 			/* project */
 			s("/project/list/user", http.MethodGet, project.ListByUserView),
-			s("/project/list/org", http.MethodGet, project.ListByOrgView),
+			// s("/project/list/org", http.MethodGet, project.ListByOrgView),
 			s("/project/slugs/user", http.MethodGet, project.SlugListByUserView),
 			s("/project/detail", http.MethodGet, project.ProjectDetailView),
 			s("/project/create", http.MethodPost, project.CreateView),
