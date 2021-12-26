@@ -10,8 +10,10 @@ import {
   Typography,
 } from '@mui/material'
 import { NextPage } from 'next'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import useSWR from 'swr'
+import { useRequireLogin } from '../../../../hooks/useRequireLogin'
 import { cliUserResponseBody } from '../../../../http/body/cliUser'
 import { fetchUpdateCliUser } from '../../../../http/cliUser'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
@@ -20,6 +22,7 @@ import { PageProps } from '../../../../types/page'
 const CliPassword: NextPage<PageProps> = (props) => {
   const [pass, setPass] = useState<string | undefined>(undefined)
   const [isCopied, setIsCopied] = useState<boolean>(false)
+  const snack = useSnackbar()
 
   const { data, error } = useSWR<cliUserResponseBody>(
     GetPath.CLI_USER,
@@ -34,15 +37,17 @@ const CliPassword: NextPage<PageProps> = (props) => {
       switch (res.status) {
         case 200:
           setPass(ret.data)
-          break
+          return
         default:
-          break
+          snack.enqueueSnackbar(ret.error, { variant: 'error' })
+          return
       }
-    } catch (e) {
-      console.log(e)
-      // @TODO show snack
+    } catch {
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
+
+  useRequireLogin()
 
   return (
     <Grid container mt={2}>

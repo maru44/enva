@@ -2,6 +2,7 @@ import { Box, Card, Container, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
+import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { projectResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
@@ -17,6 +18,8 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   )
 
   if (error) console.log(error)
+
+  useRequireLogin()
 
   return (
     <Container>

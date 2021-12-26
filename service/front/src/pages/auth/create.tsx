@@ -11,7 +11,7 @@ const UserCreate: NextPage<PageProps> = (props) => {
     ;(async () => {
       // insert user to db
       const res = await fetchBaseApi(GetPath.USER_CREATE, 'GET')
-      router.push('/')
+      router.push('/project')
     })()
   }, [router])
 

@@ -1,4 +1,5 @@
 export type PageProps = {
+  // head
   title?: string
   ogType?: string
   ogImage?: string

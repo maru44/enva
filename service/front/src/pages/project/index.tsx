@@ -12,6 +12,7 @@ import {
 } from '../../../hooks/kvs/useListProject'
 import { useReducer } from 'react'
 import { ProjectListCard } from '../../components/project/ProjectListCard'
+import { useRequireLogin } from '../../../hooks/useRequireLogin'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
@@ -26,9 +27,12 @@ const ProjectList: NextPage<PageProps> = (props) => {
   // @TODO error handling
   if (error) console.log(error)
 
+  useRequireLogin()
+
   return (
     <Box mt={2} width="100%">
-      <Grid container rowSpacing={2} columnSpacing={2}>
+      <Typography variant="h5">Projects</Typography>
+      <Grid container mt={1} rowSpacing={2} columnSpacing={2}>
         {data &&
           data.data &&
           data.data.map((p, i) => (

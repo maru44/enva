@@ -1,10 +1,12 @@
 import { Box, Grid, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { NextPage } from 'next'
+import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { PageProps } from '../../../types/page'
 import { ProjectCreateForm } from '../../components/form/project/ProjectCreateForm'
 
 const ProjectCreate: NextPage<PageProps> = (props) => {
+  useRequireLogin()
   return (
     <Grid container mt={2}>
       <Grid xs={12} item>

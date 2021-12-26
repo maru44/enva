@@ -20,6 +20,7 @@ const AppInit = () => {
     ;(async () => {
       try {
         const user = await fetchCurrentUser()
+        console.log(user)
         setCurrentUser(user)
       } catch {
         setCurrentUser(null)
