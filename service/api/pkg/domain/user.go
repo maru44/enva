@@ -14,16 +14,15 @@ type (
 	UserType string
 
 	User struct {
-		ID              UserID    `json:"id"`
+		ID              UserID    `json:"-"`
 		Username        string    `json:"username"`
 		Email           string    `json:"email"`
 		ImageURL        *string   `json:"image_url"`
 		CliPassword     *string   `json:"-"`
 		IsValid         bool      `json:"is_valid"`
 		IsEmailVerified bool      `json:"is_email_verified"`
-		UserType        *UserType `json:"user_type"`
-		CreatedAt       time.Time `json:"created_at"`
-		UpdatedAt       time.Time `json:"updatd_at"`
+		CreatedAt       time.Time `json:"-"`
+		UpdatedAt       time.Time `json:"-"`
 
 		// fk
 
@@ -63,13 +62,6 @@ const (
 	UserTypeUser  = UserType("user")
 	UserTypeGuest = UserType("guest")
 )
-
-func (u *User) IsAdmin() bool {
-	if u.UserType == nil {
-		return false
-	}
-	return *u.UserType == UserTypeAdmin
-}
 
 func (u *UserID) String() string {
 	return string(*u)

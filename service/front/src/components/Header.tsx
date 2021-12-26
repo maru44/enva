@@ -1,8 +1,11 @@
-import { Add, AddCircle } from '@material-ui/icons'
-import { Grid, IconButton, Typography } from '@mui/material'
+import { AccountCircle, Add, AddCircle } from '@material-ui/icons'
+import { Box, Grid, IconButton, Typography } from '@mui/material'
 import Link from 'next/link'
+import { useCurrentUser } from '../../hooks/useCurrentUser'
 
 export const Header: React.FC = () => {
+  const { currentUser } = useCurrentUser()
+
   return (
     <Grid container justifyContent="space-between" spacing={3} pt={1} pb={1}>
       <Grid item>
@@ -13,11 +16,23 @@ export const Header: React.FC = () => {
         </Typography>
       </Grid>
       <Grid item>
-        <Link href="/project/create" passHref>
-          <IconButton>
-            <AddCircle />
-          </IconButton>
-        </Link>
+        <Box display="flex" flexDirection="row">
+          <Box>
+            {/* {currentUser ? } */}
+            <Link href="/auth/profile" passHref>
+              <IconButton>
+                <AccountCircle />
+              </IconButton>
+            </Link>
+          </Box>
+          <Box>
+            <Link href="/project/create" passHref>
+              <IconButton>
+                <AddCircle />
+              </IconButton>
+            </Link>
+          </Box>
+        </Box>
       </Grid>
     </Grid>
   )
