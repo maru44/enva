@@ -33,6 +33,17 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX ON users (email);
 CREATE UNIQUE INDEX ON users (username);
 
+CREATE TABLE ssh_keys (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name VARCHAR(31) NOT NULL,
+    pub_key TEXT NOT NULL,
+    user_id uuid REFERENCES users (id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+    PRIMARY KEY (id)
+);
+
 -- relation org and users
 CREATE TABLE rel_org_members (
     org_id uuid NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
@@ -54,16 +65,16 @@ CREATE TABLE projects (
     slug VARCHAR(63) NOT NULL,
     description TEXT NULL,
     owner_type VARCHAR(15) NOT NULL,
-    owner_user_id VARCHAR(127) NULL, -- dbのユーザーのidのfkにする?
+    owner_user_id uuid NULL REFERENCES users (id),
     owner_org_id uuid NULL REFERENCES orgs (id) ON DELETE CASCADE,
     is_valid BOOLEAN NOT NULL DEFAULT true,
     is_deleted BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT projeccts_owner CHECK (owner_user_id IS NOT NULL OR owner_org_id IS NOT NULL)
 );
-CREATE INDEX ON projects (owner_user_id);
 CREATE UNIQUE INDEX project_slug_owner_user ON projects (slug, owner_user_id) WHERE (is_valid = true);
 CREATE UNIQUE INDEX project_slug_owner_org_id ON projects (slug, owner_org_id) WHERE (is_valid = true);
 
@@ -82,8 +93,8 @@ CREATE TABLE kvs (
 
     PRIMARY KEY (id)
 );
-CREATE INDEX ON kvs (env_key, project_id, is_valid);
+-- CREATE INDEX ON kvs (env_key, project_id, is_valid);
 CREATE INDEX ON kvs (project_id, is_valid);
-CREATE UNIQUE INDEX valid_project_kvs ON kvs (env_key, project_id) WHERE (is_valid = true);
+CREATE UNIQUE INDEX kvs_env_key_project_id_valid ON kvs (env_key, project_id) WHERE (is_valid = true);
 
 COMMIT;
