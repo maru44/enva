@@ -20,7 +20,7 @@ export const Header: React.FC = () => {
         {currentUser && (
           <Box display="flex" flexDirection="row">
             <Box mr={1}>
-              <Link href="/auth/profile" passHref>
+              <Link href="/user" passHref>
                 <IconButton>
                   <AccountCircle />
                 </IconButton>

@@ -17,18 +17,21 @@ type UserRepository struct {
 }
 
 func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*domain.User, error) {
-	u := &domain.User{}
-
 	row := repo.QueryRowContext(ctx, queryset.UserGetByIDQuery, id)
 	if err := row.Err(); err != nil {
 		return nil, err
 	}
 
+	u := &domain.User{}
 	if err := row.Scan(
 		&u.ID, &u.Email, &u.Username, &u.ImageURL, &u.CliPassword,
 		&u.IsValid, &u.IsEmailVerified, &u.CreatedAt, &u.UpdatedAt,
 	); err != nil {
 		return nil, err
+	}
+
+	if u.CliPassword != nil {
+		u.HasCliPassword = true
 	}
 	return u, nil
 }

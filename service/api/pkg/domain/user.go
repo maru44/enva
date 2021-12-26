@@ -24,6 +24,9 @@ type (
 		CreatedAt       time.Time `json:"-"`
 		UpdatedAt       time.Time `json:"-"`
 
+		HasCliPassword bool `json:"has_cli_password"`
+		// SshPubKeys []string `json:"ssh_pub_keys"`
+
 		// fk
 
 		MemberOf []ProjectID `json:"member_of"`

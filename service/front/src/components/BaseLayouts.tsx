@@ -10,7 +10,7 @@ type props = {
 }
 
 export const BaseLayout: React.FC<props> = ({ main }) => {
-  const classes = useStyles(theme)
+  const classes = useStyles()
   return (
     <Box
       display="flex"
@@ -26,7 +26,7 @@ export const BaseLayout: React.FC<props> = ({ main }) => {
   )
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   main: {
     flex: 1,
     overflowX: 'hidden',

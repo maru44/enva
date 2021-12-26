@@ -3,4 +3,5 @@ export type CurrentUser = {
   email: string
   is_valid: boolean
   is_email_verified: boolean
+  has_cli_password: boolean
 }

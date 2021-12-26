@@ -9,17 +9,15 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { NextPage } from 'next'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import useSWR from 'swr'
-import { useRequireLogin } from '../../../../hooks/useRequireLogin'
-import { cliUserResponseBody } from '../../../../http/body/cliUser'
-import { fetchUpdateCliUser } from '../../../../http/cliUser'
-import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
-import { PageProps } from '../../../../types/page'
+import useSWR, { mutate } from 'swr'
+import { useRequireLogin } from '../../../hooks/useRequireLogin'
+import { cliUserResponseBody } from '../../../http/body/cliUser'
+import { fetchUpdateCliUser } from '../../../http/cliUser'
+import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 
-const CliPassword: NextPage<PageProps> = (props) => {
+export const Cli: React.FC = () => {
   const [pass, setPass] = useState<string | undefined>(undefined)
   const [isCopied, setIsCopied] = useState<boolean>(false)
   const snack = useSnackbar()
@@ -37,6 +35,7 @@ const CliPassword: NextPage<PageProps> = (props) => {
       switch (res.status) {
         case 200:
           setPass(ret.data)
+          mutate(GetPath.CLI_USER)
           return
         default:
           snack.enqueueSnackbar(ret.error, { variant: 'error' })
@@ -67,13 +66,12 @@ const CliPassword: NextPage<PageProps> = (props) => {
         <Typography variant="h5">Password For CLI</Typography>
         <Box mt={2}>
           <Typography>This password can be used in only cli.</Typography>
-        </Box>
-        <Box>
+          <br />
           {data && data.data && (
             <Typography>
               Your password has been already generated.
               <br />
-              If you forgot it. {`>>`}
+              If you forgot it, regenerate from here.
             </Typography>
           )}
           {data && !data.data && (
@@ -141,5 +139,3 @@ const CliPassword: NextPage<PageProps> = (props) => {
     </Grid>
   )
 }
-
-export default CliPassword

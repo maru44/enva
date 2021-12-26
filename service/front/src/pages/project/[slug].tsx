@@ -24,7 +24,7 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   return (
     <Container>
       {data && data.data && (
-        <Box mt={4}>
+        <Box mt={2}>
           <Typography variant="h5">{data.data.name}</Typography>
           <KvList projectId={data.data.id} />
         </Box>
