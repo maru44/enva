@@ -37,7 +37,10 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 }
 
 func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
-	user := domain.UserFromCtx(ctx)
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
 	input := &domain.UserInput{
 		ID:              user.ID.String(),
 		Email:           user.Email,
@@ -53,7 +56,7 @@ func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
-	err := row.Scan(&id)
+	err = row.Scan(&id)
 	if err == nil {
 		return nil, perr.New("The user already exists", perr.BadRequest, "The user already exists")
 	}
@@ -73,7 +76,10 @@ func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 }
 
 func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, error) {
-	user := domain.UserFromCtx(ctx)
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
 
 	// generate new password and its hash
 	rawPass := tools.GenRandSlug(48)

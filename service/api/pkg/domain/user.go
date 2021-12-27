@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -60,12 +61,6 @@ type (
 	}
 )
 
-const (
-	UserTypeAdmin = UserType("admin")
-	UserTypeUser  = UserType("user")
-	UserTypeGuest = UserType("guest")
-)
-
 func (u *UserID) String() string {
 	return string(*u)
 }
@@ -102,12 +97,12 @@ func (u *UserCliValidationInput) Validate() error {
 	return nil
 }
 
-func UserFromCtx(ctx context.Context) *User {
+func UserFromCtx(ctx context.Context) (*User, error) {
 	user, ok := ctx.Value(CtxUserKey).(User)
 	if !ok {
-		return nil
+		return nil, errors.New("No user in context")
 	}
-	return &user
+	return &user, nil
 }
 
 const (

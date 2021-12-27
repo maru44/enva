@@ -1,6 +1,7 @@
 BEGIN;
 
 DROP TABLE IF EXISTS rel_org_members;
+DROP TABLE IF EXISTS org_invitations;
 DROP TABLE IF EXISTS kvs;
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS orgs;

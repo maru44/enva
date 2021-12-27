@@ -1,0 +1,59 @@
+package domain
+
+import (
+	"context"
+	"time"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+)
+
+type (
+	OrgInvitationID string
+
+	OrgInvitation struct {
+		ID        OrgInvitationID `json:"id"`
+		OrgID     OrgID           `json:"org_id"`
+		UserID    UserID          `json:"user_id"`
+		UserType  UserType        `json:"user_type"`
+		IsValid   bool            `json:"is_valid"`
+		InvitedBy UserID          `json:"invited_by"`
+
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
+		DeletedAt time.Time `json:"deleted_at"`
+	}
+
+	OrgInvitationInput struct {
+		OrgID    OrgID    `json:"org_id"`
+		UserID   UserID   `json:"user_id"`
+		UserType UserType `json:"user_type"`
+	}
+
+	IOrgInvitationInteractor interface {
+		Create(context.Context, OrgInvitationInput, UserID) error
+		// sent from
+		ListFromOrg(context.Context, OrgID) ([]OrgInvitation, error)
+		// sent by anyone
+		List(context.Context) ([]OrgInvitation, error)
+		// detail
+		Detail(context.Context, OrgInvitationID) (*OrgInvitation, error)
+	}
+)
+
+const (
+	UserTypeOwner = UserType("owner")
+	UserTypeAdmin = UserType("admin")
+	UserTypeUser  = UserType("user")
+	UserTypeGuest = UserType("guest")
+)
+
+func (o *OrgInvitationInput) Validate() error {
+	return validation.ValidateStruct(o,
+		validation.Field(&o.OrgID, validation.Required, is.UUID),
+		validation.Field(&o.UserID, validation.Required, is.UUID),
+		validation.Field(&o.UserType, validation.Required, validation.In(UserTypeOwner, UserTypeAdmin, UserTypeUser, UserTypeGuest)),
+	)
+}
+
+// func (o *OrgInvitation) ToMember()

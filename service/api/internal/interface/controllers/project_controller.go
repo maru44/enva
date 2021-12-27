@@ -79,7 +79,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 	}
 
 	// validate user access
-	user := domain.UserFromCtx(ctx)
+	user, _ := domain.UserFromCtx(ctx)
 	if err := p.ValidateUserGet(user); err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -119,7 +119,8 @@ func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request)
 	}
 
 	// validate user access
-	user := domain.UserFromCtx(ctx)
+	user, err := domain.UserFromCtx(ctx)
+
 	if err := p.ValidateUserGet(user); err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return

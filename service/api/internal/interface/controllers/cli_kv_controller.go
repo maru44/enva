@@ -190,7 +190,10 @@ func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug string) (*domain.ProjectID, error) {
-	user := domain.UserFromCtx(ctx)
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
 
 	// find parent project
 	p, err := con.pIn.GetBySlug(ctx, projectSlug)

@@ -3,8 +3,10 @@ package domain
 import (
 	"context"
 	"errors"
+	"regexp"
 	"time"
 
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/maru44/perr"
 )
 
@@ -50,6 +52,13 @@ type (
 		// by org 系
 	}
 )
+
+func (p *ProjectInput) Validate() error {
+	return validation.ValidateStruct(p,
+		validation.Field(&p.Slug, validation.Required, validation.Length(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
+		validation.Field(&p.Name, validation.Required, validation.Length(1, 64)),
+	)
+}
 
 const (
 	// if owner is user

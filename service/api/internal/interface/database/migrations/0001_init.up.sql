@@ -3,16 +3,18 @@ BEGIN;
 -- organization
 CREATE TABLE orgs (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    slug VARCHAR(63) NOT NULL,
+    slug VARCHAR(63) UNIQUE NOT NULL,
     name VARCHAR(63) NOT NULL,
     description VARCHAR(511) NULL,
-    is_valid BOOLEAN NOT NULL,
-    created_by VARCHAR(127) NOT NULL,
+    is_valid BOOLEAN NOT NULL DEFAULT true,
+    created_by uuid NULL REFERENCES users (id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id)
 );
+-- tmp: user can create only one orgs
+CREATE UNIQUE INDEX ON orgs (created_by) WHERE (is_valid = true);
 
 -- @TODO add username and email and cli password table
 -- OR make custome field to aws cognito
@@ -44,19 +46,38 @@ CREATE TABLE ssh_keys (
     PRIMARY KEY (id)
 );
 
--- relation org and users
-CREATE TABLE rel_org_members (
+CREATE TABLE org_invitations (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     org_id uuid NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
     user_id uuid NOT NULL REFERENCES users (id),
     user_type VARCHAR(15) NOT NULL DEFAULT 'user', -- 'owner', 'admin', 'user', 'guest'
+    is_valid BOOLEAN NOT NULL DEFAULT true,
+    invited_by uuid REFERENCES users (id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+
+    PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX org_invitations ON org_invitations (user_id, org_id) WHERE (is_valid = true);
+
+-- relation org and users
+CREATE TABLE rel_org_members (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    org_id uuid NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES users (id),
+    user_type VARCHAR(15) NOT NULL DEFAULT 'user', -- 'owner', 'admin', 'user', 'guest'
+
+    org_invitation_id uuid REFERENCES org_invitations (id),
+
     is_valid BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
-    PRIMARY KEY (org_id, user_id),
-    CONSTRAINT slug_unique_every_user UNIQUE (org_id, user_id)
+    PRIMARY KEY (id)
 );
+CREATE UNIQUE INDEX rel_org_members ON rel_org_members (user_id, org_id) WHERE (is_valid = true);
 
 -- projects
 CREATE TABLE projects (
