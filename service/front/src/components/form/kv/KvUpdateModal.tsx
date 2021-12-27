@@ -12,7 +12,6 @@ import { mutate } from 'swr'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchUpdateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
-import theme from '../../../theme/theme'
 
 type props = {
   kvKey: string
@@ -69,8 +68,8 @@ export const KvUpdateModal: React.FC<props> = ({
       open={isOpen}
     >
       <Grid container className="dialogContainer" p={3}>
-        <Grid sm={2} />
-        <Grid lg={8} sm={8}>
+        <Grid item sm={2} />
+        <Grid item lg={8} sm={8}>
           <Typography variant="h5">Edit: {kvKey}</Typography>
           <Box mt={2}>
             <FormControl fullWidth>

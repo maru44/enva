@@ -52,8 +52,8 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
   return (
     <Dialog onClose={onClose} open={isOpen}>
       <Grid container className="dialogContainer" p={3}>
-        <Grid sm={2} />
-        <Grid xs={8}>
+        <Grid sm={2} item />
+        <Grid item xs={8}>
           {Message}
           <Box mt={4} display="flex" justifyContent="space-between">
             <Box>

@@ -17,8 +17,8 @@ type props = {
 
 export const UserProfile: React.FC<props> = ({ currentUser }) => {
   return (
-    <Grid mt={2} container>
-      <Grid xs={0} sm={2} md={3} />
+    <Grid container>
+      <Grid item xs={0} sm={2} md={3} />
       <Grid
         item
         xs={12}

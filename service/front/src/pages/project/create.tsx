@@ -8,7 +8,7 @@ const ProjectCreate: NextPage<PageProps> = (props) => {
   useRequireLogin()
 
   return (
-    <Grid container mt={2}>
+    <Grid container mt={10}>
       <Grid xs={12} item>
         <ProjectCreateForm />
       </Grid>

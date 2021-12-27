@@ -1,4 +1,5 @@
-import { Box, Card, Container, Typography } from '@mui/material'
+import { ArrowBack } from '@material-ui/icons'
+import { Box, IconButton, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
@@ -22,14 +23,25 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   useRequireLogin()
 
   return (
-    <Container>
+    <Box mt={6}>
       {data && data.data && (
-        <Box mt={2}>
-          <Typography variant="h5">{data.data.name}</Typography>
+        <Box>
+          <Box display="flex" flexDirection="row" alignItems="center">
+            <Box mr={2}>
+              <IconButton
+                onClick={() => {
+                  router.back()
+                }}
+              >
+                <ArrowBack />
+              </IconButton>
+            </Box>
+            <Typography variant="h5">{data.data.name}</Typography>
+          </Box>
           <KvList projectId={data.data.id} />
         </Box>
       )}
-    </Container>
+    </Box>
   )
 }
 

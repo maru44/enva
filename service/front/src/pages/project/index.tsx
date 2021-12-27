@@ -15,6 +15,8 @@ import { ProjectListCard } from '../../components/project/ProjectListCard'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
 
 const ProjectList: NextPage<PageProps> = (props) => {
+  useRequireLogin()
+
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
     GetPath.PROJECT_LIST_USER,
     fetcherGetFromApiUrl
@@ -27,10 +29,8 @@ const ProjectList: NextPage<PageProps> = (props) => {
   // @TODO error handling
   if (error) console.log(error)
 
-  useRequireLogin()
-
   return (
-    <Box mt={2} width="100%">
+    <Box mt={6} width="100%">
       <Typography variant="h5">Projects</Typography>
       <Grid container mt={1} rowSpacing={2} columnSpacing={2}>
         {data &&

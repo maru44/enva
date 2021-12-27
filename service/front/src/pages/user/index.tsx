@@ -5,7 +5,6 @@ import { useCurrentUser } from '../../../hooks/useCurrentUser'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { PageProps } from '../../../types/page'
 import { UserProfile } from '../../components/user/UserProfile'
-import clsx from 'clsx'
 import { Cli } from '../../components/user/Cli'
 import styles from '../../styles/user.module.css'
 
@@ -27,29 +26,17 @@ const UserPage: NextPage<UserPageProps> = (props) => {
   }
 
   return (
-    <Box mt={2} width="100%">
-      <Tabs value="1" onChange={handleChange} className={styles.tabs}>
-        <Tab
-          key="profile"
-          value="profile"
-          label="Profile"
-          className={clsx(tab === 'profile' && styles.selected)}
-          aria-selected={tab === 'profile'}
-        />
-        <Tab
-          key="cli"
-          value="cli"
-          label="CLI"
-          className={clsx(tab === 'cli' && styles.selected)}
-          aria-selected={tab === 'cli'}
-        />
+    <Box mt={6} width="100%">
+      <Tabs value={tab} onChange={handleChange} className={styles.tabs}>
+        <Tab key="profile" value="profile" label="Profile" />
+        <Tab key="cli" value="cli" label="CLI" />
       </Tabs>
-      <Grid mt={1}>
+      <Box mt={6}>
         {currentUser && tab === 'profile' && (
           <UserProfile currentUser={currentUser} />
         )}
         {currentUser && tab === 'cli' && <Cli />}
-      </Grid>
+      </Box>
     </Box>
   )
 }
