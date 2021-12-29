@@ -18,18 +18,27 @@ const (
 		"FROM projects " +
 		"WHERE is_valid = true AND is_deleted = false AND owner_user_id = $1"
 
+	// list by organization
 	ProjectListByOrgQuery = "SELECT " +
-		"id, name, slug, description, owenr_type, owner_org_id, " +
+		"id, name, slug, description, owenr_type, owner_user_id, owner_org_id, " +
 		"created_at, updated_at " +
 		"FROM projects " +
 		"WHERE is_valid = true AND is_deleted = false AND owner_org_id = $1"
 
+	// only by user
 	ProjectDetailBySlugQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"is_valid, is_deleted, " +
 		"created_at, updated_at " +
 		"FROM projects " +
 		"WHERE slug = $1 AND owner_user_id = $2 AND is_deleted = false"
+
+	ProjectDetailBySlugAndOrgIdQuery = "SELECT " +
+		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
+		"is_valid, is_deleted, " +
+		"created_at, updated_at " +
+		"FROM projects " +
+		"WHERE slug = $1 AND owner_org_id = $2 AND is_deleted = false"
 
 	ProjectDetailByIDQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +

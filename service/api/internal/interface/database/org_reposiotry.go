@@ -8,12 +8,6 @@ import (
 	"github.com/maru44/perr"
 )
 
-// type IOrgRepository interface {
-// 	List(context.Context) ([]domain.Org, error)
-// 	Detail(context.Context, domain.OrgID) (*domain.Org, error)
-// 	Create(context.Context, domain.OrgInput) (*domain.OrgID, error)
-// }
-
 type OrgRepository struct {
 	ISqlHandler
 }
@@ -61,6 +55,34 @@ func (repo *OrgRepository) Detail(ctx context.Context, orgID domain.OrgID) (*dom
 		ctx,
 		queryset.OrgDetailQuery,
 		user.ID, orgID,
+	)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	var (
+		o       *domain.Org
+		ownerID domain.UserID
+	)
+	if err := row.Scan(
+		&o.ID, &o.Slug, &o.Name, &o.Description,
+		&ownerID, &o.CreatedAt, &o.UpdatedAt, &o.UserCount,
+	); err != nil {
+		return nil, perr.Wrap(err, perr.Wrap(err, perr.NotFound))
+	}
+
+	o.CreatedBy = domain.User{ID: ownerID}
+	return o, nil
+}
+
+func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*domain.Org, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	row := repo.QueryRowContext(
+		ctx,
+		queryset.OrgDetailBySlugQuery,
+		user.ID, slug,
 	)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)

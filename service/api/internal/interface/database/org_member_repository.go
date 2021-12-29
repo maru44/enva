@@ -27,3 +27,50 @@ func (repo *OrgMemberRepository) Create(ctx context.Context, input domain.OrgMem
 
 	return nil
 }
+
+func (repo *OrgMemberRepository) List(ctx context.Context, orgID domain.OrgID) (map[domain.UserType][]domain.User, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	// confirm access
+	var userType domain.UserType
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgUserTypeQuery,
+		orgID, cu.ID,
+	)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+	if err := row.Scan(&userType); err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	} else if userType == domain.UserType("") {
+		return nil, perr.New("Not belong to this org", perr.Forbidden)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.OrgUsersQuery,
+		orgID,
+	)
+	if err := rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	var users map[domain.UserType][]domain.User
+	for rows.Next() {
+		var (
+			u  domain.User
+			ut domain.UserType
+		)
+		if err := rows.Scan(
+			&u.ID, &u.Username, &u.Email, &u.ImageURL, &ut,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+
+		users[ut] = append(users[ut], u)
+	}
+
+	return users, nil
+}

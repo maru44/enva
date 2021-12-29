@@ -27,13 +27,6 @@ type (
 
 		HasCliPassword bool `json:"has_cli_password"`
 		// SshPubKeys []string `json:"ssh_pub_keys"`
-
-		// fk
-
-		OwnerOf []Org `json:"owner_of"`
-		AdminOf []Org `json:"admin_of"`
-		UserOf  []Org `json:"member_of"`
-		GuestOf []Org `json:"guest_of"`
 	}
 
 	UserInput struct {

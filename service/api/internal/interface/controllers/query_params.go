@@ -3,11 +3,13 @@ package controllers
 import "errors"
 
 const (
-	QueryParamsOrgID = "orgId"
+	QueryParamsOrgID   = "orgId"
+	QueryParamsOrgSlug = "orgSlug"
 
 	QueryParamsProjectID   = "projectId"
 	QueryParamsProjectSlug = "projectSlug"
 
+	QueryParamsID   = "id"
 	QueryParamsSlug = "slug"
 
 	QueryParamsKvID  = "kvId"

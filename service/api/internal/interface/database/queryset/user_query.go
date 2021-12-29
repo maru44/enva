@@ -25,12 +25,6 @@ const (
 		"FROM users " +
 		"WHERE (email = $1 OR username = $1) AND is_valid = true AND is_email_verified"
 
-	UsersBelongOrgQuery = "SELECT " +
-		"o.id, o.slug, o.name, r.user_type " +
-		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
-		"FROM rel_org_members AS r " +
-		"WHERE r.user_id = $1 AND r.is_valid = true AND r.deleted_at IS NULL"
-
 	// UserGetPasswordByEmailOrPassword = "SELECT passsword " +
 	// 	"FROM users " +
 	// 	"WHERE (email = $1 OR username = $1) AND is_valid = true"

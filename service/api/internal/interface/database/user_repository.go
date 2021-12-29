@@ -34,36 +34,6 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 		u.HasCliPassword = true
 	}
 
-	rows, err := repo.QueryContext(ctx, queryset.UsersBelongOrgQuery, id)
-	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
-	}
-
-	for rows.Next() {
-		var (
-			o        domain.Org
-			userType domain.UserType
-		)
-		if err := rows.Scan(
-			&o.ID, &o.Slug, &o.Name, &userType,
-		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
-		}
-
-		if userType == domain.UserTypeOwner {
-			u.OwnerOf = append(u.OwnerOf, o)
-		}
-		if userType == domain.UserTypeAdmin {
-			u.AdminOf = append(u.AdminOf, o)
-		}
-		if userType == domain.UserTypeUser {
-			u.UserOf = append(u.UserOf, o)
-		}
-	}
-
 	return u, nil
 }
 

@@ -22,6 +22,25 @@ func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.Or
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
+	var ut domain.UserType
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgUserTypeQuery,
+		input.OrgID, cu.ID,
+	)
+	if err := row.Err(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if err := row.Scan(&ut); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if ut == domain.UserTypeAdmin || ut == domain.UserTypeOwner {
+		return perr.New(
+			perr.Forbidden.Error(),
+			perr.Forbidden,
+			"You are not 'OWNER' or 'ADMIN' user of this organization.",
+		)
+	}
+
 	var id *string
 	if err := repo.QueryRowContext(ctx,
 		queryset.OrgInvitationCraeteQuery,

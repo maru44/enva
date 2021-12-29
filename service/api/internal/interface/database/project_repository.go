@@ -76,7 +76,7 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 		)
 		if err := rows.Scan(
 			&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
-			&orgID,
+			&p.OwnerOrg.ID, &orgID,
 			&p.CreatedAt, &p.UpdatedAt,
 		); err != nil {
 			return nil, perr.Wrap(err, perr.NotFound)
