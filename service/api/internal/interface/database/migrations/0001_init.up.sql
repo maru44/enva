@@ -1,21 +1,5 @@
 BEGIN;
 
--- organization
-CREATE TABLE orgs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    slug VARCHAR(63) UNIQUE NOT NULL,
-    name VARCHAR(63) NOT NULL,
-    description VARCHAR(511) NULL,
-    is_valid BOOLEAN NOT NULL DEFAULT true,
-    created_by uuid NULL REFERENCES users (id),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-
-    PRIMARY KEY (id)
-);
--- tmp: user can create only one orgs
-CREATE UNIQUE INDEX ON orgs (created_by) WHERE (is_valid = true);
-
 -- @TODO add username and email and cli password table
 -- OR make custome field to aws cognito
 
@@ -34,6 +18,23 @@ CREATE TABLE users (
 );
 CREATE UNIQUE INDEX ON users (email);
 CREATE UNIQUE INDEX ON users (username);
+
+-- organization
+CREATE TABLE orgs (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    slug VARCHAR(63) UNIQUE NOT NULL,
+    name VARCHAR(63) NOT NULL,
+    description VARCHAR(511) NULL,
+    is_valid BOOLEAN NOT NULL DEFAULT true,
+    created_by uuid NULL REFERENCES users (id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+    PRIMARY KEY (id)
+);
+-- tmp: user can create only one orgs
+CREATE UNIQUE INDEX ON orgs (created_by) WHERE (is_valid = true);
+
 
 CREATE TABLE ssh_keys (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -59,7 +60,7 @@ CREATE TABLE org_invitations (
 
     PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX org_invitations ON org_invitations (user_id, org_id) WHERE (is_valid = true);
+CREATE UNIQUE INDEX org_invitations_user_id_org_id ON org_invitations (user_id, org_id) WHERE (is_valid = true);
 
 -- relation org and users
 CREATE TABLE rel_org_members (
@@ -68,7 +69,7 @@ CREATE TABLE rel_org_members (
     user_id uuid NOT NULL REFERENCES users (id),
     user_type VARCHAR(15) NOT NULL DEFAULT 'user', -- 'owner', 'admin', 'user', 'guest'
 
-    org_invitation_id uuid REFERENCES org_invitations (id),
+    org_invitation_id uuid REFERENCES org_invitations (id) DEFAULT NULL,
 
     is_valid BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -77,7 +78,7 @@ CREATE TABLE rel_org_members (
 
     PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX rel_org_members ON rel_org_members (user_id, org_id) WHERE (is_valid = true);
+CREATE UNIQUE INDEX rel_org_members_user_id_org_id ON rel_org_members (user_id, org_id) WHERE (is_valid = true);
 
 -- projects
 CREATE TABLE projects (

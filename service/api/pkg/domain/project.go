@@ -86,9 +86,9 @@ func (p *Project) ValidateUserGet(u *User) error {
 	}
 
 	// org type
-	if p.OwnerOrg.IsMember(u) {
-		return nil
-	}
+	// if p.OwnerOrg.IsMember(u) {
+	// 	return nil
+	// }
 	return perr.New("Not member of owner organization", perr.Forbidden)
 }
 

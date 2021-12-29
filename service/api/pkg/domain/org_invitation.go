@@ -12,16 +12,17 @@ type (
 	OrgInvitationID string
 
 	OrgInvitation struct {
-		ID        OrgInvitationID `json:"id"`
-		OrgID     OrgID           `json:"org_id"`
-		UserID    UserID          `json:"user_id"`
-		UserType  UserType        `json:"user_type"`
-		IsValid   bool            `json:"is_valid"`
-		InvitedBy UserID          `json:"invited_by"`
+		ID       OrgInvitationID `json:"id"`
+		UserType UserType        `json:"user_type"`
+		IsValid  bool            `json:"is_valid"`
 
 		CreatedAt time.Time `json:"created_at"`
 		UpdatedAt time.Time `json:"updated_at"`
 		DeletedAt time.Time `json:"deleted_at"`
+
+		Org     Org  `json:"org"`
+		User    User `json:"user"`
+		Invitor User `json:"invitor"`
 	}
 
 	OrgInvitationInput struct {

@@ -30,9 +30,10 @@ type (
 
 		// fk
 
-		MemberOf []ProjectID `json:"member_of"`
-		AdminOf  []ProjectID `json:"admin_of"`
-		GuestOf  []ProjectID `json:"guest_of"`
+		OwnerOf []Org `json:"owner_of"`
+		AdminOf []Org `json:"admin_of"`
+		UserOf  []Org `json:"member_of"`
+		GuestOf []Org `json:"guest_of"`
 	}
 
 	UserInput struct {

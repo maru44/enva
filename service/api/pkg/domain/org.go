@@ -22,11 +22,7 @@ type (
 		CreatedAt   time.Time `json:"created_at"`
 		UpdatedAt   time.Time `json:"updated_at"`
 
-		// fk
-
-		Admins []User `json:"admin"`
-		Users  []User `json:"users"`
-		Guests []User `json:"guests"`
+		UserCount int `json:"user_count"`
 	}
 
 	OrgInput struct {
@@ -44,8 +40,8 @@ type (
 
 	IOrgInteractor interface {
 		List(context.Context) ([]Org, error)
-		Detail(context.Context, string) (*Org, error)
-		Create(context.Context, *OrgInput) (*OrgID, error)
+		Detail(context.Context, OrgID) (*Org, error)
+		Create(context.Context, OrgInput) (*string, error)
 		// Update
 		// Delete
 	}
@@ -66,8 +62,8 @@ func (o *OrgInput) Validate() error {
 
 func (o *OrgInvitation) ToMemberInput() *OrgMemberInput {
 	return &OrgMemberInput{
-		OrgID:           o.OrgID,
-		UserID:          o.UserID,
+		OrgID:           o.Org.ID,
+		UserID:          o.User.ID,
 		UserType:        o.UserType,
 		OrgInvitationID: o.ID,
 	}
@@ -90,28 +86,32 @@ func (o *OrgMemberInput) Validate(ctx context.Context) error {
 	)
 }
 
-func (o *Org) IsMember(u *User) bool {
-	if u == nil {
-		return false
-	}
-	for _, user := range o.Users {
-		if user.ID == u.ID {
-			return true
-		}
-	}
+var (
+// ValidationErrorOrgMemberInput = perr.New("")
+)
 
-	return o.IsAdmin(u)
-}
+// func (o *Org) IsMember(u *User) bool {
+// 	if u == nil {
+// 		return false
+// 	}
+// 	for _, user := range o.Users {
+// 		if user.ID == u.ID {
+// 			return true
+// 		}
+// 	}
 
-func (o *Org) IsAdmin(u *User) bool {
-	if u == nil {
-		return false
-	}
-	for _, user := range o.Admins {
-		if user.ID == u.ID {
-			return true
-		}
-	}
+// 	return o.IsAdmin(u)
+// }
 
-	return false
-}
+// func (o *Org) IsAdmin(u *User) bool {
+// 	if u == nil {
+// 		return false
+// 	}
+// 	for _, user := range o.Admins {
+// 		if user.ID == u.ID {
+// 			return true
+// 		}
+// 	}
+
+// 	return false
+// }
