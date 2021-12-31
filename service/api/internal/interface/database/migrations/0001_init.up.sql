@@ -90,9 +90,9 @@ CREATE TABLE projects (
     owner_user_id uuid NULL REFERENCES users (id),
     owner_org_id uuid NULL REFERENCES orgs (id) ON DELETE CASCADE,
     is_valid BOOLEAN NOT NULL DEFAULT true,
-    is_deleted BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
     PRIMARY KEY (id),
     CONSTRAINT projeccts_owner CHECK (owner_user_id IS NOT NULL OR owner_org_id IS NOT NULL)

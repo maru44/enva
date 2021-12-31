@@ -13,7 +13,7 @@ export type Project = {
   description: string
   owner_type: string
   is_valid: boolean
-  is_deleted: boolean
   created_at: string
   updated_at: string
+  deleted_at: string
 }

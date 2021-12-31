@@ -145,7 +145,7 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 	if err := row.Scan(
 		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
 		&userID, &orgID,
-		&p.IsValid, &p.IsDeleted,
+		&p.IsValid, &p.DeletedAt,
 		&p.CreatedAt, &p.UpdatedAt,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
@@ -188,7 +188,7 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 	if err := row.Scan(
 		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
 		&userID, &orgID,
-		&p.IsValid, &p.IsDeleted,
+		&p.IsValid, &p.DeletedAt,
 		&p.CreatedAt, &p.UpdatedAt,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)

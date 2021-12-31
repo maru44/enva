@@ -15,15 +15,15 @@ type (
 	OwnerType string
 
 	Project struct {
-		ID          ProjectID `json:"id"`
-		Slug        string    `json:"slug"`
-		Name        string    `json:"name"`
-		Description *string   `json:"description"`
-		OwnerType   OwnerType `json:"owner_type"`
-		IsValid     bool      `json:"is_valid"`
-		IsDeleted   bool      `json:"is_deleted"`
-		CreatedAt   time.Time `json:"created_at"`
-		UpdatedAt   time.Time `json:"updated_at"`
+		ID          ProjectID  `json:"id"`
+		Slug        string     `json:"slug"`
+		Name        string     `json:"name"`
+		Description *string    `json:"description"`
+		OwnerType   OwnerType  `json:"owner_type"`
+		IsValid     bool       `json:"is_valid"`
+		CreatedAt   time.Time  `json:"created_at"`
+		UpdatedAt   time.Time  `json:"updated_at"`
+		DeletedAt   *time.Time `json:"deleted_at"`
 
 		// fk
 
