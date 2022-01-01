@@ -7,8 +7,9 @@ import { PageProps } from '../../../types/page'
 import { UserProfile } from '../../components/user/UserProfile'
 import { Cli } from '../../components/user/Cli'
 import styles from '../../styles/user.module.css'
+import { UserOrgs } from '../../components/user/UserOrgs'
 
-type tab = 'profile' | 'cli'
+type tab = 'profile' | 'cli' | 'orgs'
 
 export type UserPageProps = {
   tabSelect?: tab
@@ -17,7 +18,7 @@ export type UserPageProps = {
 const UserPage: NextPage<UserPageProps> = (props) => {
   useRequireLogin()
   const { currentUser } = useCurrentUser()
-  const [tab, setTab] = useState<'profile' | 'cli'>(
+  const [tab, setTab] = useState<'profile' | 'cli' | 'orgs'>(
     props.tabSelect ?? 'profile'
   )
 
@@ -30,12 +31,14 @@ const UserPage: NextPage<UserPageProps> = (props) => {
       <Tabs value={tab} onChange={handleChange} className={styles.tabs}>
         <Tab key="profile" value="profile" label="Profile" />
         <Tab key="cli" value="cli" label="CLI" />
+        <Tab key="orgs" value="orgs" label="Orgs" />
       </Tabs>
       <Box mt={6}>
         {currentUser && tab === 'profile' && (
           <UserProfile currentUser={currentUser} />
         )}
         {currentUser && tab === 'cli' && <Cli />}
+        {currentUser && tab === 'orgs' && <UserOrgs />}
       </Box>
     </Box>
   )

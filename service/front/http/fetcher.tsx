@@ -15,6 +15,10 @@ export const GetPath: { [key: string]: string } = {
   KV_UPDATE: '/kv/update',
   KV_DELETE: '/kv/delete',
 
+  ORG_CREATE: '/org/create',
+  ORG_LIST: '/org',
+  ORG_DETAIL: '/org/detail',
+
   USER: '/user',
   USER_CREATE: '/user/create',
 

@@ -9,17 +9,22 @@ import {
 } from '@mui/material'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { Project } from '../../../types/project'
-import theme from '../../theme/theme'
-import styles from '../../styles/project.module.css'
+import { BaseInformation } from '../../types/information'
+import theme from '../theme/theme'
 
 type props = {
-  project: Project
-  startDeleteFunc: () => void
+  info: BaseInformation
+  linkAs: string
+  linkHref: string
+  styles: { readonly [key: string]: string }
+  startDeleteFunc?: () => void
 }
 
-export const ProjectListCard: React.FC<props> = ({
-  project,
+export const CommonListCard: React.FC<props> = ({
+  info,
+  linkAs,
+  linkHref,
+  styles,
   startDeleteFunc,
 }) => {
   return (
@@ -39,7 +44,7 @@ export const ProjectListCard: React.FC<props> = ({
             justifyContent="space-between"
           >
             <Grid item flex={1} overflow="hidden">
-              <Typography variant="h6">{project.name}</Typography>
+              <Typography variant="h6">{info.name}</Typography>
             </Grid>
             <Grid item width={40}>
               <Tooltip title="delete project" arrow>
@@ -54,11 +59,11 @@ export const ProjectListCard: React.FC<props> = ({
           </Grid>
           <Grid item xs={12} mt={1} overflow="hidden">
             <Typography maxHeight={theme.spacing(9.5)}>
-              {project.description}
+              {info.description}
             </Typography>
           </Grid>
         </Grid>
-        <Link as={`/project/${project.slug}`} href={`/project/[slug]`} passHref>
+        <Link as={linkAs} href={linkHref} passHref>
           <a className="hrefBoxIn"></a>
         </Link>
       </Card>

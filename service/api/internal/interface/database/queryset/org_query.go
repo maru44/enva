@@ -80,10 +80,10 @@ const (
 	OrgDetailBySlugQuery = "SELECT " +
 		"o.id, o.slug, o.name, o.description, o.is_valid, o.created_by, o.created_at, o.updated_at, " +
 		"COUNT(DISTINCT rs.id) " +
+		"FROM orgs AS o " +
 		"LEFT JOIN rel_org_members AS rs ON o.id = rs.org_id AND rs.is_valid = true " +
 		// eliminate if relation does not exists
-		"JOIN rel_org_members AS r ON o.user_id = $1 AND o.id = r.org_id AND r.is_valid = true " +
-		"FROM orgs AS o " +
+		"JOIN rel_org_members AS r ON r.user_id = $1 AND o.id = r.org_id AND r.is_valid = true " +
 		"WHERE o.slug = $2"
 
 	OrgCreateQuery = "INSERT INTO orgs " +

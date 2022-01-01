@@ -22,7 +22,7 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 
-	var u *domain.User
+	u := &domain.User{}
 	if err := row.Scan(
 		&u.ID, &u.Email, &u.Username, &u.ImageURL, &u.CliPassword,
 		&u.IsValid, &u.IsEmailVerified, &u.CreatedAt, &u.UpdatedAt,

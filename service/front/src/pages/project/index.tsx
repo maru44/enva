@@ -11,8 +11,9 @@ import {
   projectListReducer,
 } from '../../../hooks/kvs/useListProject'
 import { useReducer } from 'react'
-import { ProjectListCard } from '../../components/project/ProjectListCard'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
+import { CommonListCard } from '../../components/CommonListCard'
+import styles from '../../styles/project.module.css'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   useRequireLogin()
@@ -36,16 +37,19 @@ const ProjectList: NextPage<PageProps> = (props) => {
         {data &&
           data.data &&
           data.data.map((p, i) => (
-            <ProjectListCard
-              project={p}
+            <CommonListCard
+              info={p}
               key={i}
-              startDeleteFunc={() =>
+              startDeleteFunc={() => {
                 dispatch({
                   type: 'openDelete',
                   targetKey: p.name,
                   deleteId: p.id,
                 })
-              }
+              }}
+              linkAs={`/project/${p.slug}`}
+              linkHref="/project/[slug]"
+              styles={styles}
             />
           ))}
         {data && data.error && <Box>{data.error}</Box>}

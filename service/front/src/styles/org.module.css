@@ -1,0 +1,6 @@
+.card {
+  height: 136px;
+}
+.card .deleteIcon {
+  z-index: 100;
+}

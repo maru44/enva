@@ -12,7 +12,6 @@ import {
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import useSWR, { mutate } from 'swr'
-import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { cliUserResponseBody } from '../../../http/body/cliUser'
 import { fetchUpdateCliUser } from '../../../http/cliUser'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
@@ -45,8 +44,6 @@ export const Cli: React.FC = () => {
       snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
-
-  useRequireLogin()
 
   return (
     <Grid container>

@@ -34,6 +34,7 @@ func main() {
 	kv := controllers.NewKvController(sql)
 	cliKv := controllers.NewCliKvController(sql)
 	project := controllers.NewProjectController(sql)
+	org := controllers.NewOrgController(sql)
 	user := controllers.NewUserController(sql, pass)
 	cliU := controllers.NewCliUserController(sql, pass)
 
@@ -66,6 +67,11 @@ func main() {
 			s("/project/detail", http.MethodGet, project.ProjectDetailView),
 			s("/project/create", http.MethodPost, project.CreateView),
 			s("/project/delete", http.MethodDelete, project.DeleteView),
+
+			/* org */
+			s("/org", http.MethodGet, org.ListView),
+			s("/org/detail", http.MethodGet, org.DetailBySlugView),
+			s("/org/create", http.MethodPost, org.CreateView),
 
 			/* user */
 			s("/user", http.MethodGet, user.GetUserView),

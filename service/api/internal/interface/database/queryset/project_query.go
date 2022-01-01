@@ -5,25 +5,25 @@ const (
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE is_valid = true AND deleted_at = null"
+		"WHERE is_valid = true AND deleted_at IS NULL"
 
 	ProjectListByUserQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE is_valid = true AND deleted_at = null AND owner_user_id = $1"
+		"WHERE is_valid = true AND deleted_at IS NULL AND owner_user_id = $1"
 
 	ProjectSlugListByUserQuery = "SELECT " +
 		"slug " +
 		"FROM projects " +
-		"WHERE is_valid = true AND deleted_at = null AND owner_user_id = $1"
+		"WHERE is_valid = true AND deleted_at IS NULL AND owner_user_id = $1"
 
 	// list by organization
 	ProjectListByOrgQuery = "SELECT " +
 		"id, name, slug, description, owenr_type, owner_user_id, owner_org_id, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE is_valid = true AND deleted_at = null AND owner_org_id = $1"
+		"WHERE is_valid = true AND deleted_at IS NULL AND owner_org_id = $1"
 
 	// only by user
 	ProjectDetailBySlugQuery = "SELECT " +
@@ -31,14 +31,14 @@ const (
 		"is_valid, deleted_at, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE slug = $1 AND owner_user_id = $2 AND deleted_at = null"
+		"WHERE slug = $1 AND owner_user_id = $2 AND deleted_at IS NULL"
 
 	ProjectDetailBySlugAndOrgIdQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"is_valid, deleted_at, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE slug = $1 AND owner_org_id = $2 AND deleted_at = null"
+		"WHERE slug = $1 AND owner_org_id = $2 AND deleted_at IS NULL"
 
 	ProjectDetailByIDQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
