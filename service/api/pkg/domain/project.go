@@ -45,11 +45,10 @@ type (
 		// SlugListByOrg(context.Context, OrgID) ([]string, error)
 
 		GetBySlug(context.Context, string) (*Project, error)
+		GetBySlugAndOrgID(context.Context, string, OrgID) (*Project, error)
 		GetByID(context.Context, ProjectID) (*Project, error)
 		Create(context.Context, ProjectInput) (*string, error)
 		Delete(context.Context, ProjectID) (int, error)
-
-		// by org 系
 	}
 )
 
@@ -72,6 +71,7 @@ var (
 	ErrProjectSlugAlreadyExistsOrg  = errors.New("Slug duplicated: Project slug has already exists for organization") // 400
 )
 
+// @TODO: add for org
 func (p *Project) ValidateUserGet(u *User) error {
 	if u == nil {
 		return perr.New("unauthorized", perr.Unauthorized)

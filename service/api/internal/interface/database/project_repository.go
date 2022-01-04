@@ -185,6 +185,43 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 	return p, nil
 }
 
+func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug string, orgID domain.OrgID) (*domain.Project, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	row := repo.QueryRowContext(ctx, queryset.ProjectDetailBySlugAndOrgIdQuery, user.ID, orgID, slug)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		p      *domain.Project = &domain.Project{}
+		userID *domain.UserID
+	)
+	if err := row.Scan(
+		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
+		&userID,
+		&p.IsValid, &p.DeletedAt,
+		&p.CreatedAt, &p.UpdatedAt,
+	); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	// set user
+	if userID != nil {
+		p.OwnerUser = &domain.User{ID: *userID}
+	}
+
+	// set org
+	p.OwnerOrg = &domain.Org{
+		ID: orgID,
+	}
+
+	return p, nil
+}
+
 func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID) (*domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {

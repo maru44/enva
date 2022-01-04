@@ -12,9 +12,10 @@ import { KvList } from '../../components/kv/KvList'
 const ProjectDetail: NextPage<PageProps> = (props) => {
   const router = useRouter()
   const slug = router.query.slug as string
+  const orgId = router.query.orgId as string
 
   const { data, error } = useSWR<projectResponseBody, ErrorConstructor>(
-    `${GetPath.PROJECT_DETAIl}?slug=${slug}`,
+    `${GetPath.PROJECT_DETAIl}?slug=${slug}&orgId=${orgId ?? ''}`,
     fetcherGetFromApiUrl
   )
 

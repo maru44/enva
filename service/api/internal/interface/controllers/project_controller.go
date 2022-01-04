@@ -72,6 +72,17 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	orgID := r.URL.Query().Get(QueryParamsOrgID)
+	if orgID != "" {
+		p, err := con.in.GetBySlugAndOrgID(ctx, slug, domain.OrgID(orgID))
+		if err != nil {
+			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			return
+		}
+		response(w, r, nil, map[string]interface{}{"data": p})
+		return
+	}
+
 	p, err := con.in.GetBySlug(ctx, slug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)

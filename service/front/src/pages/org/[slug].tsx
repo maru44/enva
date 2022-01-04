@@ -17,12 +17,10 @@ const OrgDetail: NextPage<PageProps> = (props) => {
   const router = useRouter()
   const slug = router.query.slug as string
 
-  const { data, error } = useSWR<OrgResponseBody>(
+  const { data, error } = useSWR<OrgResponseBody, ErrorConstructor>(
     `${GetPath.ORG_DETAIL}?slug=${slug}`,
     fetcherGetFromApiUrl
   )
-
-  console.log(data)
 
   return (
     <Box mt={6}>
@@ -62,12 +60,14 @@ type orgProjectsProps = {
 }
 
 const OrgProjects: React.FC<orgProjectsProps> = ({ id }) => {
-  const { data, error } = useSWR<projectsResponseBody>(
+  const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
     `${GetPath.PROJECT_LIST_ORG}?id=${id}`,
     fetcherGetFromApiUrl
   )
 
   if (error) return <div></div>
+
+  console.log(data)
 
   return (
     <Grid container rowSpacing={2} columnSpacing={2}>
