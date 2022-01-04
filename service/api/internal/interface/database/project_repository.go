@@ -60,7 +60,15 @@ func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project
 }
 
 func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID) ([]domain.Project, error) {
-	rows, err := repo.QueryContext(ctx, queryset.ProjectListByOrgQuery, orgID)
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.ProjectListByOrgQuery,
+		orgID, user.ID,
+	)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -71,12 +79,13 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 	var ps []domain.Project
 	for rows.Next() {
 		var (
-			p     domain.Project
-			orgID *string
+			p      domain.Project
+			userID *string
+			orgID  *string
 		)
 		if err := rows.Scan(
 			&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
-			&p.OwnerOrg.ID, &orgID,
+			&userID, &orgID,
 			&p.CreatedAt, &p.UpdatedAt,
 		); err != nil {
 			return nil, perr.Wrap(err, perr.NotFound)
@@ -86,6 +95,12 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 		if orgID != nil {
 			p.OwnerOrg = &domain.Org{
 				ID: domain.OrgID(*orgID),
+			}
+		}
+
+		if userID != nil {
+			p.OwnerUser = &domain.User{
+				ID: domain.UserID(*userID),
 			}
 		}
 
@@ -211,27 +226,23 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 }
 
 func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectInput) (*string, error) {
-	user, err := domain.UserFromCtx(ctx)
-	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
-	}
-
-	var (
-		in           domain.ProjectInput
-		inputU, slug *string
-	)
+	var inputU, slug *string
 
 	ownerType := domain.OwnerTypeUser
-	if in.OrgID != nil {
+	if input.OrgID != nil {
 		ownerType = domain.OwnerTypeOrg
 	} else {
+		user, err := domain.UserFromCtx(ctx)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.Forbidden)
+		}
 		inputU = tools.StringPtr(user.ID.String())
 	}
 
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.ProjectCreateQuery,
-		input.Name, input.Slug, input.Description, ownerType, inputU, in.OrgID,
+		input.Name, input.Slug, input.Description, ownerType, inputU, input.OrgID,
 	).Scan(&slug); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}

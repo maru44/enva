@@ -36,7 +36,7 @@ func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Requ
 }
 
 func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Request) {
-	orgID := r.URL.Query().Get(QueryParamsOrgID)
+	orgID := r.URL.Query().Get(QueryParamsID)
 	if orgID == "" {
 		response(w, r, perr.New(ErrorNoOrgIdParams.Error(), perr.BadRequest), nil)
 		return

@@ -46,6 +46,42 @@ func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
 	return orgs, nil
 }
 
+func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.OrgListQuery, user.ID,
+	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var orgs []domain.Org
+	for rows.Next() {
+		var (
+			o        domain.Org
+			userType domain.UserType
+		)
+		if err := rows.Scan(
+			&o.ID, &o.Slug, &o.Name, &o.Description,
+			&o.CreatedAt, &o.UpdatedAt, &userType,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+
+		if userType == domain.UserTypeOwner || userType == domain.UserTypeAdmin {
+			orgs = append(orgs, o)
+		}
+	}
+	return orgs, nil
+}
+
 func (repo *OrgRepository) Detail(ctx context.Context, orgID domain.OrgID) (*domain.Org, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
@@ -88,17 +124,18 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 	var (
-		o       *domain.Org
-		ownerID domain.UserID
+		o *domain.Org = &domain.Org{}
+		u domain.User
 	)
 	if err := row.Scan(
-		&o.ID, &o.Slug, &o.Name, &o.Description,
-		&ownerID, &o.CreatedAt, &o.UpdatedAt, &o.UserCount,
+		&o.ID, &o.Slug, &o.Name, &o.Description, &o.IsValid,
+		&o.CreatedAt, &o.UpdatedAt, &o.UserCount,
+		&u.ID,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.Wrap(err, perr.NotFound))
 	}
 
-	o.CreatedBy = domain.User{ID: ownerID}
+	o.CreatedBy = u
 	return o, nil
 }
 

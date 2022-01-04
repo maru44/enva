@@ -37,6 +37,19 @@ func (con *OrgController) ListView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (con *OrgController) ListOwnerAdminView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	orgs, err := con.in.ListOwnerAdmin(ctx)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": orgs})
+	return
+}
+
 func (con *OrgController) DetailBySlugView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	slug := r.URL.Query().Get(QueryParamsSlug)

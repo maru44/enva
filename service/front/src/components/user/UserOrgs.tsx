@@ -5,7 +5,7 @@ import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { CommonListCard } from '../CommonListCard'
 import styles from '../../styles/org.module.css'
 import Link from 'next/link'
-import { AddCircle } from '@material-ui/icons'
+import { AddCircle, Apartment } from '@material-ui/icons'
 
 export const UserOrgs: React.FC = () => {
   const { data, error } = useSWR<OrgsResponseBody>(
@@ -39,6 +39,7 @@ export const UserOrgs: React.FC = () => {
               info={o}
               linkAs={`/org/${o.slug}`}
               linkHref="/org/[slug]"
+              icon={<Apartment />}
               styles={styles}
             />
           ))}

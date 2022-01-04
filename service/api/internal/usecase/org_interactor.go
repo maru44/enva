@@ -18,6 +18,7 @@ func NewOrgInteractor(repo IOrgRepository) domain.IOrgInteractor {
 
 type IOrgRepository interface {
 	List(context.Context) ([]domain.Org, error)
+	ListOwnerAdmin(context.Context) ([]domain.Org, error)
 	Detail(context.Context, domain.OrgID) (*domain.Org, error)
 	DetailBySlug(context.Context, string) (*domain.Org, error)
 	Create(context.Context, domain.OrgInput) (*string, error)
@@ -25,6 +26,10 @@ type IOrgRepository interface {
 
 func (in *OrgInteractor) List(ctx context.Context) ([]domain.Org, error) {
 	return in.repo.List(ctx)
+}
+
+func (in *OrgInteractor) ListOwnerAdmin(ctx context.Context) ([]domain.Org, error) {
+	return in.repo.ListOwnerAdmin(ctx)
 }
 
 func (in *OrgInteractor) Detail(ctx context.Context, orgID domain.OrgID) (*domain.Org, error) {

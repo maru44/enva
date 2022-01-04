@@ -1,7 +1,22 @@
-import { Box, Button, Grid, TextField, Typography, Paper } from '@mui/material'
+import { AccountCircle, Apartment } from '@material-ui/icons'
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  Paper,
+  Select,
+  MenuItem,
+  IconButton,
+} from '@mui/material'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
+import useSWR from 'swr'
+import { OrgsResponseBody } from '../../../../http/body/org'
+import { projectCreateResponseBody } from '../../../../http/body/project'
+import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
 import { fetchCreateProject } from '../../../../http/project'
 import { ProjectInput } from '../../../../types/project'
 import { slugify } from '../../../../utils/slug'
@@ -15,9 +30,15 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
   const router = useRouter()
   const snack = useSnackbar()
 
+  const { data, error } = useSWR<OrgsResponseBody>(
+    GetPath.ORG_ADMIN_LIST,
+    fetcherGetFromApiUrl
+  )
+
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const t = e.currentTarget
+    const orgs = t.orgs.value === 'user' ? null : t.orgs.value
     const name = t.project_name.value
     const description = t.description.value === '' ? null : t.description.value
 
@@ -25,14 +46,15 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
       name: name,
       slug: slug,
       description: description,
+      org_id: orgs,
     }
     const res = await fetchCreateProject(input)
-    const ret = await res.json()
+    const ret: projectCreateResponseBody = await res.json()
     if (res.status === 200) {
-      const slug = ret['data']
+      const slug = ret.data
       router.push(`/project/${slug}`)
     } else {
-      const message = ret['error']
+      const message = ret.error
       snack.enqueueSnackbar(message, { variant: 'error' })
     }
   }
@@ -46,7 +68,13 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
   }
 
   return (
-    <Box width="100%" component="form" onSubmit={submit}>
+    <Box
+      width="100%"
+      component="form"
+      onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+        submit(e)
+      }}
+    >
       <Grid container>
         <Grid item xs={0} sm={1} md={3} />
         <Grid
@@ -61,6 +89,30 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
           variant="outlined"
         >
           <Typography variant="h5">New Project</Typography>
+          <Box mt={2}>
+            <Select label="orgs" name="orgs" fullWidth defaultValue="user">
+              <MenuItem value="user">
+                <Box display="flex" flexDirection="row" alignItems="center">
+                  <IconButton>
+                    <AccountCircle />
+                  </IconButton>
+                  <Typography>As a user</Typography>
+                </Box>
+              </MenuItem>
+              {data &&
+                data.data &&
+                data.data.map((o, i) => (
+                  <MenuItem key={i} value={o.id}>
+                    <Box display="flex" flexDirection="row" alignItems="center">
+                      <IconButton>
+                        <Apartment />
+                      </IconButton>
+                      <Typography>{o.name}</Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+            </Select>
+          </Box>
           <Box mt={2}>
             <TextField
               name="project_name"

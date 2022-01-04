@@ -10,3 +10,7 @@ export type projectResponseBody =
   | {
       data: Project
     } & errorResponseBody
+
+export type projectCreateResponseBody = {
+  data: string
+} & errorResponseBody

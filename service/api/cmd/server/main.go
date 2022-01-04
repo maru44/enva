@@ -62,7 +62,7 @@ func main() {
 
 			/* project */
 			s("/project/list/user", http.MethodGet, project.ListByUserView),
-			// s("/project/list/org", http.MethodGet, project.ListByOrgView),
+			s("/project/list/org", http.MethodGet, project.ListByOrgView),
 			s("/project/slugs/user", http.MethodGet, project.SlugListByUserView),
 			s("/project/detail", http.MethodGet, project.ProjectDetailView),
 			s("/project/create", http.MethodPost, project.CreateView),
@@ -70,6 +70,7 @@ func main() {
 
 			/* org */
 			s("/org", http.MethodGet, org.ListView),
+			s("/org/admins", http.MethodGet, org.ListOwnerAdminView),
 			s("/org/detail", http.MethodGet, org.DetailBySlugView),
 			s("/org/create", http.MethodPost, org.CreateView),
 

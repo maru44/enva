@@ -1,5 +1,6 @@
 import { Delete } from '@material-ui/icons'
 import {
+  Box,
   Card,
   Grid,
   IconButton,
@@ -9,6 +10,7 @@ import {
 } from '@mui/material'
 import clsx from 'clsx'
 import Link from 'next/link'
+import { ReactNode } from 'react'
 import { BaseInformation } from '../../types/information'
 import theme from '../theme/theme'
 
@@ -17,6 +19,7 @@ type props = {
   linkAs: string
   linkHref: string
   styles: { readonly [key: string]: string }
+  icon?: ReactNode
   startDeleteFunc?: () => void
 }
 
@@ -25,6 +28,7 @@ export const CommonListCard: React.FC<props> = ({
   linkAs,
   linkHref,
   styles,
+  icon,
   startDeleteFunc,
 }) => {
   return (
@@ -43,10 +47,15 @@ export const CommonListCard: React.FC<props> = ({
             alignItems="center"
             justifyContent="space-between"
           >
-            <Grid item flex={1} overflow="hidden">
+            {icon && (
+              <Box width={40}>
+                <IconButton>{icon}</IconButton>
+              </Box>
+            )}
+            <Box flex={1} overflow="hidden">
               <Typography variant="h6">{info.name}</Typography>
-            </Grid>
-            <Grid item width={40}>
+            </Box>
+            <Box width={40}>
               <Tooltip title="delete project" arrow>
                 <IconButton
                   className={styles.deleteIcon}
@@ -55,7 +64,7 @@ export const CommonListCard: React.FC<props> = ({
                   <Delete />
                 </IconButton>
               </Tooltip>
-            </Grid>
+            </Box>
           </Grid>
           <Grid item xs={12} mt={1} overflow="hidden">
             <Typography maxHeight={theme.spacing(9.5)}>

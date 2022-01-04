@@ -35,7 +35,7 @@ type (
 		Slug        string  `json:"slug"`
 		Name        string  `json:"name"`
 		Description *string `json:"description"`
-		OrgID       *OrgID  `json:"org_id"`
+		OrgID       *OrgID  `json:"org_id,omitempty"`
 	}
 
 	IProjectInteractor interface {

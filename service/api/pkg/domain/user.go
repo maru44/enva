@@ -15,7 +15,7 @@ type (
 	UserType string
 
 	User struct {
-		ID              UserID    `json:"-"`
+		ID              UserID    `json:"id"`
 		Username        string    `json:"username"`
 		Email           string    `json:"email"`
 		ImageURL        *string   `json:"image_url"`

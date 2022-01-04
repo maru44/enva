@@ -20,10 +20,12 @@ const (
 
 	// list by organization
 	ProjectListByOrgQuery = "SELECT " +
-		"id, name, slug, description, owenr_type, owner_user_id, owner_org_id, " +
-		"created_at, updated_at " +
-		"FROM projects " +
-		"WHERE is_valid = true AND deleted_at IS NULL AND owner_org_id = $1"
+		"p.id, p.name, p.slug, p.description, p.owner_type, p.owner_user_id, p.owner_org_id, " +
+		"p.created_at, p.updated_at " +
+		"FROM projects AS p " +
+		// filter current user is member of org
+		"JOIN rel_org_members AS r ON r.org_id = $1 AND r.user_id = $2 AND r.is_valid = true " +
+		"WHERE p.is_valid = true AND p.deleted_at IS NULL AND p.owner_org_id = $1"
 
 	// only by user
 	ProjectDetailBySlugQuery = "SELECT " +

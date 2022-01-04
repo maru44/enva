@@ -4,7 +4,7 @@ import { ApiUrl, IsDevelopment, ThisUrl } from '../config/env'
 
 export const GetPath: { [key: string]: string } = {
   PROJECT_LIST_USER: '/project/list/user',
-  PROJECT_LIST_ORG: '/project/list/org',
+  PROJECT_LIST_ORG: '/project/list/org', // ?id=
   PROJECT_DETAIl: '/project/detail',
   PROJECT_CREATE: '/project/create',
   PROJECT_DELETE: '/project/delete',
@@ -17,6 +17,7 @@ export const GetPath: { [key: string]: string } = {
 
   ORG_CREATE: '/org/create',
   ORG_LIST: '/org',
+  ORG_ADMIN_LIST: '/org/admins',
   ORG_DETAIL: '/org/detail',
 
   USER: '/user',
