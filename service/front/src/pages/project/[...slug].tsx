@@ -11,11 +11,23 @@ import { KvList } from '../../components/kv/KvList'
 
 const ProjectDetail: NextPage<PageProps> = (props) => {
   const router = useRouter()
-  const slug = router.query.slug as string
-  const orgId = router.query.orgId as string
+  const slug = router.query.slug as string[]
+
+  let url = GetPath.PROJECT_DETAIl as string
+  if (slug) {
+    switch (slug.length) {
+      case 2:
+        url = `${GetPath.PROJECT_DETAIl}?slug=${slug[1]}&orgId=${slug[0]}`
+        break
+      default:
+        url = `${GetPath.PROJECT_DETAIl}?slug=${slug[0]}`
+    }
+  }
+
+  console.log(url)
 
   const { data, error } = useSWR<projectResponseBody, ErrorConstructor>(
-    `${GetPath.PROJECT_DETAIl}?slug=${slug}&orgId=${orgId ?? ''}`,
+    url,
     fetcherGetFromApiUrl
   )
 

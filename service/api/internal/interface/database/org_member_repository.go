@@ -74,3 +74,21 @@ func (repo *OrgMemberRepository) List(ctx context.Context, orgID domain.OrgID) (
 
 	return users, nil
 }
+
+func (repo *OrgMemberRepository) GetCurrentUserType(ctx context.Context, orgID domain.OrgID) (*domain.UserType, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, user.ID)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	var ut *domain.UserType
+	if err := row.Scan(&ut); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	return ut, nil
+}

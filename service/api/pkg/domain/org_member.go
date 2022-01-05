@@ -21,7 +21,15 @@ type (
 		List(context.Context, OrgID) (map[UserType][]User, error)
 		// Update() // mainly userType
 		// Delete()
+		GetCurrentUserType(context.Context, OrgID) (*UserType, error)
 	}
+)
+
+const (
+	UserTypeOwner = UserType("owner")
+	UserTypeAdmin = UserType("admin")
+	UserTypeUser  = UserType("user")
+	UserTypeGuest = UserType("guest")
 )
 
 func (o *OrgInvitation) ToMemberInput() *OrgMemberInput {

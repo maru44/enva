@@ -14,6 +14,7 @@ import (
 type KvController struct {
 	in  domain.IKvInteractor
 	pIn domain.IProjectInteractor
+	oIn domain.IOrgMemberInteractor
 }
 
 func NewKvController(sql database.ISqlHandler) *KvController {
@@ -28,6 +29,11 @@ func NewKvController(sql database.ISqlHandler) *KvController {
 				ISqlHandler: sql,
 			},
 		),
+		oIn: usecase.NewOrgMemberInteractor(
+			&database.OrgMemberRepository{
+				ISqlHandler: sql,
+			},
+		),
 	}
 }
 
@@ -35,7 +41,7 @@ func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectID := r.URL.Query().Get(QueryParamsProjectID)
 
-	if err := con.userAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
+	if err := con.userGuestAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
@@ -126,9 +132,44 @@ func (con *KvController) userAccessToProject(ctx context.Context, projectID doma
 		return perr.Wrap(err, perr.NotFound, "Project is not found")
 	}
 
-	// validate user can access to project
-	if err := p.ValidateUserGet(user); err != nil {
+	if p.OwnerType == "user" {
+		if p.OwnerUser.ID != user.ID {
+			return perr.New("user is guest", perr.Forbidden)
+		}
+	} else {
+		ut, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		if err != nil {
+			return perr.Wrap(err, perr.Forbidden)
+		}
+		if *ut == domain.UserTypeGuest {
+			return perr.New("user is guest", perr.Forbidden, "you are guest user")
+		}
+	}
+
+	return nil
+}
+
+func (con *KvController) userGuestAccessToProject(ctx context.Context, projectID domain.ProjectID) error {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
 		return perr.Wrap(err, perr.Forbidden)
+	}
+
+	// find parent project
+	p, err := con.pIn.GetByID(ctx, projectID)
+	if err != nil {
+		return perr.Wrap(err, perr.NotFound, "Project is not found")
+	}
+
+	if p.OwnerType == "user" {
+		if p.OwnerUser.ID != user.ID {
+			return perr.New("user is not owner of this project", perr.Forbidden)
+		}
+	} else {
+		_, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		if err != nil {
+			return perr.Wrap(err, perr.Forbidden)
+		}
 	}
 
 	return nil

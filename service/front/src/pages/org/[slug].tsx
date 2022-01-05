@@ -77,8 +77,8 @@ const OrgProjects: React.FC<orgProjectsProps> = ({ id }) => {
           <CommonListCard
             info={p}
             key={i}
-            linkAs={`/project/${p.slug}?orgId=${id}`}
-            linkHref="/project/[slug]"
+            linkAs={`/project/${id}/${p.slug}`}
+            linkHref="/project/[...slug]"
             styles={styles}
           />
         ))}

@@ -48,7 +48,7 @@ const ProjectList: NextPage<PageProps> = (props) => {
                 })
               }}
               linkAs={`/project/${p.slug}`}
-              linkHref="/project/[slug]"
+              linkHref="/project/[...slug]"
               styles={styles}
             />
           ))}

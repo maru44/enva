@@ -11,7 +11,8 @@ import (
 )
 
 type ProjectController struct {
-	in domain.IProjectInteractor
+	in  domain.IProjectInteractor
+	oIn domain.IOrgMemberInteractor
 }
 
 func NewProjectController(sql database.ISqlHandler) *ProjectController {
@@ -21,9 +22,15 @@ func NewProjectController(sql database.ISqlHandler) *ProjectController {
 				ISqlHandler: sql,
 			},
 		),
+		oIn: usecase.NewOrgMemberInteractor(
+			&database.OrgMemberRepository{
+				ISqlHandler: sql,
+			},
+		),
 	}
 }
 
+// filtered by user @sql
 func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Request) {
 	ps, err := con.in.ListByUser(r.Context())
 	if err != nil {
@@ -35,6 +42,7 @@ func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Requ
 	return
 }
 
+// filtered by user @sql
 func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Request) {
 	orgID := r.URL.Query().Get(QueryParamsID)
 	if orgID == "" {
@@ -52,6 +60,7 @@ func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Reque
 	return
 }
 
+// filtered by user @sql
 func (con *ProjectController) SlugListByUserView(w http.ResponseWriter, r *http.Request) {
 	slugs, err := con.in.SlugListByUser(r.Context())
 	if err != nil {
@@ -63,6 +72,7 @@ func (con *ProjectController) SlugListByUserView(w http.ResponseWriter, r *http.
 	return
 }
 
+// filtered by user @sql
 func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -89,13 +99,6 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// validate user access
-	user, _ := domain.UserFromCtx(ctx)
-	if err := p.ValidateUserGet(user); err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
-		return
-	}
-
 	response(w, r, nil, map[string]interface{}{"data": p})
 	return
 }
@@ -103,13 +106,26 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 // @TODO if orgID not equal null >>
 // user need to be a member of that org
 func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	var input domain.ProjectInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}
 
-	id, err := con.in.Create(r.Context(), input)
+	if input.OrgID != nil {
+		ut, err := con.oIn.GetCurrentUserType(ctx, *input.OrgID)
+		if err != nil {
+			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			return
+		}
+		if *ut == domain.UserTypeUser || *ut == domain.UserTypeGuest {
+			response(w, r, perr.New("user is not admin or owner of this orgs", perr.Forbidden, "you are not admin or owner of this orgs"), nil)
+			return
+		}
+	}
+
+	id, err := con.in.Create(ctx, input)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
@@ -131,10 +147,24 @@ func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request)
 
 	// validate user access
 	user, err := domain.UserFromCtx(ctx)
-
-	if err := p.ValidateUserGet(user); err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
-		return
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+	}
+	if p.OwnerType == "user" {
+		if p.OwnerUser.ID != user.ID {
+			response(w, r, perr.New("user is not owner of this project", perr.Forbidden), nil)
+			return
+		}
+	} else {
+		ut, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		if err != nil {
+			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			return
+		}
+		if *ut == domain.UserTypeUser || *ut == domain.UserTypeGuest {
+			response(w, r, perr.New("user is not admin or owner of this orgs", perr.Forbidden, "you are not admin or owner of this orgs"), nil)
+			return
+		}
 	}
 
 	affected, err := con.in.Delete(ctx, domain.ProjectID(projectID))

@@ -2,31 +2,30 @@ import { NextPageContext } from 'next'
 import { parseCookies } from 'nookies'
 import { ApiUrl, IsDevelopment, ThisUrl } from '../config/env'
 
-export const GetPath: { [key: string]: string } = {
-  PROJECT_LIST_USER: '/project/list/user',
-  PROJECT_LIST_ORG: '/project/list/org', // ?id=
-  PROJECT_DETAIl: '/project/detail',
-  PROJECT_CREATE: '/project/create',
-  PROJECT_DELETE: '/project/delete',
-  PROJECT_UPDATE: '/project/update',
+export enum GetPath {
+  PROJECT_LIST_USER = '/project/list/user',
+  PROJECT_LIST_ORG = '/project/list/org', // ?id=
+  PROJECT_DETAIl = '/project/detail',
+  PROJECT_CREATE = '/project/create',
+  PROJECT_DELETE = '/project/delete',
+  PROJECT_UPDATE = '/project/update',
 
-  KVS_BY_PROJECT: '/kv',
-  KV_CREATE: '/kv/create',
-  KV_UPDATE: '/kv/update',
-  KV_DELETE: '/kv/delete',
+  KVS_BY_PROJECT = '/kv',
+  KV_CREATE = '/kv/create',
+  KV_UPDATE = '/kv/update',
+  KV_DELETE = '/kv/delete',
 
-  ORG_CREATE: '/org/create',
-  ORG_LIST: '/org',
-  ORG_ADMIN_LIST: '/org/admins',
-  ORG_DETAIL: '/org/detail',
+  ORG_CREATE = '/org/create',
+  ORG_LIST = '/org',
+  ORG_ADMIN_LIST = '/org/admins',
+  ORG_DETAIL = '/org/detail',
 
-  USER: '/user',
-  USER_CREATE: '/user/create',
+  USER = '/user',
+  USER_CREATE = '/user/create',
 
-  CLI_USER: '/cli/user',
-  CLI_USER_UPDATE: '/cli/user/update',
-} as const
-export type GetPath = typeof GetPath[keyof typeof GetPath]
+  CLI_USER = '/cli/user',
+  CLI_USER_UPDATE = '/cli/user/update',
+}
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 

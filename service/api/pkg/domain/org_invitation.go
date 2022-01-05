@@ -42,13 +42,6 @@ type (
 	}
 )
 
-const (
-	UserTypeOwner = UserType("owner")
-	UserTypeAdmin = UserType("admin")
-	UserTypeUser  = UserType("user")
-	UserTypeGuest = UserType("guest")
-)
-
 func (o *OrgInvitationInput) Validate() error {
 	return validation.ValidateStruct(o,
 		validation.Field(&o.OrgID, validation.Required, is.UUID),

@@ -16,6 +16,7 @@ type (
 		in  domain.IKvInteractor
 		pIn domain.IProjectInteractor
 		cIn domain.ICliKvInteractor
+		oIn domain.IOrgMemberInteractor
 	}
 )
 
@@ -36,6 +37,11 @@ func NewCliKvController(sql database.ISqlHandler) *CliKvController {
 				ISqlHandler: sql,
 			},
 		),
+		oIn: usecase.NewOrgMemberInteractor(
+			&database.OrgMemberRepository{
+				ISqlHandler: sql,
+			},
+		),
 	}
 }
 
@@ -43,7 +49,7 @@ func (con *CliKvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 
-	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	projectID, err := con.userGuesAccessToProject(ctx, projectSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -63,7 +69,7 @@ func (con *CliKvController) DetailView(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get(QueryParamsKvKey)
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 
-	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	projectID, err := con.userGuesAccessToProject(ctx, projectSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -202,8 +208,45 @@ func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug
 	}
 
 	// validate user can access to project
-	if err := p.ValidateUserGet(user); err != nil {
+	if p.OwnerType == "user" {
+		if p.OwnerUser.ID != user.ID {
+			return nil, perr.New("user is guest", perr.Forbidden)
+		}
+	} else {
+		ut, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.Forbidden)
+		}
+		if *ut == domain.UserTypeGuest {
+			return nil, perr.New("user is guest", perr.Forbidden, "you are guest user")
+		}
+	}
+
+	return &p.ID, nil
+}
+
+func (con *CliKvController) userGuesAccessToProject(ctx context.Context, projectSlug string) (*domain.ProjectID, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
 		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	// find parent project
+	p, err := con.pIn.GetBySlug(ctx, projectSlug)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+	}
+
+	// validate user can access to project
+	if p.OwnerType == "user" {
+		if p.OwnerUser.ID != user.ID {
+			return nil, perr.New("user is not owner of this project", perr.Forbidden)
+		}
+	} else {
+		_, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.Forbidden)
+		}
 	}
 
 	return &p.ID, nil

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/maru44/perr"
 )
 
 type (
@@ -70,26 +69,5 @@ var (
 	ErrProjectSlugAlreadyExistsUser = errors.New("Slug duplicated: Project slug has already exists for user")         // 400
 	ErrProjectSlugAlreadyExistsOrg  = errors.New("Slug duplicated: Project slug has already exists for organization") // 400
 )
-
-// @TODO: add for org
-func (p *Project) ValidateUserGet(u *User) error {
-	if u == nil {
-		return perr.New("unauthorized", perr.Unauthorized)
-	}
-
-	// user type
-	if p.OwnerOrg == nil {
-		if p.OwnerUser.ID == u.ID {
-			return nil
-		}
-		return perr.New("Not owner of project", perr.Forbidden)
-	}
-
-	// org type
-	// if p.OwnerOrg.IsMember(u) {
-	// 	return nil
-	// }
-	return perr.New("Not member of owner organization", perr.Forbidden)
-}
 
 // func (p *Project) ValidateUserPost()

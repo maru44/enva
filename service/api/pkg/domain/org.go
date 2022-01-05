@@ -50,29 +50,3 @@ func (o *OrgInput) Validate() error {
 var (
 // ValidationErrorOrgMemberInput = perr.New("")
 )
-
-// func (o *Org) IsMember(u *User) bool {
-// 	if u == nil {
-// 		return false
-// 	}
-// 	for _, user := range o.Users {
-// 		if user.ID == u.ID {
-// 			return true
-// 		}
-// 	}
-
-// 	return o.IsAdmin(u)
-// }
-
-// func (o *Org) IsAdmin(u *User) bool {
-// 	if u == nil {
-// 		return false
-// 	}
-// 	for _, user := range o.Admins {
-// 		if user.ID == u.ID {
-// 			return true
-// 		}
-// 	}
-
-// 	return false
-// }
