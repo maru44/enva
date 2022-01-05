@@ -19,7 +19,7 @@ const ProjectList: NextPage<PageProps> = (props) => {
   useRequireLogin()
 
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
-    GetPath.PROJECT_LIST_USER,
+    GetPath.PROJECT_LIST,
     fetcherGetFromApiUrl
   )
   const [state, dispatch] = useReducer(
@@ -47,9 +47,12 @@ const ProjectList: NextPage<PageProps> = (props) => {
                   deleteId: p.id,
                 })
               }}
-              linkAs={`/project/${p.slug}`}
+              linkAs={
+                p.org ? `/project/${p.org.id}/${p.slug}` : `/project/${p.slug}`
+              }
               linkHref="/project/[...slug]"
               styles={styles}
+              name={p.org && `${p.org.slug}/${p.name}`}
             />
           ))}
         {data && data.error && <Box>{data.error}</Box>}

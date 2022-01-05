@@ -30,6 +30,17 @@ func NewProjectController(sql database.ISqlHandler) *ProjectController {
 	}
 }
 
+func (con *ProjectController) ListAllView(w http.ResponseWriter, r *http.Request) {
+	ps, err := con.in.ListAll(r.Context())
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": ps})
+	return
+}
+
 // filtered by user @sql
 func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Request) {
 	ps, err := con.in.ListByUser(r.Context())

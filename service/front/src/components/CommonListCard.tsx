@@ -21,6 +21,7 @@ type props = {
   styles: { readonly [key: string]: string }
   icon?: ReactNode
   startDeleteFunc?: () => void
+  name?: string
 }
 
 export const CommonListCard: React.FC<props> = ({
@@ -30,6 +31,7 @@ export const CommonListCard: React.FC<props> = ({
   styles,
   icon,
   startDeleteFunc,
+  name,
 }) => {
   return (
     <Grid item md={4} xs={6}>
@@ -53,7 +55,7 @@ export const CommonListCard: React.FC<props> = ({
               </Box>
             )}
             <Box flex={1} overflow="hidden">
-              <Typography variant="h6">{info.name}</Typography>
+              <Typography variant="h6">{name ?? info.name}</Typography>
             </Box>
             <Box width={40}>
               <Tooltip title="delete project" arrow>

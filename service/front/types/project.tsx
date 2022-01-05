@@ -1,4 +1,6 @@
 import { BaseInformation } from './information'
+import { Org } from './org'
+import { CurrentUser } from './user'
 
 export type ProjectInput = {
   name: string
@@ -13,4 +15,6 @@ export type Project = {
   created_at: string
   updated_at: string
   deleted_at: string
+  user?: CurrentUser
+  org?: Org
 } & BaseInformation

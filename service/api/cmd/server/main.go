@@ -61,6 +61,7 @@ func main() {
 			s("/kv/delete", http.MethodDelete, kv.DeleteView),
 
 			/* project */
+			s("/project", http.MethodGet, project.ListAllView),
 			s("/project/list/user", http.MethodGet, project.ListByUserView),
 			s("/project/list/org", http.MethodGet, project.ListByOrgView),
 			s("/project/slugs/user", http.MethodGet, project.SlugListByUserView),

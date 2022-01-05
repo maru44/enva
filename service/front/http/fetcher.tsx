@@ -3,6 +3,7 @@ import { parseCookies } from 'nookies'
 import { ApiUrl, IsDevelopment, ThisUrl } from '../config/env'
 
 export enum GetPath {
+  PROJECT_LIST = '/project',
   PROJECT_LIST_USER = '/project/list/user',
   PROJECT_LIST_ORG = '/project/list/org', // ?id=
   PROJECT_DETAIl = '/project/detail',

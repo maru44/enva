@@ -38,6 +38,7 @@ type (
 	}
 
 	IProjectInteractor interface {
+		ListAll(context.Context) ([]Project, error)
 		ListByUser(context.Context) ([]Project, error)
 		ListByOrg(context.Context, OrgID) ([]Project, error)
 		SlugListByUser(context.Context) ([]string, error)

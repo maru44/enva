@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"sort"
 
 	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -11,6 +12,62 @@ import (
 
 type ProjectReposotory struct {
 	ISqlHandler
+}
+
+func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	orgRows, err := repo.QueryContext(ctx,
+		queryset.OrgListQuery,
+		user.ID,
+	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	if err := orgRows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	var orgs []domain.Org
+	for orgRows.Next() {
+		var (
+			o        domain.Org
+			userType domain.UserType
+		)
+		if err := orgRows.Scan(
+			&o.ID, &o.Slug, &o.Name, &o.Description,
+			&o.CreatedAt, &o.UpdatedAt, &userType,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.BadRequest)
+		}
+		orgs = append(orgs, o)
+	}
+
+	var projects []domain.Project
+	for _, o := range orgs {
+		ps, err := repo.ListByOrg(ctx, o.ID)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.BadRequest)
+		}
+		// set org
+		for _, p := range ps {
+			p.OwnerOrg = &o
+			projects = append(projects, p)
+		}
+	}
+
+	ps, err := repo.ListByUser(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	projects = append(projects, ps...)
+
+	sort.Slice(projects, func(i, j int) bool { return projects[i].UpdatedAt.String() < projects[j].UpdatedAt.String() })
+
+	return projects, nil
 }
 
 func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project, error) {

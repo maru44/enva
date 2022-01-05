@@ -34,10 +34,10 @@ func (in *UserInteractor) Create(ctx context.Context) (*string, error) {
 	return in.repo.Create(ctx)
 }
 
-func (in UserInteractor) UpdateCliPassword(ctx context.Context) (*string, error) {
+func (in *UserInteractor) UpdateCliPassword(ctx context.Context) (*string, error) {
 	return in.repo.UpdateCliPassword(ctx)
 }
 
-func (in UserInteractor) GetUserCli(ctx context.Context, input *domain.UserCliValidationInput) (*domain.User, error) {
+func (in *UserInteractor) GetUserCli(ctx context.Context, input *domain.UserCliValidationInput) (*domain.User, error) {
 	return in.repo.GetUserCli(ctx, input)
 }

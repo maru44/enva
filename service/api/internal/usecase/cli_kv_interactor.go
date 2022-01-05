@@ -20,6 +20,6 @@ type ICliKvRepository interface {
 	BulkInsert(context.Context, domain.ProjectID, []domain.KvInput) error
 }
 
-func (in CliKvInteractor) BulkInsert(ctx context.Context, projectID domain.ProjectID, inputs []domain.KvInput) error {
+func (in *CliKvInteractor) BulkInsert(ctx context.Context, projectID domain.ProjectID, inputs []domain.KvInput) error {
 	return in.repo.BulkInsert(ctx, projectID, inputs)
 }
