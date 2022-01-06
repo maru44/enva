@@ -256,12 +256,14 @@ func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug strin
 	var (
 		p      *domain.Project = &domain.Project{}
 		userID *domain.UserID
+		o      *domain.Org = &domain.Org{ID: orgID}
 	)
 	if err := row.Scan(
 		&p.ID, &p.Name, &p.Slug, &p.Description, &p.OwnerType,
 		&userID,
 		&p.IsValid, &p.DeletedAt,
 		&p.CreatedAt, &p.UpdatedAt,
+		&o.Slug, &o.Name,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -271,10 +273,7 @@ func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug strin
 		p.OwnerUser = &domain.User{ID: *userID}
 	}
 
-	// set org
-	p.OwnerOrg = &domain.Org{
-		ID: orgID,
-	}
+	p.OwnerOrg = o
 
 	return p, nil
 }

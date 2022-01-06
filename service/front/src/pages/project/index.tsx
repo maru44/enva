@@ -14,6 +14,7 @@ import { useReducer } from 'react'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { CommonListCard } from '../../components/CommonListCard'
 import styles from '../../styles/project.module.css'
+import Link from 'next/link'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   useRequireLogin()
@@ -52,7 +53,18 @@ const ProjectList: NextPage<PageProps> = (props) => {
               }
               linkHref="/project/[...slug]"
               styles={styles}
-              name={p.org && `${p.org.slug}/${p.name}`}
+              name={
+                p.org && (
+                  <Box display="flex" flexDirection="row" alignItems="center">
+                    <Link href="/org/[slug]" as={`org/${p.org.slug}`} passHref>
+                      <a style={{ zIndex: 100 }}>
+                        <Typography variant="h6">{p.org.slug}</Typography>
+                      </a>
+                    </Link>
+                    <Typography variant="h6"> / {p.name}</Typography>
+                  </Box>
+                )
+              }
             />
           ))}
         {data && data.error && <Box>{data.error}</Box>}

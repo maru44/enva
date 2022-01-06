@@ -21,7 +21,7 @@ type props = {
   styles: { readonly [key: string]: string }
   icon?: ReactNode
   startDeleteFunc?: () => void
-  name?: string
+  name?: ReactNode
 }
 
 export const CommonListCard: React.FC<props> = ({
@@ -55,7 +55,7 @@ export const CommonListCard: React.FC<props> = ({
               </Box>
             )}
             <Box flex={1} overflow="hidden">
-              <Typography variant="h6">{name ?? info.name}</Typography>
+              {name ?? <Typography variant="h6">{info.name}</Typography>}
             </Box>
             <Box width={40}>
               <Tooltip title="delete project" arrow>

@@ -1,6 +1,7 @@
 import { ArrowBack } from '@material-ui/icons'
 import { Box, IconButton, Typography } from '@mui/material'
 import { NextPage } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
@@ -10,6 +11,7 @@ import { PageProps } from '../../../types/page'
 import { KvList } from '../../components/kv/KvList'
 
 const ProjectDetail: NextPage<PageProps> = (props) => {
+  useRequireLogin()
   const router = useRouter()
   const slug = router.query.slug as string[]
 
@@ -24,16 +26,12 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
     }
   }
 
-  console.log(url)
-
   const { data, error } = useSWR<projectResponseBody, ErrorConstructor>(
     url,
     fetcherGetFromApiUrl
   )
 
   if (error) console.log(error)
-
-  useRequireLogin()
 
   return (
     <Box mt={6}>
@@ -49,7 +47,23 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
                 <ArrowBack />
               </IconButton>
             </Box>
-            <Typography variant="h5">{data.data.name}</Typography>
+            <Box display="flex" flexDirection="row" alignItems="center">
+              {data.data.org && (
+                <Box display="flex" flexDirection="row" alignItems="center">
+                  <Link
+                    href="/org/[slug]"
+                    as={`/org/${data.data.org.slug}`}
+                    passHref
+                  >
+                    <a>
+                      <Typography variant="h5">{data.data.org.name}</Typography>
+                    </a>
+                  </Link>
+                  <Typography variant="h5"> / </Typography>
+                </Box>
+              )}
+              <Typography variant="h5">{data.data.name}</Typography>
+            </Box>
           </Box>
           <KvList projectId={data.data.id} />
         </Box>
