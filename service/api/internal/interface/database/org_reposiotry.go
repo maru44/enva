@@ -82,10 +82,10 @@ func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, er
 	return orgs, nil
 }
 
-func (repo *OrgRepository) Detail(ctx context.Context, orgID domain.OrgID) (*domain.Org, error) {
+func (repo *OrgRepository) Detail(ctx context.Context, orgID domain.OrgID) (*domain.Org, *domain.UserType, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}
 	row := repo.QueryRowContext(
 		ctx,
@@ -93,27 +93,29 @@ func (repo *OrgRepository) Detail(ctx context.Context, orgID domain.OrgID) (*dom
 		user.ID, orgID,
 	)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}
 	var (
 		o       *domain.Org
 		ownerID domain.UserID
+		ut      *domain.UserType
 	)
 	if err := row.Scan(
 		&o.ID, &o.Slug, &o.Name, &o.Description,
 		&ownerID, &o.CreatedAt, &o.UpdatedAt, &o.UserCount,
+		&ut,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.Wrap(err, perr.NotFound))
+		return nil, nil, perr.Wrap(err, perr.Wrap(err, perr.NotFound))
 	}
 
 	o.CreatedBy = domain.User{ID: ownerID}
-	return o, nil
+	return o, ut, nil
 }
 
-func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*domain.Org, error) {
+func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*domain.Org, *domain.UserType, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}
 	row := repo.QueryRowContext(
 		ctx,
@@ -121,22 +123,23 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 		user.ID, slug,
 	)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}
 	var (
-		o *domain.Org = &domain.Org{}
-		u domain.User
+		o  *domain.Org = &domain.Org{}
+		u  domain.User
+		ut *domain.UserType
 	)
 	if err := row.Scan(
 		&o.ID, &o.Slug, &o.Name, &o.Description, &o.IsValid,
-		&o.CreatedAt, &o.UpdatedAt, &o.UserCount,
-		&u.ID,
+		&u.ID, &o.CreatedAt, &o.UpdatedAt, &o.UserCount,
+		&ut,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.Wrap(err, perr.NotFound))
+		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}
 
 	o.CreatedBy = u
-	return o, nil
+	return o, ut, nil
 }
 
 func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*string, error) {

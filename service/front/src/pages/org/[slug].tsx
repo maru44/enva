@@ -8,6 +8,7 @@ import { OrgResponseBody, OrgsResponseBody } from '../../../http/body/org'
 import { projectsResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
+import { AdminUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
 import styles from '../../styles/project.module.css'
 
@@ -15,44 +16,54 @@ const OrgDetail: NextPage<PageProps> = (props) => {
   useRequireLogin()
 
   const router = useRouter()
-  const slug = router.query.slug as string
+  const slug = router.query.slug
 
   const { data, error } = useSWR<OrgResponseBody, ErrorConstructor>(
     `${GetPath.ORG_DETAIL}?slug=${slug}`,
     fetcherGetFromApiUrl
   )
 
-  return (
-    <Box mt={6}>
-      {data && data.data && (
-        <Box>
-          <Box display="flex" flexDirection="row" alignItems="center">
-            <Box mr={2}>
-              <IconButton
-                onClick={() => {
-                  router.back()
-                }}
-              >
-                <ArrowBack />
-              </IconButton>
-            </Box>
+  if (error) {
+    router.push('/500')
+    return <div></div>
+  }
+
+  if (data?.data) {
+    const org = data.data.org
+    const userType = data.data.current_user_type!
+
+    return (
+      <Box mt={6}>
+        {data && data.data && (
+          <Box>
             <Box display="flex" flexDirection="row" alignItems="center">
-              <IconButton>
-                <Apartment />
-              </IconButton>
-              <Typography variant="h5">{data.data.name}</Typography>
+              <Box mr={2}>
+                <IconButton
+                  onClick={() => {
+                    router.back()
+                  }}
+                >
+                  <ArrowBack />
+                </IconButton>
+              </Box>
+              <Box display="flex" flexDirection="row" alignItems="center">
+                <IconButton>
+                  <Apartment />
+                </IconButton>
+                <Typography variant="h5">{org!.name}</Typography>
+              </Box>
+              <Typography>{org!.description}</Typography>
             </Box>
-            {data.data.description && (
-              <Typography>{data.data.description}</Typography>
-            )}
+            <Box mt={6}>
+              <OrgProjects id={org!.id} />
+            </Box>
           </Box>
-          <Box mt={6}>
-            <OrgProjects id={data.data.id} />
-          </Box>
-        </Box>
-      )}
-    </Box>
-  )
+        )}
+      </Box>
+    )
+  }
+
+  return <div></div>
 }
 
 type orgProjectsProps = {

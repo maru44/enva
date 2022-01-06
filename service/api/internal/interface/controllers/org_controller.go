@@ -54,13 +54,17 @@ func (con *OrgController) DetailBySlugView(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	slug := r.URL.Query().Get(QueryParamsSlug)
 
-	org, err := con.in.DetailBySlug(ctx, slug)
+	org, cuUserType, err := con.in.DetailBySlug(ctx, slug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
 	}
 
-	response(w, r, nil, map[string]interface{}{"data": org})
+	response(w, r, nil, map[string]interface{}{
+		"data": map[string]interface{}{
+			"org":               org,
+			"current_user_type": *cuUserType,
+		}})
 	return
 }
 
