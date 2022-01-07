@@ -50,13 +50,13 @@ CREATE TABLE ssh_keys (
 CREATE TABLE org_invitations (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     org_id uuid NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
-    user_id uuid NOT NULL REFERENCES users (id),
+    user_id uuid REFERENCES users (id) DEFAULT NULL,
+    email VARCHAR(255) NOT NULL,
     user_type VARCHAR(15) NOT NULL DEFAULT 'user', -- 'owner', 'admin', 'user', 'guest'
-    is_valid BOOLEAN NOT NULL DEFAULT true,
+    status VARCHAR(15) NOT NULL DEFAULT 'new', -- 'accepted', 'denied', 'new', 'closed'
     invited_by uuid REFERENCES users (id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 
     PRIMARY KEY (id)
 );

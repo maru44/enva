@@ -17,13 +17,99 @@ func (repo *OrgMemberRepository) Create(ctx context.Context, input domain.OrgMem
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
+	// current user
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.NotFound)
+	}
+	if cu.ID != input.UserID {
+		return perr.New("current user is not invited user", perr.Forbidden)
+	}
+
+	tx, err := repo.BeginTx(ctx, nil)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	// create member
 	var id *string
-	if err := repo.QueryRowContext(ctx,
+	if err := tx.QueryRowContext(ctx,
 		queryset.RelOrgMembersInsertQuery,
 		input.OrgID, input.UserID, input.UserType, input.OrgInvitationID,
 	).Scan(&id); err != nil {
+		tx.Rollback()
 		return perr.Wrap(err, perr.BadRequest)
 	}
+
+	// update invitation status
+	res, err := tx.ExecContext(ctx,
+		queryset.OrgInvitationUpdateStatusQuery,
+		domain.OrgInvitationStatusAccepted,
+		input.OrgInvitationID,
+	)
+	if err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if affected == 0 {
+		tx.Rollback()
+		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	// past invitation ids
+	rows, err := repo.QueryContext(ctx,
+		queryset.PastOrgInvitationListQuery,
+		input.OrgID, cu.Email,
+	)
+	if err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.NotFound)
+	}
+	if err := rows.Err(); err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.NotFound)
+	}
+
+	var pastIDs []domain.OrgInvitationID
+	for rows.Next() {
+		var id domain.OrgInvitationID
+		if err := rows.Scan(
+			&id,
+		); err != nil {
+			tx.Rollback()
+			return perr.Wrap(err, perr.NotFound)
+		}
+		pastIDs = append(pastIDs, id)
+	}
+
+	// update past invitations' status >> closed
+	for _, invID := range pastIDs {
+		res, err := repo.ExecContext(ctx,
+			queryset.OrgInvitationUpdateStatusQuery,
+			domain.OrgInvitationStatusClosed, invID,
+		)
+		if err != nil {
+			tx.Rollback()
+			return perr.Wrap(err, perr.BadRequest)
+		}
+
+		affected, err := res.RowsAffected()
+		if err != nil {
+			tx.Rollback()
+			return perr.Wrap(err, perr.BadRequest)
+		}
+		if affected == 0 {
+			tx.Rollback()
+			return perr.New("no rows affected", perr.BadRequest)
+		}
+	}
+
+	tx.Commit()
 
 	return nil
 }

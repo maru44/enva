@@ -35,6 +35,8 @@ func main() {
 	cliKv := controllers.NewCliKvController(sql)
 	project := controllers.NewProjectController(sql)
 	org := controllers.NewOrgController(sql)
+	inv := controllers.NewOrgInvitationController(sql)
+	oMember := controllers.NewOrgMemberController(sql)
 	user := controllers.NewUserController(sql, pass)
 	cliU := controllers.NewCliUserController(sql, pass)
 
@@ -82,6 +84,12 @@ func main() {
 			/* cli_users */
 			s("/cli/user", http.MethodGet, user.ExistsCliPasswordView),
 			s("/cli/user/update", http.MethodGet, user.UpdateCliPasswordView),
+
+			/* org invitation */
+			s("/inv/detail", http.MethodGet, inv.DetailView),
+
+			/* org_member */
+			s("/member/create", http.MethodPost, oMember.CreateView),
 		},
 		"login",
 	)

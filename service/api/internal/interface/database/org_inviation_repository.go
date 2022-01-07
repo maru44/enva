@@ -12,46 +12,6 @@ type OrgInvitationRepository struct {
 	ISqlHandler
 }
 
-func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.OrgInvitationInput, targetID domain.UserID) error {
-	if err := input.Validate(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-
-	cu, err := domain.UserFromCtx(ctx)
-	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-
-	var ut domain.UserType
-	row := repo.QueryRowContext(ctx,
-		queryset.OrgUserTypeQuery,
-		input.OrgID, cu.ID,
-	)
-	if err := row.Err(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-	if err := row.Scan(&ut); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-	if ut == domain.UserTypeAdmin || ut == domain.UserTypeOwner {
-		return perr.New(
-			perr.Forbidden.Error(),
-			perr.Forbidden,
-			"You are not 'OWNER' or 'ADMIN' user of this organization.",
-		)
-	}
-
-	var id *string
-	if err := repo.QueryRowContext(ctx,
-		queryset.OrgInvitationCraeteQuery,
-		input.OrgID, input.UserID, input.UserType, cu.ID,
-	).Scan(&id); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-
-	return nil
-}
-
 func (repo *OrgInvitationRepository) ListFromOrg(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitation, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
@@ -76,7 +36,7 @@ func (repo *OrgInvitationRepository) ListFromOrg(ctx context.Context, orgID doma
 			inv domain.User
 		)
 		if err := rows.Scan(
-			&o.ID, &o.IsValid, &o.UserType, &o.CreatedAt, &o.UpdatedAt, &o.DeletedAt,
+			&o.ID, &o.Status, &o.UserType, &o.CreatedAt, &o.UpdatedAt,
 			&u.ID, &u.Username, &u.Email, &u.ImageURL,
 			&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
 		); err != nil {
@@ -148,7 +108,7 @@ func (repo *OrgInvitationRepository) Detail(ctx context.Context, invID domain.Or
 		inv domain.User
 	)
 	if err := row.Scan(
-		&o.ID, &o.UserType, &o.IsValid, &o.CreatedAt,
+		&o.ID, &o.UserType, &o.Status, &o.CreatedAt,
 		&org.ID, &org.Slug, &org.Name, &org.Description,
 		&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
 	); err != nil {
@@ -159,4 +119,94 @@ func (repo *OrgInvitationRepository) Detail(ctx context.Context, invID domain.Or
 	o.User = *cu
 
 	return o, nil
+}
+
+func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.OrgInvitationInput, targetID domain.UserID) error {
+	if err := input.Validate(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	var ut domain.UserType
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgUserTypeQuery,
+		input.OrgID, cu.ID,
+	)
+	if err := row.Err(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if err := row.Scan(&ut); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if ut == domain.UserTypeAdmin || ut == domain.UserTypeOwner {
+		return perr.New(
+			perr.Forbidden.Error(),
+			perr.Forbidden,
+			"You are not 'OWNER' or 'ADMIN' user of this organization.",
+		)
+	}
+
+	var id *string
+	if err := repo.QueryRowContext(ctx,
+		queryset.OrgInvitationCraeteQuery,
+		input.OrgID, input.UserID, input.Eamil, input.UserType, cu.ID,
+	).Scan(&id); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	return nil
+}
+
+func (repo *OrgInvitationRepository) ListPastInvitations(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitationID, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.PastOrgInvitationListQuery,
+		orgID, cu.Email,
+	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var ids []domain.OrgInvitationID
+	for rows.Next() {
+		var id domain.OrgInvitationID
+		if err := rows.Scan(
+			&id,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (repo *OrgInvitationRepository) UpdateStatus(ctx context.Context, invID domain.OrgInvitationID, status domain.OrgInvitationStatus) error {
+	res, err := repo.ExecContext(ctx,
+		queryset.OrgInvitationUpdateStatusQuery,
+		status, invID,
+	)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if affected == 0 {
+		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	return nil
 }

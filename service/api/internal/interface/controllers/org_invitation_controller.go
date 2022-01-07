@@ -49,6 +49,21 @@ func (con *OrgInvitationController) ListView(w http.ResponseWriter, r *http.Requ
 	return
 }
 
+func (con *OrgInvitationController) DetailView(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get(QueryParamsID)
+
+	ctx := r.Context()
+	inv, err := con.in.Detail(ctx, domain.OrgInvitationID(id))
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": inv})
+	return
+}
+
+// @TODO send mail
 func (con *OrgInvitationController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	cu, err := domain.UserFromCtx(ctx)

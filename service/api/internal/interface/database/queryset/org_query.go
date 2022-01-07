@@ -10,7 +10,7 @@ const (
 	// invitation list by org
 	// flitered
 	OrgInvitationListFromOrgQuery = "SELECT " +
-		"r.id, r.is_valid, r.user_type, r.created_at, r.updated_at, r.deleted_at " +
+		"r.id, r.status, r.user_type, r.created_at, r.updated_at, " +
 		"u.id, u.username, u.email, u.image_url, " +
 		"inv.id, inv.username, inv.email, inv.image_url, " +
 		"FROM org_invitations AS r " +
@@ -30,12 +30,18 @@ const (
 		"FROM org_invitations AS r " +
 		"JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
 		"JOIN users AS u ON u.id = r.invited_by AND u.is_valid = true " +
-		"WHERE r.user_id = $1 AND r.is_valid = true AND r.deleted_at IS NULL"
+		"WHERE r.user_id = $1 AND r.status = 'new'"
+
+	PastOrgInvitationListQuery = "SELECT " +
+		"r.id " +
+		"FROM org_invitations AS r " +
+		"WHERE r.org_id = $1 AND r.email = $2 AND status = 'new'"
 
 	// invitation detail
 	// filtered by user
+	// must filter status = 'new' @controller
 	OrgInvitationDetailQuery = "SELECT " +
-		"r.id, r.user_type, r.is_valid, r.created_at, " +
+		"r.id, r.user_type, r.status, r.created_at, " +
 		"o.id, o.slug, o.name, o.description, " +
 		"u.id, u.username, u.email, u.image_url " + // invitor's information
 		"FROM org_invitations AS r " +
@@ -46,9 +52,13 @@ const (
 	// invitation insert
 	// need filter in repo or con (only ownerType user can invite)
 	OrgInvitationCraeteQuery = "INSERT org_invitations INTO " +
-		"(org_id, user_id, user_type, invited_by) " +
-		"VALUES ($1, $2, $3, $4) " +
+		"(org_id, user_id, email, user_type, invited_by) " +
+		"VALUES ($1, $2, $3, $4, $5) " +
 		"RETURNING id"
+
+	OrgInvitationUpdateStatusQuery = "UPDATE org_invitations " +
+		"SET status = $1, updated_at = now() " +
+		"WHERE id = $2"
 
 	// @TODO delete invitation
 
