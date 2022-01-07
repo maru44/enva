@@ -37,6 +37,27 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 	return u, nil
 }
 
+func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	row := repo.QueryRowContext(ctx, queryset.UserGetByEmailQuery, email)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	u := &domain.User{}
+	if err := row.Scan(
+		&u.ID, &u.Email, &u.Username, &u.ImageURL, &u.CliPassword,
+		&u.IsValid, &u.IsEmailVerified, &u.CreatedAt, &u.UpdatedAt,
+	); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	if u.CliPassword != nil {
+		u.HasCliPassword = true
+	}
+
+	return u, nil
+}
+
 func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
@@ -116,7 +137,7 @@ func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, err
 
 func (repo *UserRepository) GetUserCli(ctx context.Context, input *domain.UserCliValidationInput) (*domain.User, error) {
 	row := repo.QueryRowContext(ctx,
-		queryset.UserGetByEmailOrPassword,
+		queryset.UserGetByEmailAdnPassword,
 		input.EmailOrUsername,
 	)
 	if err := row.Err(); err != nil {

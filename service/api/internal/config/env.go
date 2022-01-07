@@ -27,4 +27,9 @@ var (
 
 	REDIS_ADDR = os.Getenv("REDIS_ADDRESS")
 	REDIS_PASS = os.Getenv("REDIS_PASSWORD")
+
+	EMAIL_HOST      = os.Getenv("EMAIL_HOST")
+	EMAIL_HOST_USER = os.Getenv("EMAIL_HOST_USER")
+	EMAIL_HOST_PASS = os.Getenv("EMAIL_HOST_PASS")
+	EMAIL_PORT      = os.Getenv("EMAIL_PORT")
 )

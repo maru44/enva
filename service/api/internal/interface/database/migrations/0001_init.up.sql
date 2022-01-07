@@ -56,11 +56,11 @@ CREATE TABLE org_invitations (
     status VARCHAR(15) NOT NULL DEFAULT 'new', -- 'accepted', 'denied', 'new', 'closed'
     invited_by uuid REFERENCES users (id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX org_invitations_user_id_org_id ON org_invitations (user_id, org_id) WHERE (is_valid = true);
+-- CREATE UNIQUE INDEX org_invitations_user_id_org_id ON org_invitations (user_id, org_id) WHERE (status = 'activate');
 
 -- relation org and users
 CREATE TABLE rel_org_members (

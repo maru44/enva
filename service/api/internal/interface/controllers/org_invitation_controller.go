@@ -1,22 +1,37 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/maru44/enva/service/api/internal/interface/database"
+	"github.com/maru44/enva/service/api/internal/interface/mysmtp"
 	"github.com/maru44/enva/service/api/internal/usecase"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
 
 type OrgInvitationController struct {
-	in domain.IOrgInvitationInteractor
+	in  domain.IOrgInvitationInteractor
+	mIn domain.IOrgMemberInteractor
+	uIn domain.IUserInteractor
 }
 
-func NewOrgInvitationController(sql database.ISqlHandler) *OrgInvitationController {
+func NewOrgInvitationController(sql database.ISqlHandler, smtp mysmtp.ISmtpHandler) *OrgInvitationController {
 	return &OrgInvitationController{
 		in: usecase.NewOrgInvitaionInteractor(
 			&database.OrgInvitationRepository{
+				ISqlHandler:  sql,
+				ISmtpHandler: smtp,
+			},
+		),
+		mIn: usecase.NewOrgMemberInteractor(
+			&database.OrgMemberRepository{
+				ISqlHandler: sql,
+			},
+		),
+		uIn: usecase.NewUserInteractor(
+			&database.UserRepository{
 				ISqlHandler: sql,
 			},
 		),
@@ -73,6 +88,28 @@ func (con *OrgInvitationController) CreateView(w http.ResponseWriter, r *http.Re
 	}
 
 	var input domain.OrgInvitationInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	// validate by current user type
+	userType, err := con.mIn.GetCurrentUserType(ctx, input.OrgID)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+	if !userType.IsAdmin() {
+		response(w, r, perr.New("current user does not admin or owner of this org", perr.Forbidden), nil)
+		return
+	}
+
+	// add input invited userID
+	invitedUser, err := con.uIn.GetByEmail(ctx, input.Eamil)
+	if err == nil {
+		input.UserID = &invitedUser.ID
+	}
+
 	if err := con.in.Create(ctx, input, cu.ID); err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return

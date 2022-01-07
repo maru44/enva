@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/mysmtp"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
 
 type OrgInvitationRepository struct {
 	ISqlHandler
+	mysmtp.ISmtpHandler
 }
 
 func (repo *OrgInvitationRepository) ListFromOrg(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitation, error) {
@@ -131,30 +133,20 @@ func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.Or
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
-	var ut domain.UserType
-	row := repo.QueryRowContext(ctx,
-		queryset.OrgUserTypeQuery,
-		input.OrgID, cu.ID,
-	)
-	if err := row.Err(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-	if err := row.Scan(&ut); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-	if ut == domain.UserTypeAdmin || ut == domain.UserTypeOwner {
-		return perr.New(
-			perr.Forbidden.Error(),
-			perr.Forbidden,
-			"You are not 'OWNER' or 'ADMIN' user of this organization.",
-		)
-	}
-
 	var id *string
 	if err := repo.QueryRowContext(ctx,
 		queryset.OrgInvitationCraeteQuery,
 		input.OrgID, input.UserID, input.Eamil, input.UserType, cu.ID,
 	).Scan(&id); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	mailInput := domain.SmtpInput{
+		Subject: "",
+		Message: "",
+		To:      input.Eamil,
+	}
+	if err := repo.Send(mailInput); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
 

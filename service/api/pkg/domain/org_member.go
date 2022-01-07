@@ -32,6 +32,14 @@ const (
 	UserTypeGuest = UserType("guest")
 )
 
+func (u *UserType) IsAdmin() bool {
+	return *u == UserTypeOwner || *u == UserTypeAdmin
+}
+
+func (u *UserType) IsUser() bool {
+	return *u != UserTypeGuest
+}
+
 func (o *OrgInvitation) ToMemberInput() *OrgMemberInput {
 	return &OrgMemberInput{
 		OrgID:           o.Org.ID,

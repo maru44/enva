@@ -130,7 +130,7 @@ func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request)
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return
 		}
-		if *ut == domain.UserTypeUser || *ut == domain.UserTypeGuest {
+		if ut.IsAdmin() {
 			response(w, r, perr.New("user is not admin or owner of this orgs", perr.Forbidden, "you are not admin or owner of this orgs"), nil)
 			return
 		}
@@ -172,7 +172,7 @@ func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request)
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return
 		}
-		if *ut == domain.UserTypeUser || *ut == domain.UserTypeGuest {
+		if ut.IsAdmin() {
 			response(w, r, perr.New("user is not admin or owner of this orgs", perr.Forbidden, "you are not admin or owner of this orgs"), nil)
 			return
 		}

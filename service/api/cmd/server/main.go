@@ -30,12 +30,13 @@ var (
 func main() {
 	sql := infra.NewSqlHandler()
 	pass := &infra.Password{}
+	smtp := &infra.Smtp{}
 
 	kv := controllers.NewKvController(sql)
 	cliKv := controllers.NewCliKvController(sql)
 	project := controllers.NewProjectController(sql)
 	org := controllers.NewOrgController(sql)
-	inv := controllers.NewOrgInvitationController(sql)
+	inv := controllers.NewOrgInvitationController(sql, smtp)
 	oMember := controllers.NewOrgMemberController(sql)
 	user := controllers.NewUserController(sql, pass)
 	cliU := controllers.NewCliUserController(sql, pass)
@@ -86,7 +87,8 @@ func main() {
 			s("/cli/user/update", http.MethodGet, user.UpdateCliPasswordView),
 
 			/* org invitation */
-			s("/inv/detail", http.MethodGet, inv.DetailView),
+			s("/invite", http.MethodPost, inv.CreateView),
+			s("/invite/detail", http.MethodGet, inv.DetailView),
 
 			/* org_member */
 			s("/member/create", http.MethodPost, oMember.CreateView),

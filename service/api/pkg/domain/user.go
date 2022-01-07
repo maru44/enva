@@ -48,6 +48,7 @@ type (
 
 	IUserInteractor interface {
 		GetByID(context.Context, UserID) (*User, error)
+		GetByEmail(context.Context, string) (*User, error)
 		Create(context.Context) (*string, error)
 
 		UpdateCliPassword(context.Context) (*string, error)
