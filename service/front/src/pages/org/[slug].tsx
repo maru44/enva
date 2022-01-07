@@ -1,15 +1,18 @@
-import { Apartment, ArrowBack } from '@material-ui/icons'
-import { Box, Grid, IconButton, Typography } from '@mui/material'
+import { Apartment, ArrowBack, Mail } from '@material-ui/icons'
+import { Box, Grid, Icon, IconButton, Tooltip, Typography } from '@mui/material'
 import { NextPage } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import useSWR from 'swr'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { OrgResponseBody, OrgsResponseBody } from '../../../http/body/org'
 import { projectsResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
-import { AdminUserTypes } from '../../../types/user'
+import { AdminUserTypes, UserUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
+import { InviteFormModal } from '../../components/form/org/InviteFormModal'
 import styles from '../../styles/project.module.css'
 
 const OrgDetail: NextPage<PageProps> = (props) => {
@@ -17,6 +20,7 @@ const OrgDetail: NextPage<PageProps> = (props) => {
 
   const router = useRouter()
   const slug = router.query.slug
+  const [inviteFormOpen, setInviteFormOpen] = useState<boolean>(false)
 
   const { data, error } = useSWR<OrgResponseBody, ErrorConstructor>(
     `${GetPath.ORG_DETAIL}?slug=${slug}`,
@@ -34,8 +38,13 @@ const OrgDetail: NextPage<PageProps> = (props) => {
 
     return (
       <Box mt={6}>
-        {data && data.data && (
-          <Box>
+        <Box>
+          <Box
+            display="flex"
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
             <Box display="flex" flexDirection="row" alignItems="center">
               <Box mr={2}>
                 <IconButton
@@ -47,18 +56,37 @@ const OrgDetail: NextPage<PageProps> = (props) => {
                 </IconButton>
               </Box>
               <Box display="flex" flexDirection="row" alignItems="center">
-                <IconButton>
+                <Icon>
                   <Apartment />
-                </IconButton>
+                </Icon>
                 <Typography variant="h5">{org!.name}</Typography>
               </Box>
+            </Box>
+            {UserUserTypes.includes(userType) && (
+              <Tooltip title="invite" arrow placement="top">
+                <IconButton onClick={() => setInviteFormOpen(true)}>
+                  <Mail />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+          {org.description && (
+            <Box mt={2}>
               <Typography>{org!.description}</Typography>
             </Box>
-            <Box mt={6}>
-              <OrgProjects id={org!.id} />
-            </Box>
+          )}
+          <Box mt={6}>
+            <OrgProjects id={org!.id} />
           </Box>
-        )}
+        </Box>
+        <InviteFormModal
+          orgId={org!.id}
+          orgName={org!.name}
+          isOpen={inviteFormOpen}
+          onClose={() => {
+            setInviteFormOpen(false)
+          }}
+        />
       </Box>
     )
   }
@@ -77,8 +105,6 @@ const OrgProjects: React.FC<orgProjectsProps> = ({ id }) => {
   )
 
   if (error) return <div></div>
-
-  console.log(data)
 
   return (
     <Grid container rowSpacing={2} columnSpacing={2}>
