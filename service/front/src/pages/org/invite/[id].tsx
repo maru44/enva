@@ -66,8 +66,6 @@ const OrgInvitationDetailPage: NextPage = () => {
 
   if (error) return <Box></Box>
 
-  console.log(data?.data)
-
   if (data?.data)
     return (
       <Box>

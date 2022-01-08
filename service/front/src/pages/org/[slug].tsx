@@ -80,10 +80,9 @@ const OrgDetail: NextPage<PageProps> = (props) => {
               <OrgProjects id={org!.id} slug={org!.slug} />
             </Box>
             <Box mt={4}>
-              <Typography>
-                There are {org.user_count} members in this orgs.
-              </Typography>
+              <Typography variant="h6">{org.user_count} Members</Typography>
             </Box>
+            <MembersList id={org.id}></MembersList>
           </Box>
         </Box>
         <InviteFormModal
@@ -94,7 +93,6 @@ const OrgDetail: NextPage<PageProps> = (props) => {
             setInviteFormOpen(false)
           }}
         />
-        <MembersList id={org.id}></MembersList>
       </Box>
     )
   }
