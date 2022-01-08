@@ -122,8 +122,8 @@ const (
 	// must throw forbidden error
 	OrgUsersQuery = "SELECT " +
 		"u.id, u.username, u.email, u.image_url, r.user_type " +
-		"LEFT JOIN users AS u ON u.id = r.user_id AND " +
 		"FROM rel_org_members AS r " +
+		"LEFT JOIN users AS u ON u.id = r.user_id " +
 		"WHERE r.org_id = $1 AND r.is_valid = true AND r.deleted_at IS NULL"
 
 	// userType in orgs

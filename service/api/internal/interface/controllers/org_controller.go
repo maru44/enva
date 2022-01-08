@@ -209,3 +209,17 @@ func (con *OrgController) MemberCreateView(w http.ResponseWriter, r *http.Reques
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
 	return
 }
+
+func (con *OrgController) MemberListView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := r.URL.Query().Get(QueryParamsID)
+
+	members, err := con.in.MemberList(ctx, domain.OrgID(id))
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": members})
+	return
+}

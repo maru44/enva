@@ -531,7 +531,7 @@ func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	var users map[domain.UserType][]domain.User
+	users := map[domain.UserType][]domain.User{}
 	for rows.Next() {
 		var (
 			u  domain.User

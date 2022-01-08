@@ -12,6 +12,7 @@ import { PageProps } from '../../../types/page'
 import { UserUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
 import { InviteFormModal } from '../../components/form/org/InviteFormModal'
+import { MembersList } from '../../components/form/org/MembersList'
 import styles from '../../styles/project.module.css'
 
 const OrgDetail: NextPage<PageProps> = (props) => {
@@ -69,16 +70,20 @@ const OrgDetail: NextPage<PageProps> = (props) => {
               </Tooltip>
             )}
           </Box>
-          {org.description && (
-            <Box mt={2}>
-              <Typography>{org!.description}</Typography>
+          <Box mt={2} pl={1} pr={1}>
+            {org.description && (
+              <Box>
+                <Typography>{org!.description}</Typography>
+              </Box>
+            )}
+            <Box mt={6}>
+              <OrgProjects id={org!.id} slug={org!.slug} />
             </Box>
-          )}
-          <Box mt={6}>
-            <OrgProjects id={org!.id} slug={org!.slug} />
-          </Box>
-          <Box mt={4}>
-            <Typography>Member: {org.user_count}</Typography>
+            <Box mt={4}>
+              <Typography>
+                There are {org.user_count} members in this orgs.
+              </Typography>
+            </Box>
           </Box>
         </Box>
         <InviteFormModal
@@ -89,6 +94,7 @@ const OrgDetail: NextPage<PageProps> = (props) => {
             setInviteFormOpen(false)
           }}
         />
+        <MembersList id={org.id}></MembersList>
       </Box>
     )
   }

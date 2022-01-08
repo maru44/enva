@@ -1,5 +1,5 @@
 import { Org, OrgInvitation } from '../../types/org'
-import { UserType } from '../../types/user'
+import { CurrentUser, UserType } from '../../types/user'
 import { errorResponseBody } from './error'
 
 export type OrgsResponseBody = {
@@ -24,4 +24,9 @@ export type OrgInviteResponseBody = {
 
 export type OrgInvitationDetailBody = {
   data: OrgInvitation
+} & errorResponseBody
+
+type membersMap = { [key: UserType]: CurrentUser[] }
+export type OrgMemberListResponseBody = {
+  data: membersMap
 } & errorResponseBody
