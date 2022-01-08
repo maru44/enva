@@ -1,4 +1,9 @@
-import { OrgInput, OrgInvitationInput, OrgMemberInput } from '../types/org'
+import {
+  OrgInput,
+  OrgInvitationInput,
+  OrgMemberInput,
+  OrgMemberUpdateInput,
+} from '../types/org'
 import { fetchBaseApi, GetPath } from './fetcher'
 
 export const fetchCreateOrg = async (input: OrgInput) =>
@@ -12,3 +17,12 @@ export const fetchAcceptInvitation = async (input: OrgMemberInput) =>
 
 export const fetchDenyInvitation = async (invId: string) =>
   await fetchBaseApi(`${GetPath.ORG_INVITATION_DENY}?id=${invId}`, 'GET')
+
+export const fetchUpdateMemberUserType = async (input: OrgMemberUpdateInput) =>
+  await fetchBaseApi(`${GetPath.ORG_MEMBER_UPDATE_TYPE}`, 'POST', input)
+
+export const fetchDeleteMember = async (userId: string, orgId: string) =>
+  await fetchBaseApi(
+    `${GetPath.ORG_MEMBER_DELETE}?id=${userId}&orgId=${orgId}`,
+    'DELETE'
+  )

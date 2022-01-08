@@ -15,6 +15,12 @@ type (
 		UserType        UserType        `json:"user_type"`
 		OrgInvitationID OrgInvitationID `json:"org_invitation_id"`
 	}
+
+	OrgMemberUpdateInput struct {
+		OrgID    OrgID     `json:"org_id"`
+		UserID   UserID    `json:"user_id"`
+		UserType *UserType `json:"user_type"`
+	}
 )
 
 const (
@@ -61,5 +67,13 @@ func (o *OrgMemberInput) Validate(ctx context.Context) error {
 		validation.Field(&o.UserID, validation.Required, is.UUID),
 		validation.Field(&o.OrgInvitationID, validation.Required, is.UUID),
 		validation.Field(&o.UserType, validation.Required, validation.In(UserTypeOwner, UserTypeAdmin, UserTypeUser, UserTypeGuest)),
+	)
+}
+
+func (r *OrgMemberUpdateInput) Validate() error {
+	return validation.ValidateStruct(r,
+		validation.Field(r.OrgID, validation.Required, is.UUID),
+		validation.Field(r.UserID, validation.Required, is.UUID),
+		validation.Field(r.UserType, validation.Required, validation.In(UserTypeAdmin, UserTypeGuest, UserTypeOwner, UserTypeUser)),
 	)
 }

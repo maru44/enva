@@ -17,7 +17,7 @@ export type OrgCreateResponseBody = {
   data: string
 } & errorResponseBody
 
-// invite / create member / deny
+// invite / create member / deny / update member / delete member
 export type OrgInviteResponseBody = {
   data: string
 } & errorResponseBody

@@ -92,6 +92,8 @@ func main() {
 			/* org_member */
 			s("/member/create", http.MethodPost, org.MemberCreateView),
 			s("/member", http.MethodGet, org.MemberListView), // ?id=
+			s("/member/update/type", http.MethodPost, org.MemberUpdateUserTypeView),
+			s("/member/delete", http.MethodDelete, org.MemberDeleteView), // ?id=&orgId=
 		},
 		"login",
 	)

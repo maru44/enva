@@ -48,8 +48,6 @@ const OrgInvitationDetailPage: NextPage = () => {
       org_invitation_id: id as string,
     }
 
-    console.log(input)
-
     const res = await fetchAcceptInvitation(input)
     const ret: OrgInviteResponseBody = await res.json()
 

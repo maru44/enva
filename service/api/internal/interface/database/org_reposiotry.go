@@ -421,10 +421,6 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 	if err != nil {
 		return perr.Wrap(err, perr.NotFound)
 	}
-	// validate current user
-	if cu.ID != input.UserID {
-		return perr.New("current user is not invited user", perr.Forbidden)
-	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {
@@ -555,7 +551,112 @@ func (repo *OrgRepository) MemberGetCurrentUserType(ctx context.Context, orgID d
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, user.ID)
+	return repo.memberGetUserType(ctx, user.ID, orgID)
+}
+
+func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domain.OrgMemberUpdateInput) error {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	currentUt, err := repo.MemberGetCurrentUserType(ctx, input.OrgID)
+	if err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+	if err := currentUt.IsAdmin(); err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+
+	if err := input.Validate(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if user.ID == input.UserID {
+		return perr.New("cannot change own user type", perr.Forbidden, "cannot change your user type by yourself")
+	}
+	updatedUserUt, err := repo.memberGetUserType(ctx, input.UserID, input.OrgID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	// if target or new value is owner, current user must be owner
+	if *updatedUserUt == domain.UserTypeOwner || *input.UserType == domain.UserTypeOwner {
+		if *currentUt != domain.UserTypeOwner {
+			return perr.New("User is not owner", perr.Forbidden, "you are not owner")
+		}
+	}
+
+	res, err := repo.ExecContext(ctx,
+		queryset.OrgMemberUserTypeUpdateQuery,
+		input.UserType, input.OrgID, input.UserID,
+	)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if affected == 0 {
+		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	return nil
+}
+
+func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserID, orgID domain.OrgID) error {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if user.ID == userID {
+		return perr.New("cannot delete own", perr.Forbidden, "cannot delete yourself")
+	}
+
+	currentUt, err := repo.MemberGetCurrentUserType(ctx, orgID)
+	if err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+	if err := currentUt.IsAdmin(); err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+
+	updatedUserUt, err := repo.memberGetUserType(ctx, userID, orgID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	// only owner user can delete owner
+	if *updatedUserUt == domain.UserTypeOwner && *currentUt != domain.UserTypeOwner {
+		return perr.New("User is not owner", perr.Forbidden, "you are not owner")
+	}
+
+	res, err := repo.ExecContext(ctx,
+		queryset.OrgEliminateMemberQuery,
+		orgID, userID,
+	)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if affected == 0 {
+		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	return nil
+}
+
+/*************************
+
+util
+
+*************************/
+
+func (repo *OrgRepository) memberGetUserType(ctx context.Context, userID domain.UserID, orgID domain.OrgID) (*domain.UserType, error) {
+	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, userID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}

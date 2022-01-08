@@ -49,12 +49,14 @@ type (
 		MemberCreate(context.Context, OrgMemberInput) error
 		MemberList(context.Context, OrgID) (map[UserType][]User, error)
 		MemberGetCurrentUserType(context.Context, OrgID) (*UserType, error)
+		MemberUpdateUserType(context.Context, OrgMemberUpdateInput) error
+		MemberDelete(context.Context, UserID, OrgID) error
 	}
 )
 
 func (o *OrgInput) Validate() error {
 	return validation.ValidateStruct(&o,
-		validation.Field(o.Name, validation.Required, validation.Length(1, 64)),
+		validation.Field(o.Slug, validation.Required, validation.Length(1, 64)),
 		validation.Field(o.Name, validation.Required, validation.Length(1, 64)),
 	)
 }

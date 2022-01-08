@@ -36,6 +36,8 @@ type IOrgRepository interface {
 	MemberCreate(context.Context, domain.OrgMemberInput) error
 	MemberList(context.Context, domain.OrgID) (map[domain.UserType][]domain.User, error)
 	MemberGetCurrentUserType(context.Context, domain.OrgID) (*domain.UserType, error)
+	MemberUpdateUserType(context.Context, domain.OrgMemberUpdateInput) error
+	MemberDelete(context.Context, domain.UserID, domain.OrgID) error
 }
 
 func (in *OrgInteractor) List(ctx context.Context) ([]domain.Org, error) {
@@ -100,4 +102,12 @@ func (in *OrgInteractor) MemberList(ctx context.Context, orgID domain.OrgID) (ma
 
 func (in *OrgInteractor) MemberGetCurrentUserType(ctx context.Context, orgID domain.OrgID) (*domain.UserType, error) {
 	return in.repo.MemberGetCurrentUserType(ctx, orgID)
+}
+
+func (in *OrgInteractor) MemberUpdateUserType(ctx context.Context, input domain.OrgMemberUpdateInput) error {
+	return in.repo.MemberUpdateUserType(ctx, input)
+}
+
+func (in *OrgInteractor) MemberDelete(ctx context.Context, userID domain.UserID, orgID domain.OrgID) error {
+	return in.repo.MemberDelete(ctx, userID, orgID)
 }

@@ -223,3 +223,37 @@ func (con *OrgController) MemberListView(w http.ResponseWriter, r *http.Request)
 	response(w, r, nil, map[string]interface{}{"data": members})
 	return
 }
+
+func (con *OrgController) MemberUpdateUserTypeView(w http.ResponseWriter, r *http.Request) {
+	var input domain.OrgMemberUpdateInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	if err := con.in.MemberUpdateUserType(r.Context(), input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": "OK"})
+	return
+}
+
+func (con *OrgController) MemberDeleteView(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get(QueryParamsID)
+	orgID := r.URL.Query().Get(QueryParamsOrgID)
+
+	if id == "" || orgID == "" {
+		response(w, r, perr.New("need id and orgId params", perr.BadRequest), nil)
+		return
+	}
+
+	if err := con.in.MemberDelete(r.Context(), domain.UserID(id), domain.OrgID(orgID)); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": "OK"})
+	return
+}

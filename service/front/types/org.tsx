@@ -42,6 +42,12 @@ export type OrgMemberInput = {
   org_invitation_id: string
 }
 
+export type OrgMemberUpdateInput = {
+  org_id: string
+  user_id: string
+  user_type: UserType
+}
+
 export const InvitationStatus = {
   NEW: 'new',
   ACCEPTED: 'accepted',

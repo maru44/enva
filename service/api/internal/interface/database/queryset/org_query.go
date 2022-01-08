@@ -132,9 +132,15 @@ const (
 		"FROM rel_org_members AS r " +
 		"WHERE r.org_id = $1 AND r.user_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL"
 
+	// if updated user's origin user type is 'owner'
+	// validate is current user 'owner'
 	OrgEliminateMemberQuery = "UPDATE rel_org_members " +
-		"SET is_valid = true AND deleted_at = now()" +
+		"SET is_valid = false, updated_at = now(), deleted_at = now() " +
 		"WHERE org_id = $1 AND user_id = $2"
+
+	OrgMemberUserTypeUpdateQuery = "UPDATE rel_org_members " +
+		"SET user_type = $1, updated_at = now() " +
+		"WHERE org_id = $2 AND user_id = $3"
 
 	OrgReAddMemberQuery = ""
 )
