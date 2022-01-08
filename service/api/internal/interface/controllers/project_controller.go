@@ -93,9 +93,22 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// with ?orgId=
 	orgID := r.URL.Query().Get(QueryParamsOrgID)
 	if orgID != "" {
 		p, err := con.in.GetBySlugAndOrgID(ctx, slug, domain.OrgID(orgID))
+		if err != nil {
+			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			return
+		}
+		response(w, r, nil, map[string]interface{}{"data": p})
+		return
+	}
+
+	// with ?orgSlug=
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
+	if orgSlug != "" {
+		p, err := con.in.GetBySlugAndOrgSlug(ctx, slug, orgSlug)
 		if err != nil {
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return

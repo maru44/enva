@@ -23,6 +23,7 @@ type IProjectRepository interface {
 	SlugListByUser(context.Context) ([]string, error)
 	GetBySlug(context.Context, string) (*domain.Project, error)
 	GetBySlugAndOrgID(context.Context, string, domain.OrgID) (*domain.Project, error)
+	GetBySlugAndOrgSlug(context.Context, string, string) (*domain.Project, error)
 	GetByID(context.Context, domain.ProjectID) (*domain.Project, error)
 	Create(context.Context, domain.ProjectInput) (*string, error)
 	Delete(context.Context, domain.ProjectID) (int, error)
@@ -50,6 +51,10 @@ func (in *ProjectInteractor) GetBySlug(ctx context.Context, slug string) (*domai
 
 func (in *ProjectInteractor) GetBySlugAndOrgID(ctx context.Context, slug string, orgID domain.OrgID) (*domain.Project, error) {
 	return in.repo.GetBySlugAndOrgID(ctx, slug, orgID)
+}
+
+func (in *ProjectInteractor) GetBySlugAndOrgSlug(ctx context.Context, slug, orgSlug string) (*domain.Project, error) {
+	return in.repo.GetBySlugAndOrgSlug(ctx, slug, orgSlug)
 }
 
 func (in *ProjectInteractor) GetByID(ctx context.Context, id domain.ProjectID) (*domain.Project, error) {

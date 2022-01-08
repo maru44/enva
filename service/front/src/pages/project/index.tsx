@@ -51,7 +51,9 @@ const ProjectList: NextPage<PageProps> = (props) => {
                 })
               }}
               linkAs={
-                p.org ? `/project/${p.org.id}/${p.slug}` : `/project/${p.slug}`
+                p.org
+                  ? `/project/${p.org.slug}/${p.slug}`
+                  : `/project/${p.slug}`
               }
               linkHref="/project/[...slug]"
               styles={styles}

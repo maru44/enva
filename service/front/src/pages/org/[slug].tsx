@@ -75,7 +75,7 @@ const OrgDetail: NextPage<PageProps> = (props) => {
             </Box>
           )}
           <Box mt={6}>
-            <OrgProjects id={org!.id} />
+            <OrgProjects id={org!.id} slug={org!.slug} />
           </Box>
           <Box mt={4}>
             <Typography>Member: {org.user_count}</Typography>
@@ -98,9 +98,10 @@ const OrgDetail: NextPage<PageProps> = (props) => {
 
 type orgProjectsProps = {
   id: string
+  slug: string
 }
 
-const OrgProjects: React.FC<orgProjectsProps> = ({ id }) => {
+const OrgProjects: React.FC<orgProjectsProps> = ({ id, slug }) => {
   const { data, error } = useSWR<projectsResponseBody, ErrorConstructor>(
     `${GetPath.PROJECT_LIST_ORG}?id=${id}`,
     fetcherGetFromApiUrl
@@ -116,7 +117,7 @@ const OrgProjects: React.FC<orgProjectsProps> = ({ id }) => {
           <CommonListCard
             info={p}
             key={i}
-            linkAs={`/project/${id}/${p.slug}`}
+            linkAs={`/project/${slug}/${p.slug}`}
             linkHref="/project/[...slug]"
             styles={styles}
           />

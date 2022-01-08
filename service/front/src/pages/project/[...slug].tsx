@@ -13,16 +13,16 @@ import { KvList } from '../../components/kv/KvList'
 const ProjectDetail: NextPage<PageProps> = (props) => {
   useRequireLogin()
   const router = useRouter()
-  const slug = router.query.slug as string[]
+  const slugs = router.query.slug as string[]
 
   let url = GetPath.PROJECT_DETAIl as string
-  if (slug) {
-    switch (slug.length) {
+  if (slugs) {
+    switch (slugs.length) {
       case 2:
-        url = `${GetPath.PROJECT_DETAIl}?slug=${slug[1]}&orgId=${slug[0]}`
+        url = `${GetPath.PROJECT_DETAIl}?slug=${slugs[1]}&orgSlug=${slugs[0]}`
         break
       default:
-        url = `${GetPath.PROJECT_DETAIl}?slug=${slug[0]}`
+        url = `${GetPath.PROJECT_DETAIl}?slug=${slugs[0]}`
     }
   }
 

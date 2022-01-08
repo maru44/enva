@@ -46,6 +46,7 @@ type (
 
 		GetBySlug(context.Context, string) (*Project, error)
 		GetBySlugAndOrgID(context.Context, string, OrgID) (*Project, error)
+		GetBySlugAndOrgSlug(context.Context, string, string) (*Project, error)
 		GetByID(context.Context, ProjectID) (*Project, error)
 		Create(context.Context, ProjectInput) (*string, error)
 		Delete(context.Context, ProjectID) (int, error)
