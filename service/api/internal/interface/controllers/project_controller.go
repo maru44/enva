@@ -12,7 +12,7 @@ import (
 
 type ProjectController struct {
 	in  domain.IProjectInteractor
-	oIn domain.IOrgMemberInteractor
+	oIn domain.IOrgInteractor
 }
 
 func NewProjectController(sql database.ISqlHandler) *ProjectController {
@@ -22,8 +22,8 @@ func NewProjectController(sql database.ISqlHandler) *ProjectController {
 				ISqlHandler: sql,
 			},
 		),
-		oIn: usecase.NewOrgMemberInteractor(
-			&database.OrgMemberRepository{
+		oIn: usecase.NewOrgInteractor(
+			&database.OrgRepository{
 				ISqlHandler: sql,
 			},
 		),
@@ -125,7 +125,7 @@ func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request)
 	}
 
 	if input.OrgID != nil {
-		ut, err := con.oIn.GetCurrentUserType(ctx, *input.OrgID)
+		ut, err := con.oIn.MemberGetCurrentUserType(ctx, *input.OrgID)
 		if err != nil {
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return
@@ -167,7 +167,7 @@ func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request)
 			return
 		}
 	} else {
-		ut, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		ut, err := con.oIn.MemberGetCurrentUserType(ctx, p.OwnerOrg.ID)
 		if err != nil {
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return

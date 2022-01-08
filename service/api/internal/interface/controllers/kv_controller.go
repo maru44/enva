@@ -14,7 +14,7 @@ import (
 type KvController struct {
 	in  domain.IKvInteractor
 	pIn domain.IProjectInteractor
-	oIn domain.IOrgMemberInteractor
+	oIn domain.IOrgInteractor
 }
 
 func NewKvController(sql database.ISqlHandler) *KvController {
@@ -29,8 +29,8 @@ func NewKvController(sql database.ISqlHandler) *KvController {
 				ISqlHandler: sql,
 			},
 		),
-		oIn: usecase.NewOrgMemberInteractor(
-			&database.OrgMemberRepository{
+		oIn: usecase.NewOrgInteractor(
+			&database.OrgRepository{
 				ISqlHandler: sql,
 			},
 		),
@@ -137,7 +137,7 @@ func (con *KvController) userAccessToProject(ctx context.Context, projectID doma
 			return perr.New("user is guest", perr.Forbidden)
 		}
 	} else {
-		ut, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		ut, err := con.oIn.MemberGetCurrentUserType(ctx, p.OwnerOrg.ID)
 		if err != nil {
 			return perr.Wrap(err, perr.Forbidden)
 		}
@@ -166,7 +166,7 @@ func (con *KvController) userGuestAccessToProject(ctx context.Context, projectID
 			return perr.New("user is not owner of this project", perr.Forbidden)
 		}
 	} else {
-		_, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		_, err := con.oIn.MemberGetCurrentUserType(ctx, p.OwnerOrg.ID)
 		if err != nil {
 			return perr.Wrap(err, perr.Forbidden)
 		}

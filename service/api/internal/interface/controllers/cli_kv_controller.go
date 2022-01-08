@@ -16,7 +16,7 @@ type (
 		in  domain.IKvInteractor
 		pIn domain.IProjectInteractor
 		cIn domain.ICliKvInteractor
-		oIn domain.IOrgMemberInteractor
+		oIn domain.IOrgInteractor
 	}
 )
 
@@ -37,8 +37,8 @@ func NewCliKvController(sql database.ISqlHandler) *CliKvController {
 				ISqlHandler: sql,
 			},
 		),
-		oIn: usecase.NewOrgMemberInteractor(
-			&database.OrgMemberRepository{
+		oIn: usecase.NewOrgInteractor(
+			&database.OrgRepository{
 				ISqlHandler: sql,
 			},
 		),
@@ -213,7 +213,7 @@ func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug
 			return nil, perr.New("user is guest", perr.Forbidden)
 		}
 	} else {
-		ut, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		ut, err := con.oIn.MemberGetCurrentUserType(ctx, p.OwnerOrg.ID)
 		if err != nil {
 			return nil, perr.Wrap(err, perr.Forbidden)
 		}
@@ -243,7 +243,7 @@ func (con *CliKvController) userGuesAccessToProject(ctx context.Context, project
 			return nil, perr.New("user is not owner of this project", perr.Forbidden)
 		}
 	} else {
-		_, err := con.oIn.GetCurrentUserType(ctx, p.OwnerOrg.ID)
+		_, err := con.oIn.MemberGetCurrentUserType(ctx, p.OwnerOrg.ID)
 		if err != nil {
 			return nil, perr.Wrap(err, perr.Forbidden)
 		}

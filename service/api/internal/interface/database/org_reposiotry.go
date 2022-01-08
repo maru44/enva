@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/mysmtp"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
 
 type OrgRepository struct {
 	ISqlHandler
+	mysmtp.ISmtpHandler
 }
 
 func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
@@ -176,4 +178,391 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 	tx.Commit()
 
 	return slug, nil
+}
+
+/*************************
+
+invitation
+
+*************************/
+
+func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitation, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	rows, err := repo.QueryContext(ctx,
+		queryset.OrgInvitationListFromOrgQuery,
+		orgID, cu.ID,
+	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	if rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var orgs []domain.OrgInvitation
+	for rows.Next() {
+		var (
+			o   domain.OrgInvitation
+			u   domain.User
+			inv domain.User
+		)
+		if err := rows.Scan(
+			&o.ID, &o.Status, &o.UserType, &o.CreatedAt, &o.UpdatedAt,
+			&u.ID, &u.Username, &u.Email, &u.ImageURL,
+			&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+		o.Org = domain.Org{ID: orgID}
+		o.User = u
+		o.Invitor = inv
+		orgs = append(orgs, o)
+	}
+
+	return orgs, nil
+}
+
+func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvitation, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.OrgInvitationListQuery,
+		cu.ID,
+	)
+	if err := rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var orgs []domain.OrgInvitation
+	for rows.Next() {
+		var (
+			o   domain.OrgInvitation
+			inv domain.User
+			org domain.Org
+		)
+		if err := rows.Scan(
+			&org.ID, &org.Slug, &org.Name, &org.Description,
+			&o.ID, &o.UserType, &o.CreatedAt,
+			&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+		o.Org = org
+		o.User = *cu
+		o.Invitor = inv
+		orgs = append(orgs, o)
+	}
+
+	return orgs, nil
+}
+
+func (repo *OrgRepository) InvitationDetail(ctx context.Context, invID domain.OrgInvitationID) (*domain.OrgInvitation, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgInvitationDetailQuery,
+		invID, cu.Email,
+	)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		o   *domain.OrgInvitation = &domain.OrgInvitation{}
+		org domain.Org
+		inv domain.User
+	)
+	if err := row.Scan(
+		&o.ID, &o.UserType, &o.Status, &o.CreatedAt,
+		&org.ID, &org.Slug, &org.Name, &org.Description,
+		&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
+	); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	o.Org = org
+	o.Invitor = inv
+	o.User = *cu
+
+	return o, nil
+}
+
+func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitationInput) error {
+	if err := input.Validate(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	var uId *domain.UserID
+	if input.User != nil {
+		uId = &input.User.ID
+	}
+
+	var id *string
+	if err := repo.QueryRowContext(ctx,
+		queryset.OrgInvitationCraeteQuery,
+		input.OrgID, uId, input.Eamil, input.UserType, cu.ID,
+	).Scan(&id); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	// send invitation mail
+	mailInput := input.CreateMail(domain.OrgInvitationID(*id), *cu)
+	if err := repo.Send(mailInput); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	return nil
+}
+
+func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitationID, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.PastOrgInvitationListQuery,
+		orgID, cu.Email,
+	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var ids []domain.OrgInvitationID
+	for rows.Next() {
+		var id domain.OrgInvitationID
+		if err := rows.Scan(
+			&id,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+func (repo *OrgRepository) InvitationUpdateStatus(ctx context.Context, invID domain.OrgInvitationID, status domain.OrgInvitationStatus) error {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+
+	res, err := repo.ExecContext(ctx,
+		queryset.OrgInvitationUpdateStatusQuery,
+		status, invID, cu.Email,
+	)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if affected == 0 {
+		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	return nil
+}
+
+func (repo *OrgRepository) InvitationDeny(ctx context.Context, invID domain.OrgInvitationID) error {
+	inv, err := repo.InvitationDetail(ctx, invID)
+	if err != nil {
+		return perr.Wrap(err, perr.NotFound)
+	}
+	if err := repo.InvitationUpdateStatus(ctx, invID, domain.OrgInvitationStatusDenied); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	ids, err := repo.InvitationPastList(ctx, inv.Org.ID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	for _, id := range ids {
+		if err := repo.InvitationUpdateStatus(ctx, id, domain.OrgInvitationStatusClosed); err != nil {
+			return perr.Wrap(err, perr.BadRequest)
+		}
+	}
+
+	return nil
+}
+
+/*************************
+
+member
+
+*************************/
+
+func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMemberInput) error {
+	if err := input.Validate(ctx); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	// current user
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.NotFound)
+	}
+	// validate current user
+	if cu.ID != input.UserID {
+		return perr.New("current user is not invited user", perr.Forbidden)
+	}
+
+	tx, err := repo.BeginTx(ctx, nil)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	// create member
+	var id *string
+	if err := tx.QueryRowContext(ctx,
+		queryset.RelOrgMembersInsertQuery,
+		input.OrgID, input.UserID, input.UserType, input.OrgInvitationID,
+	).Scan(&id); err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	// update invitation status
+	res, err := tx.ExecContext(ctx,
+		queryset.OrgInvitationUpdateStatusQuery,
+		domain.OrgInvitationStatusAccepted,
+		input.OrgInvitationID, cu.Email,
+	)
+	if err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	affected, err := res.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if affected == 0 {
+		tx.Rollback()
+		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	// past invitation ids
+	rows, err := tx.QueryContext(ctx,
+		queryset.PastOrgInvitationListQuery,
+		input.OrgID, cu.Email,
+	)
+	if err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.NotFound)
+	}
+	if err := rows.Err(); err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.NotFound)
+	}
+
+	var pastIDs []domain.OrgInvitationID
+	for rows.Next() {
+		var id domain.OrgInvitationID
+		if err := rows.Scan(
+			&id,
+		); err != nil {
+			tx.Rollback()
+			return perr.Wrap(err, perr.NotFound)
+		}
+		pastIDs = append(pastIDs, id)
+	}
+
+	// update past invitations' status >> closed
+	for _, invID := range pastIDs {
+		res, err := tx.ExecContext(ctx,
+			queryset.OrgInvitationUpdateStatusQuery,
+			domain.OrgInvitationStatusClosed, invID, cu.Email,
+		)
+		if err != nil {
+			tx.Rollback()
+			return perr.Wrap(err, perr.BadRequest)
+		}
+
+		affected, err := res.RowsAffected()
+		if err != nil {
+			tx.Rollback()
+			return perr.Wrap(err, perr.BadRequest)
+		}
+		if affected == 0 {
+			tx.Rollback()
+			return perr.New("no rows affected", perr.BadRequest)
+		}
+	}
+
+	tx.Commit()
+
+	return nil
+}
+
+func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (map[domain.UserType][]domain.User, error) {
+	// confirm access
+	if _, err := repo.MemberGetCurrentUserType(ctx, orgID); err != nil {
+		return nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	rows, err := repo.QueryContext(ctx,
+		queryset.OrgUsersQuery,
+		orgID,
+	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	var users map[domain.UserType][]domain.User
+	for rows.Next() {
+		var (
+			u  domain.User
+			ut domain.UserType
+		)
+		if err := rows.Scan(
+			&u.ID, &u.Username, &u.Email, &u.ImageURL, &ut,
+		); err != nil {
+			return nil, perr.Wrap(err, perr.NotFound)
+		}
+
+		users[ut] = append(users[ut], u)
+	}
+
+	return users, nil
+}
+
+func (repo *OrgRepository) MemberGetCurrentUserType(ctx context.Context, orgID domain.OrgID) (*domain.UserType, error) {
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, user.ID)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	var ut *domain.UserType
+	if err := row.Scan(&ut); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	return ut, nil
 }

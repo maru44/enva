@@ -35,8 +35,20 @@ type (
 		Detail(context.Context, OrgID) (*Org, *UserType, error)
 		DetailBySlug(context.Context, string) (*Org, *UserType, error)
 		Create(context.Context, OrgInput) (*string, error)
-		// Update
-		// Delete
+
+		/* invitations */
+		Invite(context.Context, OrgInvitationInput) error
+		InvitationListFromOrg(context.Context, OrgID) ([]OrgInvitation, error)
+		InvitationList(context.Context) ([]OrgInvitation, error)
+		InvitationDetail(context.Context, OrgInvitationID) (*OrgInvitation, error)
+		InvitationPastList(context.Context, OrgID) ([]OrgInvitationID, error)
+		InvitationUpdateStatus(context.Context, OrgInvitationID, OrgInvitationStatus) error
+		InvitationDeny(context.Context, OrgInvitationID) error
+
+		/* member */
+		MemberCreate(context.Context, OrgMemberInput) error
+		MemberList(context.Context, OrgID) (map[UserType][]User, error)
+		MemberGetCurrentUserType(context.Context, OrgID) (*UserType, error)
 	}
 )
 

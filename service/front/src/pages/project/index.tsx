@@ -31,6 +31,8 @@ const ProjectList: NextPage<PageProps> = (props) => {
   // @TODO error handling
   if (error) console.log(error)
 
+  console.log(data?.data)
+
   return (
     <Box mt={6} width="100%">
       <Typography variant="h5">Projects</Typography>

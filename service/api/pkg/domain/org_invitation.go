@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -33,21 +32,6 @@ type (
 		User     *User
 		Eamil    string   `json:"email"`
 		UserType UserType `json:"user_type"`
-	}
-
-	IOrgInvitationInteractor interface {
-		Create(context.Context, OrgInvitationInput) error
-		// sent from
-		ListFromOrg(context.Context, OrgID) ([]OrgInvitation, error)
-		// sent by anyone
-		List(context.Context) ([]OrgInvitation, error)
-		// detail
-		Detail(context.Context, OrgInvitationID) (*OrgInvitation, error)
-		// past invitation to an email (from an org)
-		ListPastInvitations(context.Context, OrgID) ([]OrgInvitationID, error)
-		// Update status
-		UpdateStatus(context.Context, OrgInvitationID, OrgInvitationStatus) error
-		Deny(context.Context, OrgInvitationID) error
 	}
 )
 

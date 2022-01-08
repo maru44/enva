@@ -47,14 +47,15 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 	}
 
 	var projects []domain.Project
-	for _, o := range orgs {
+	for i, o := range orgs {
 		ps, err := repo.ListByOrg(ctx, o.ID)
 		if err != nil {
 			return nil, perr.Wrap(err, perr.BadRequest)
 		}
 		// set org
 		for _, p := range ps {
-			p.OwnerOrg = &o
+			// &o is failed @TODO research
+			p.OwnerOrg = &orgs[i]
 			projects = append(projects, p)
 		}
 	}

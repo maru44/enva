@@ -15,14 +15,6 @@ type (
 		UserType        UserType        `json:"user_type"`
 		OrgInvitationID OrgInvitationID `json:"org_invitation_id"`
 	}
-
-	IOrgMemberInteractor interface {
-		Create(context.Context, OrgMemberInput) error
-		List(context.Context, OrgID) (map[UserType][]User, error)
-		// Update() // mainly userType
-		// Delete()
-		GetCurrentUserType(context.Context, OrgID) (*UserType, error)
-	}
 )
 
 const (
