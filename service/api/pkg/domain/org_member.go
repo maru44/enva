@@ -32,12 +32,18 @@ const (
 	UserTypeGuest = UserType("guest")
 )
 
-func (u *UserType) IsAdmin() bool {
-	return *u == UserTypeOwner || *u == UserTypeAdmin
+func (u *UserType) IsAdmin() error {
+	if *u == UserTypeOwner || *u == UserTypeAdmin {
+		return nil
+	}
+	return perr.New("user is not admin or owner", perr.Forbidden, "you are not admin or owner of this org")
 }
 
-func (u *UserType) IsUser() bool {
-	return *u != UserTypeGuest
+func (u *UserType) IsUser() error {
+	if *u != UserTypeGuest {
+		return nil
+	}
+	return perr.New("user is guest", perr.Forbidden, "you are guest of this org")
 }
 
 func (o *OrgInvitation) ToMemberInput() *OrgMemberInput {

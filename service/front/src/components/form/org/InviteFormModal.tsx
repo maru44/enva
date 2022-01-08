@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
-import { FormEvent } from 'react'
+import { FormEvent, useState } from 'react'
 import { OrgInviteResponseBody } from '../../../../http/body/org'
 import { fetchOrgInvite } from '../../../../http/org'
 import { OrgInvitationInput } from '../../../../types/org'
@@ -28,10 +28,12 @@ export const InviteFormModal: React.FC<props> = ({
   isOpen,
   onClose,
 }) => {
+  const [isPosting, setIsPosting] = useState<boolean>(false)
   const snack = useSnackbar()
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsPosting(true)
     const email = e.currentTarget.email.value
     const userType = e.currentTarget.user_type.value
 
@@ -56,9 +58,9 @@ export const InviteFormModal: React.FC<props> = ({
         snack.enqueueSnackbar(ret.error, {
           variant: 'error',
         })
+        break
     }
-
-    onClose()
+    setIsPosting(false)
   }
 
   return (
@@ -104,12 +106,13 @@ export const InviteFormModal: React.FC<props> = ({
                 type="button"
                 variant="contained"
                 className="subButton"
+                disabled={isPosting}
               >
                 Close
               </Button>
             </Box>
             <Box>
-              <Button type="submit" variant="contained">
+              <Button disabled={isPosting} type="submit" variant="contained">
                 Invite
               </Button>
             </Box>

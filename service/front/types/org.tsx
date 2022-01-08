@@ -22,3 +22,31 @@ export type OrgInvitationInput = {
   email: string
   user_type: UserType
 }
+
+export type OrgInvitation = {
+  id: string
+  user_type: UserType
+  status: InvitationStatus
+  created_at: string
+  updated_at: string
+
+  org: Org
+  user: CurrentUser
+  invitor: CurrentUser
+}
+
+export type OrgMemberInput = {
+  org_id: string
+  user_id: string
+  user_type: UserType
+  org_invitation_id: string
+}
+
+export const InvitationStatus = {
+  NEW: 'new',
+  ACCEPTED: 'accepted',
+  CLOSED: 'closed',
+  DENIED: 'denied',
+}
+export type InvitationStatus =
+  typeof InvitationStatus[keyof typeof InvitationStatus]

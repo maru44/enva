@@ -1,7 +1,6 @@
 import { Apartment, ArrowBack, Mail } from '@material-ui/icons'
 import { Box, Grid, Icon, IconButton, Tooltip, Typography } from '@mui/material'
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useSWR from 'swr'
@@ -10,7 +9,7 @@ import { OrgResponseBody, OrgsResponseBody } from '../../../http/body/org'
 import { projectsResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
-import { AdminUserTypes, UserUserTypes } from '../../../types/user'
+import { UserUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
 import { InviteFormModal } from '../../components/form/org/InviteFormModal'
 import styles from '../../styles/project.module.css'
@@ -37,8 +36,8 @@ const OrgDetail: NextPage<PageProps> = (props) => {
     const userType = data.data.current_user_type!
 
     return (
-      <Box mt={6}>
-        <Box>
+      <Box>
+        <Box mt={6}>
           <Box
             display="flex"
             flexDirection="row"
@@ -77,6 +76,9 @@ const OrgDetail: NextPage<PageProps> = (props) => {
           )}
           <Box mt={6}>
             <OrgProjects id={org!.id} />
+          </Box>
+          <Box mt={4}>
+            <Typography>Member: {org.user_count}</Typography>
           </Box>
         </Box>
         <InviteFormModal

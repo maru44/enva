@@ -98,14 +98,14 @@ func (repo *OrgInvitationRepository) Detail(ctx context.Context, invID domain.Or
 
 	row := repo.QueryRowContext(ctx,
 		queryset.OrgInvitationDetailQuery,
-		invID, cu.ID,
+		invID, cu.Email,
 	)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 
 	var (
-		o   *domain.OrgInvitation
+		o   *domain.OrgInvitation = &domain.OrgInvitation{}
 		org domain.Org
 		inv domain.User
 	)
@@ -185,9 +185,14 @@ func (repo *OrgInvitationRepository) ListPastInvitations(ctx context.Context, or
 }
 
 func (repo *OrgInvitationRepository) UpdateStatus(ctx context.Context, invID domain.OrgInvitationID, status domain.OrgInvitationStatus) error {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
+
 	res, err := repo.ExecContext(ctx,
 		queryset.OrgInvitationUpdateStatusQuery,
-		status, invID,
+		status, invID, cu.Email,
 	)
 	if err != nil {
 		return perr.Wrap(err, perr.BadRequest)
@@ -199,6 +204,29 @@ func (repo *OrgInvitationRepository) UpdateStatus(ctx context.Context, invID dom
 	}
 	if affected == 0 {
 		return perr.New("no rows affected", perr.BadRequest)
+	}
+
+	return nil
+}
+
+func (repo *OrgInvitationRepository) Deny(ctx context.Context, invID domain.OrgInvitationID) error {
+	inv, err := repo.Detail(ctx, invID)
+	if err != nil {
+		return perr.Wrap(err, perr.NotFound)
+	}
+	if err := repo.UpdateStatus(ctx, invID, domain.OrgInvitationStatusDenied); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	ids, err := repo.ListPastInvitations(ctx, inv.Org.ID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	for _, id := range ids {
+		if err := repo.UpdateStatus(ctx, id, domain.OrgInvitationStatusClosed); err != nil {
+			return perr.Wrap(err, perr.BadRequest)
+		}
 	}
 
 	return nil

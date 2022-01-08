@@ -26,7 +26,7 @@ type (
 	OrgInput struct {
 		Slug        string  `json:"slug"`
 		Name        string  `json:"name"`
-		Description *string `json:"description"`
+		Description *string `json:"description,omitempty"`
 	}
 
 	IOrgInteractor interface {

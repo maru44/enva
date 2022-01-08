@@ -23,6 +23,7 @@ type IOrgInvitationRepository interface {
 	Create(context.Context, domain.OrgInvitationInput) error
 	ListPastInvitations(context.Context, domain.OrgID) ([]domain.OrgInvitationID, error)
 	UpdateStatus(context.Context, domain.OrgInvitationID, domain.OrgInvitationStatus) error
+	Deny(context.Context, domain.OrgInvitationID) error
 }
 
 func (in *OrgInvitationInteractor) ListFromOrg(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitation, error) {
@@ -47,4 +48,8 @@ func (in *OrgInvitationInteractor) ListPastInvitations(ctx context.Context, orgI
 
 func (in *OrgInvitationInteractor) UpdateStatus(ctx context.Context, invID domain.OrgInvitationID, status domain.OrgInvitationStatus) error {
 	return in.repo.UpdateStatus(ctx, invID, status)
+}
+
+func (in *OrgInvitationInteractor) Deny(ctx context.Context, invID domain.OrgInvitationID) error {
+	return in.repo.Deny(ctx, invID)
 }

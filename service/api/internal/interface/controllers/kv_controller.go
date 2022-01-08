@@ -141,8 +141,8 @@ func (con *KvController) userAccessToProject(ctx context.Context, projectID doma
 		if err != nil {
 			return perr.Wrap(err, perr.Forbidden)
 		}
-		if ut.IsUser() {
-			return perr.New("user is guest", perr.Forbidden, "you are guest user")
+		if err := ut.IsUser(); err != nil {
+			return perr.Wrap(err, perr.Forbidden)
 		}
 	}
 

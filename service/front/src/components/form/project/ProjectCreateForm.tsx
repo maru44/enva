@@ -52,7 +52,10 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
     const ret: projectCreateResponseBody = await res.json()
     if (res.status === 200) {
       const slug = ret.data
-      router.push(`/project/${slug}`)
+      const path = input.org_id
+        ? `/project/${input.org_id}/${slug}/`
+        : `/project/${slug}`
+      router.push(path)
     } else {
       const message = ret.error
       snack.enqueueSnackbar(message, { variant: 'error' })

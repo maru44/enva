@@ -47,6 +47,7 @@ type (
 		ListPastInvitations(context.Context, OrgID) ([]OrgInvitationID, error)
 		// Update status
 		UpdateStatus(context.Context, OrgInvitationID, OrgInvitationStatus) error
+		Deny(context.Context, OrgInvitationID) error
 	}
 )
 

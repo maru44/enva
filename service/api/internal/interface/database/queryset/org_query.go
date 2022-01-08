@@ -47,7 +47,7 @@ const (
 		"FROM org_invitations AS r " +
 		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
 		"LEFT JOIN users AS u ON u.id = r.invited_by AND u.is_valid = true " +
-		"WHERE r.id = $1 AND r.user_id = $2"
+		"WHERE r.id = $1 AND r.email = $2"
 
 	// invitation insert
 	// need filter in repo or con (only ownerType user can invite)
@@ -58,7 +58,7 @@ const (
 
 	OrgInvitationUpdateStatusQuery = "UPDATE org_invitations " +
 		"SET status = $1, updated_at = now() " +
-		"WHERE id = $2"
+		"WHERE id = $2 AND email = $3 AND status = 'new'"
 
 	// @TODO delete invitation
 

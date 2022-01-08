@@ -8,13 +8,13 @@ import { OrgInput } from '../../../../types/org'
 import { slugify } from '../../../../utils/slug'
 
 export const OrgCreateForm = () => {
-  const [input, setInput] = useState<OrgInput | undefined>(undefined)
+  const [input, setInput] = useState<OrgInput>({ slug: '', name: '' })
   const router = useRouter()
   const snack = useSnackbar()
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!input) return
+    if (!input.slug) return
 
     const res = await fetchCreateOrg(input)
     const ret: OrgCreateResponseBody = await res.json()
@@ -51,6 +51,7 @@ export const OrgCreateForm = () => {
               required
               onChange={(e) => {
                 setInput({
+                  ...input,
                   slug: slugify(e.currentTarget.value),
                   name: e.currentTarget.value,
                 })
@@ -66,10 +67,13 @@ export const OrgCreateForm = () => {
               multiline
               rows={6}
               fullWidth
+              onChange={(e) => {
+                setInput({ ...input, description: e.currentTarget.value })
+              }}
             />
           </Box>
           <Box mt={2} textAlign="right">
-            <Button type="submit" variant="outlined" disabled={!input?.slug}>
+            <Button type="submit" variant="outlined" disabled={!input.slug}>
               Create
             </Button>
           </Box>

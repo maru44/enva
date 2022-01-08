@@ -88,6 +88,7 @@ func main() {
 
 			/* org invitation */
 			s("/invite", http.MethodPost, inv.CreateView),
+			s("/invite/deny", http.MethodGet, inv.DenyView), // ?id=
 			s("/invite/detail", http.MethodGet, inv.DetailView),
 
 			/* org_member */

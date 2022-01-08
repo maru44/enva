@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/maru44/enva/service/api/internal/interface/database"
@@ -74,6 +75,12 @@ func (con *OrgInvitationController) DetailView(w http.ResponseWriter, r *http.Re
 		return
 	}
 
+	if inv.Status != domain.OrgInvitationStatusNew {
+		err := fmt.Errorf("this invitation is %s", string(inv.Status))
+		response(w, r, perr.Wrap(err, perr.BadRequest, err.Error()), nil)
+		return
+	}
+
 	response(w, r, nil, map[string]interface{}{"data": inv})
 	return
 }
@@ -94,8 +101,8 @@ func (con *OrgInvitationController) CreateView(w http.ResponseWriter, r *http.Re
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
-	if !userType.IsAdmin() {
-		response(w, r, perr.New("current user does not admin or owner of this org", perr.Forbidden), nil)
+	if err := userType.IsAdmin(); err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
 	}
 
@@ -106,6 +113,19 @@ func (con *OrgInvitationController) CreateView(w http.ResponseWriter, r *http.Re
 	}
 
 	if err := con.in.Create(ctx, input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": "OK"})
+	return
+}
+
+func (con *OrgInvitationController) DenyView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := r.URL.Query().Get(QueryParamsID)
+
+	if err := con.in.Deny(ctx, domain.OrgInvitationID(id)); err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}

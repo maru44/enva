@@ -22,6 +22,7 @@ func (repo *OrgMemberRepository) Create(ctx context.Context, input domain.OrgMem
 	if err != nil {
 		return perr.Wrap(err, perr.NotFound)
 	}
+	// validate current user
 	if cu.ID != input.UserID {
 		return perr.New("current user is not invited user", perr.Forbidden)
 	}
@@ -45,7 +46,7 @@ func (repo *OrgMemberRepository) Create(ctx context.Context, input domain.OrgMem
 	res, err := tx.ExecContext(ctx,
 		queryset.OrgInvitationUpdateStatusQuery,
 		domain.OrgInvitationStatusAccepted,
-		input.OrgInvitationID,
+		input.OrgInvitationID, cu.Email,
 	)
 	if err != nil {
 		tx.Rollback()
@@ -62,7 +63,7 @@ func (repo *OrgMemberRepository) Create(ctx context.Context, input domain.OrgMem
 	}
 
 	// past invitation ids
-	rows, err := repo.QueryContext(ctx,
+	rows, err := tx.QueryContext(ctx,
 		queryset.PastOrgInvitationListQuery,
 		input.OrgID, cu.Email,
 	)
@@ -89,9 +90,9 @@ func (repo *OrgMemberRepository) Create(ctx context.Context, input domain.OrgMem
 
 	// update past invitations' status >> closed
 	for _, invID := range pastIDs {
-		res, err := repo.ExecContext(ctx,
+		res, err := tx.ExecContext(ctx,
 			queryset.OrgInvitationUpdateStatusQuery,
-			domain.OrgInvitationStatusClosed, invID,
+			domain.OrgInvitationStatusClosed, invID, cu.Email,
 		)
 		if err != nil {
 			tx.Rollback()
