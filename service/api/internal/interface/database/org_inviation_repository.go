@@ -123,7 +123,7 @@ func (repo *OrgInvitationRepository) Detail(ctx context.Context, invID domain.Or
 	return o, nil
 }
 
-func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.OrgInvitationInput, targetID domain.UserID) error {
+func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.OrgInvitationInput) error {
 	if err := input.Validate(); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -133,19 +133,20 @@ func (repo *OrgInvitationRepository) Create(ctx context.Context, input domain.Or
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
+	var uId *domain.UserID
+	if input.User != nil {
+		uId = &input.User.ID
+	}
+
 	var id *string
 	if err := repo.QueryRowContext(ctx,
 		queryset.OrgInvitationCraeteQuery,
-		input.OrgID, input.UserID, input.Eamil, input.UserType, cu.ID,
+		input.OrgID, uId, input.Eamil, input.UserType, cu.ID,
 	).Scan(&id); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
-	mailInput := domain.SmtpInput{
-		Subject: "",
-		Message: "",
-		To:      input.Eamil,
-	}
+	mailInput := input.CreateMail(domain.OrgInvitationID(*id), *cu)
 	if err := repo.Send(mailInput); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}

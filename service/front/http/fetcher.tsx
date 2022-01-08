@@ -21,6 +21,9 @@ export enum GetPath {
   ORG_ADMIN_LIST = '/org/admins',
   ORG_DETAIL = '/org/detail',
 
+  ORG_INVITE = '/invite',
+  ORG_INVITATION_DETAIL = '/invite/detail',
+
   USER = '/user',
   USER_CREATE = '/user/create',
 

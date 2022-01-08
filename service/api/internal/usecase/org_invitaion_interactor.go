@@ -20,7 +20,7 @@ type IOrgInvitationRepository interface {
 	ListFromOrg(context.Context, domain.OrgID) ([]domain.OrgInvitation, error)
 	List(context.Context) ([]domain.OrgInvitation, error)
 	Detail(context.Context, domain.OrgInvitationID) (*domain.OrgInvitation, error)
-	Create(context.Context, domain.OrgInvitationInput, domain.UserID) error
+	Create(context.Context, domain.OrgInvitationInput) error
 	ListPastInvitations(context.Context, domain.OrgID) ([]domain.OrgInvitationID, error)
 	UpdateStatus(context.Context, domain.OrgInvitationID, domain.OrgInvitationStatus) error
 }
@@ -37,8 +37,8 @@ func (in *OrgInvitationInteractor) Detail(ctx context.Context, invID domain.OrgI
 	return in.repo.Detail(ctx, invID)
 }
 
-func (in *OrgInvitationInteractor) Create(ctx context.Context, input domain.OrgInvitationInput, userID domain.UserID) error {
-	return in.repo.Create(ctx, input, userID)
+func (in *OrgInvitationInteractor) Create(ctx context.Context, input domain.OrgInvitationInput) error {
+	return in.repo.Create(ctx, input)
 }
 
 func (in *OrgInvitationInteractor) ListPastInvitations(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitationID, error) {

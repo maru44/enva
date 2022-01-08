@@ -81,11 +81,6 @@ func (con *OrgInvitationController) DetailView(w http.ResponseWriter, r *http.Re
 // @TODO send mail
 func (con *OrgInvitationController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	cu, err := domain.UserFromCtx(ctx)
-	if err != nil {
-		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
-		return
-	}
 
 	var input domain.OrgInvitationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -107,10 +102,10 @@ func (con *OrgInvitationController) CreateView(w http.ResponseWriter, r *http.Re
 	// add input invited userID
 	invitedUser, err := con.uIn.GetByEmail(ctx, input.Eamil)
 	if err == nil {
-		input.UserID = &invitedUser.ID
+		input.User = invitedUser
 	}
 
-	if err := con.in.Create(ctx, input, cu.ID); err != nil {
+	if err := con.in.Create(ctx, input); err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}

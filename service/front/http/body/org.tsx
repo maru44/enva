@@ -16,3 +16,7 @@ export type OrgResponseBody = {
 export type OrgCreateResponseBody = {
   data: string
 } & errorResponseBody
+
+export type OrgInviteResponseBody = {
+  data: string
+} & errorResponseBody

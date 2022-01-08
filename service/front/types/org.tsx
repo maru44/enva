@@ -1,5 +1,5 @@
 import { BaseInformation } from './information'
-import { CurrentUser } from './user'
+import { CurrentUser, UserType } from './user'
 
 export type Org = {
   is_valid: boolean
@@ -14,4 +14,11 @@ export type OrgInput = {
   slug: string
   name: string
   description?: string
+}
+
+export type OrgInvitationInput = {
+  org_id: string
+  org_name: string
+  email: string
+  user_type: UserType
 }

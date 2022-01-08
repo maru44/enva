@@ -51,8 +51,8 @@ const (
 
 	// invitation insert
 	// need filter in repo or con (only ownerType user can invite)
-	OrgInvitationCraeteQuery = "INSERT org_invitations INTO " +
-		"(org_id, user_id, email, user_type, invited_by) " +
+	OrgInvitationCraeteQuery = "INSERT INTO " +
+		"org_invitations(org_id, user_id, email, user_type, invited_by) " +
 		"VALUES ($1, $2, $3, $4, $5) " +
 		"RETURNING id"
 

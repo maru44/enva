@@ -17,3 +17,10 @@ export type UserType = typeof UserType[keyof typeof UserType]
 export const AdminUserTypes = [UserType.ADMIN, UserType.OWNER]
 
 export const UserUserTypes = [UserType.ADMIN, UserType.OWNER, UserType.USER]
+
+export const UserTypesAll: UserType[] = [
+  UserType.OWNER,
+  UserType.ADMIN,
+  UserType.USER,
+  UserType.GUEST,
+]
