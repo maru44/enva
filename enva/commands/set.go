@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
@@ -28,7 +29,7 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 		return errors.New("enva.json already exists")
 	}
 
-	projectSlug, fileName, _, err := c.inputSettingsInfo()
+	projectSlug, orgSlug, fileName, pre, suf, err := c.inputSettingsInfo()
 	if err != nil {
 		return err
 	}
@@ -39,18 +40,7 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 	}
 	defer file.Close()
 
-	file.WriteString(
-		fmt.Sprintf(
-			`{
-	"project_slug": "%s",
-	"env_file_name": "%s"
-}
-`,
-			projectSlug,
-			fileName,
-		),
-	)
-
+	file.WriteString(c.fileStr(projectSlug, orgSlug, fileName, pre, suf))
 	fmt.Println("\nSucceeded to create enva.json")
 
 	return nil
@@ -62,7 +52,7 @@ func (c *set) Explain() string {
 `
 }
 
-func (c *set) inputSettingsInfo() (projectSlug string, fileName string, orgId string, err error) {
+func (c *set) inputSettingsInfo() (projectSlug, orgSlug, fileName, pre, suf string, err error) {
 	fmt.Println("start creating enva.json ...")
 	fmt.Print("project slug: ")
 	for {
@@ -71,17 +61,56 @@ func (c *set) inputSettingsInfo() (projectSlug string, fileName string, orgId st
 		projectSlug = scan.Text()
 
 		if projectSlug != "" {
-			fmt.Print("filepath: ")
+			// orgSlug
+			fmt.Println("org slug (can be blank): ")
 			scan := bufio.NewScanner(os.Stdin)
+			scan.Scan()
+			orgSlug = scan.Text()
+
+			// filePath
+			fmt.Print("filepath: ")
+			scan = bufio.NewScanner(os.Stdin)
 			scan.Scan()
 			fileName = scan.Text()
 
 			if fileName == "" {
-				return "", "", "", errors.New("filepath must not be blank")
+				return "", "", "", "", "", errors.New("filepath must not be blank")
 			}
+
+			fmt.Print("pre sentence (can be blank): ")
+			scan = bufio.NewScanner(os.Stdin)
+			scan.Scan()
+			pre = scan.Text()
+
+			// filePath
+			fmt.Print("suf sentence (can be blank): ")
+			scan = bufio.NewScanner(os.Stdin)
+			scan.Scan()
+			suf = scan.Text()
 
 			return
 		}
-		return "", "", "", errors.New("project slug must not be blank")
+		return "", "", "", "", "", errors.New("project slug must not be blank")
 	}
+}
+
+func (c *set) fileStr(projectSlug, orgSlug, fileName, pre, suf string) string {
+	input := []string{
+		fmt.Sprintf(`	"env_file_name": "%s"`, fileName),
+		fmt.Sprintf(`	"project_slug": "%s"`, projectSlug),
+	}
+
+	if orgSlug != "" {
+		input = append(input, fmt.Sprintf(`	"org_slug": "%s"`, orgSlug))
+	}
+	if pre != "" {
+		input = append(input, fmt.Sprintf(`	"pre_sentence": "%s"`, pre))
+	}
+	if suf != "" {
+		input = append(input, fmt.Sprintf(`	"suf_sentence": "%s"`, suf))
+	}
+
+	jsonContent := strings.Join(input, ",\n")
+
+	return fmt.Sprintf("{\n%s\n}\n", jsonContent)
 }

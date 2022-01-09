@@ -36,10 +36,16 @@ func fileWriteFromResponse(body kvListBody) error {
 		f = writeNormal
 	}
 
+	if s.PreSentence != nil {
+		file.WriteString(*s.PreSentence + "\n")
+	}
 	for _, d := range body.Data {
 		if _, err := file.WriteString(f(d)); err != nil {
 			return err
 		}
+	}
+	if s.SufSentence != nil {
+		file.WriteString(*s.SufSentence + "\n")
 	}
 	return nil
 }
