@@ -22,6 +22,10 @@ export type OrgInviteResponseBody = {
   data: string
 } & errorResponseBody
 
+export type OrgInvitationListResponseBody = {
+  data: OrgInvitation[]
+} & errorResponseBody
+
 export type OrgInvitationDetailBody = {
   data: OrgInvitation
 } & errorResponseBody

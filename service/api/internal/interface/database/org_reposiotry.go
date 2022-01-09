@@ -202,27 +202,37 @@ func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID doma
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 
-	var orgs []domain.OrgInvitation
+	var invs []domain.OrgInvitation
 	for rows.Next() {
 		var (
-			o   domain.OrgInvitation
-			u   domain.User
-			inv domain.User
+			id, username, email, imageUrl *string
+			o                             domain.OrgInvitation
+			u                             domain.User
+			inv                           domain.User
 		)
 		if err := rows.Scan(
 			&o.ID, &o.Status, &o.UserType, &o.CreatedAt, &o.UpdatedAt,
-			&u.ID, &u.Username, &u.Email, &u.ImageURL,
+			&id, &username, &email, &imageUrl,
 			&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
 		); err != nil {
 			return nil, perr.Wrap(err, perr.NotFound)
 		}
+		u = domain.User{Email: *email}
+		if id != nil {
+			u = domain.User{
+				ID:       domain.UserID(*id),
+				Username: *username,
+				Email:    *email,
+				ImageURL: imageUrl,
+			}
+		}
 		o.Org = domain.Org{ID: orgID}
 		o.User = u
 		o.Invitor = inv
-		orgs = append(orgs, o)
+		invs = append(invs, o)
 	}
 
-	return orgs, nil
+	return invs, nil
 }
 
 func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvitation, error) {

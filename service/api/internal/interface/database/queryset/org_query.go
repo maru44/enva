@@ -11,11 +11,11 @@ const (
 	// flitered
 	OrgInvitationListFromOrgQuery = "SELECT " +
 		"r.id, r.status, r.user_type, r.created_at, r.updated_at, " +
-		"u.id, u.username, u.email, u.image_url, " +
-		"inv.id, inv.username, inv.email, inv.image_url, " +
+		"u.id, u.username, r.email, u.image_url, " +
+		"inv.id, inv.username, inv.email, inv.image_url " +
 		"FROM org_invitations AS r " +
-		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
-		"JOIN users AS u ON u.id = r.user_id AND u.is_valid = true " + // invited
+		"JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
+		"LEFT JOIN users AS u ON u.id = r.user_id AND u.is_valid = true " + // invited
 		"JOIN users AS inv ON inv.id = r.invited_by AND inv.is_valid = true " + // invitor
 		// eliminate if current user not belong org
 		"JOIN rel_org_members AS rr ON rr.org_id = r.org_id AND rr.user_id = $2 AND rr.is_valid = true " +

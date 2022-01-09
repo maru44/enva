@@ -1,4 +1,4 @@
-import { Apartment, ArrowBack, Mail } from '@material-ui/icons'
+import { Apartment, ArrowBack, History, Mail } from '@material-ui/icons'
 import { Box, Grid, Icon, IconButton, Tooltip, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -13,6 +13,7 @@ import { Project } from '../../../types/project'
 import { UserUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
 import { DeleteModal } from '../../components/DeleteModal'
+import { InvitationHistoryModal } from '../../components/form/org/InvitationHistoryModal'
 import { InviteFormModal } from '../../components/form/org/InviteFormModal'
 import { MembersList } from '../../components/form/org/MembersList'
 import styles from '../../styles/project.module.css'
@@ -23,6 +24,7 @@ const OrgDetail: NextPage<PageProps> = (props) => {
   const router = useRouter()
   const slug = router.query.slug
   const [inviteFormOpen, setInviteFormOpen] = useState<boolean>(false)
+  const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false)
 
   const { data, error } = useSWR<OrgResponseBody, ErrorConstructor>(
     `${GetPath.ORG_DETAIL}?slug=${slug}`,
@@ -64,13 +66,6 @@ const OrgDetail: NextPage<PageProps> = (props) => {
                 <Typography variant="h5">{org!.name}</Typography>
               </Box>
             </Box>
-            {UserUserTypes.includes(userType) && (
-              <Tooltip title="invite" arrow placement="top">
-                <IconButton onClick={() => setInviteFormOpen(true)}>
-                  <Mail />
-                </IconButton>
-              </Tooltip>
-            )}
           </Box>
           <Box mt={2} pl={1} pr={1}>
             {org.description && (
@@ -85,6 +80,29 @@ const OrgDetail: NextPage<PageProps> = (props) => {
               <Typography variant="h6">{org.user_count} Members</Typography>
             </Box>
             <MembersList id={org.id} currentUserType={userType}></MembersList>
+            {UserUserTypes.includes(userType) && (
+              <Box mt={4}>
+                <Box>
+                  <Typography variant="h6">Invitations</Typography>
+                </Box>
+                <Box mt={2} display="flex" flexDirection="row">
+                  <Box mr={2}>
+                    <Tooltip title="invite" arrow placement="bottom">
+                      <IconButton onClick={() => setInviteFormOpen(true)}>
+                        <Mail />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box>
+                    <Tooltip title="history" arrow placement="bottom">
+                      <IconButton onClick={() => setIsHistoryOpen(true)}>
+                        <History />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Box>
+              </Box>
+            )}
           </Box>
         </Box>
         <InviteFormModal
@@ -93,6 +111,13 @@ const OrgDetail: NextPage<PageProps> = (props) => {
           isOpen={inviteFormOpen}
           onClose={() => {
             setInviteFormOpen(false)
+          }}
+        />
+        <InvitationHistoryModal
+          orgId={org!.id}
+          isOpen={isHistoryOpen}
+          onClose={() => {
+            setIsHistoryOpen(false)
           }}
         />
       </Box>

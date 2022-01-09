@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 
 	"github.com/maru44/enva/service/api/internal/interface/database"
 	"github.com/maru44/enva/service/api/internal/interface/mysmtp"
@@ -98,20 +99,6 @@ func (con *OrgController) CreateView(w http.ResponseWriter, r *http.Request) {
 
 /* inv */
 
-func (con *OrgController) InvitationListFromOrgView(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	id := r.URL.Query().Get(QueryParamsID)
-
-	invs, err := con.in.InvitationListFromOrg(ctx, domain.OrgID(id))
-	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
-		return
-	}
-
-	response(w, r, nil, map[string]interface{}{"data": invs})
-	return
-}
-
 // func (con *OrgController) InvitationListView(w http.ResponseWriter, r *http.Request) {
 // 	ctx := r.Context()
 // 	invs, err := con.in.InvitationList(ctx)
@@ -123,6 +110,21 @@ func (con *OrgController) InvitationListFromOrgView(w http.ResponseWriter, r *ht
 // 	response(w, r, nil, map[string]interface{}{"data": invs})
 // 	return
 // }
+
+func (con *OrgController) InvitationListByOrgView(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get(QueryParamsID)
+
+	invs, err := con.in.InvitationListFromOrg(r.Context(), domain.OrgID(id))
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	sort.Slice(invs, func(i, j int) bool { return invs[i].CreatedAt.String() > invs[j].CreatedAt.String() })
+
+	response(w, r, nil, map[string]interface{}{"data": invs})
+	return
+}
 
 func (con *OrgController) InvitationDetailView(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get(QueryParamsID)

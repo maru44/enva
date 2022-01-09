@@ -4,3 +4,21 @@
 .card .deleteIcon {
   z-index: 100;
 }
+
+.invitationStatusLabel {
+  padding: 4px 8px;
+  color: #fff;
+  border-radius: 4px;
+}
+.invitation-accepted {
+  background-color: #ed6c02;
+}
+.invitation-denied {
+  background-color: #1976d2;
+}
+.invitation-new {
+  background-color: #2e7d32;
+}
+.invitation-closed {
+  background-color: #949494;
+}

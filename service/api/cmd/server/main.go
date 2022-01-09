@@ -88,6 +88,7 @@ func main() {
 			s("/invite", http.MethodPost, org.InviteView),
 			s("/invite/deny", http.MethodGet, org.DenyView), // ?id=
 			s("/invite/detail", http.MethodGet, org.InvitationDetailView),
+			s("/invite/list/org", http.MethodGet, org.InvitationListByOrgView), // ?id=
 
 			/* org_member */
 			s("/member/create", http.MethodPost, org.MemberCreateView),

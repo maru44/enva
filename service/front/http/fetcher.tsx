@@ -25,6 +25,7 @@ export enum GetPath {
   ORG_INVITATION_DENY = '/invite/deny',
   ORG_INVITATION_DETAIL = '/invite/detail',
   ORG_INVITATION_ACCEPT = '/member/create',
+  ORG_INVITATION_LIST = '/invite/list/org',
 
   ORG_MEMBERS_LIST = '/member',
   ORG_MEMBER_UPDATE_TYPE = '/member/update/type',
