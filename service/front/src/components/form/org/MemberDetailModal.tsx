@@ -2,9 +2,7 @@ import {
   Box,
   Dialog,
   Grid,
-  MenuItem,
   Paper,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -14,7 +12,8 @@ import {
 import useSWR from 'swr'
 import { OrgMemberTypeResponseBody } from '../../../../http/body/org'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
-import { CurrentUser, UserType, UserTypesAll } from '../../../../types/user'
+import { CurrentUser, UserType } from '../../../../types/user'
+import { MemberEliminateForm } from './MemberEliminateForm'
 import { UpdateUserTypeForm } from './UpdateUserTypeForm'
 
 type props = {
@@ -81,7 +80,14 @@ export const MemberDetailModal: React.FC<props> = ({
                 />
                 <Box mt={2}>
                   <Box>
-                    <Typography>Eliminate User</Typography>
+                    <Typography variant="h5">Eliminate User</Typography>
+                  </Box>
+                  <Box mt={2}>
+                    <MemberEliminateForm
+                      user={user}
+                      orgId={orgId}
+                      onClose={onClose}
+                    />
                   </Box>
                 </Box>
               </Box>
