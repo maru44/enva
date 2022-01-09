@@ -120,10 +120,16 @@ func fileReadAndUpdateKv(key, value string) error {
 		fw = writeNormal
 	}
 
+	if s.PreSentence != nil {
+		file.WriteString(*s.PreSentence + "\n")
+	}
 	for _, d := range kvs {
 		if _, err := file.WriteString(fw(d)); err != nil {
 			return err
 		}
+	}
+	if s.SufSentence != nil {
+		file.WriteString(*s.SufSentence + "\n")
 	}
 	return nil
 }
@@ -183,10 +189,16 @@ func fileReadAndDeleteKv(key string) error {
 		fw = writeNormal
 	}
 
+	if s.PreSentence != nil {
+		file.WriteString(*s.PreSentence + "\n")
+	}
 	for _, d := range kvs {
 		if _, err := file.WriteString(fw(d)); err != nil {
 			return err
 		}
+	}
+	if s.SufSentence != nil {
+		file.WriteString(*s.SufSentence + "\n")
 	}
 	return nil
 }
@@ -227,6 +239,5 @@ func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 			kvs = append(kvs, *kv)
 		}
 	}
-
 	return kvs, nil
 }

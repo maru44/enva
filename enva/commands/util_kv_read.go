@@ -47,7 +47,7 @@ func readOneLineDirenv(str string) *domain.KvValid {
 		return nil
 	}
 
-	if strings.HasPrefix(str, "#") {
+	if !strings.HasPrefix(str, "export ") {
 		return nil
 	}
 
