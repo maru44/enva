@@ -29,7 +29,7 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 		return errors.New("enva.json already exists")
 	}
 
-	projectSlug, orgSlug, fileName, pre, suf, err := c.inputSettingsInfo()
+	setting, err := c.inputSettingsInfo()
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 	}
 	defer file.Close()
 
-	file.WriteString(c.fileStr(projectSlug, orgSlug, fileName, pre, suf))
+	file.WriteString("{\n" + *setting + "\n}\n")
 	fmt.Println("\nSucceeded to create enva.json")
 
 	return nil
@@ -52,65 +52,69 @@ func (c *set) Explain() string {
 `
 }
 
-func (c *set) inputSettingsInfo() (projectSlug, orgSlug, fileName, pre, suf string, err error) {
+func (c *set) inputSettingsInfo() (*string, error) {
 	fmt.Println("start creating enva.json ...")
-	fmt.Print("project slug: ")
 	for {
-		scan := bufio.NewScanner(os.Stdin)
-		scan.Scan()
-		projectSlug = scan.Text()
-
-		if projectSlug != "" {
-			// orgSlug
-			fmt.Println("org slug (can be blank): ")
-			scan := bufio.NewScanner(os.Stdin)
-			scan.Scan()
-			orgSlug = scan.Text()
-
-			// filePath
-			fmt.Print("filepath: ")
-			scan = bufio.NewScanner(os.Stdin)
-			scan.Scan()
-			fileName = scan.Text()
-
-			if fileName == "" {
-				return "", "", "", "", "", errors.New("filepath must not be blank")
-			}
-
-			fmt.Print("pre sentence (can be blank): ")
-			scan = bufio.NewScanner(os.Stdin)
-			scan.Scan()
-			pre = scan.Text()
-
-			// filePath
-			fmt.Print("suf sentence (can be blank): ")
-			scan = bufio.NewScanner(os.Stdin)
-			scan.Scan()
-			suf = scan.Text()
-
-			return
+		projectSlug, err := c.input("project slug", true)
+		if err != nil {
+			return nil, err
 		}
-		return "", "", "", "", "", errors.New("project slug must not be blank")
+
+		orgSlug, err := c.input("org slug", false)
+		if err != nil {
+			return nil, err
+		}
+
+		fileName, err := c.input("filepath", true)
+		if err != nil {
+			return nil, err
+		}
+
+		pre, err := c.input("pre sentence", false)
+		if err != nil {
+			return nil, err
+		}
+
+		suf, err := c.input("suf sentence", false)
+		if err != nil {
+			return nil, err
+		}
+
+		input := []string{
+			fmt.Sprintf(`	"env_file_name": "%s"`, fileName),
+			fmt.Sprintf(`	"project_slug": "%s"`, projectSlug),
+		}
+
+		if orgSlug != "" {
+			input = append(input, fmt.Sprintf(`	"org_slug": "%s"`, orgSlug))
+		}
+		if pre != "" {
+			input = append(input, fmt.Sprintf(`	"pre_sentence": "%s"`, pre))
+		}
+		if suf != "" {
+			input = append(input, fmt.Sprintf(`	"suf_sentence": "%s"`, suf))
+		}
+
+		jsonContent := strings.Join(input, ",\n")
+
+		return &jsonContent, nil
 	}
 }
 
-func (c *set) fileStr(projectSlug, orgSlug, fileName, pre, suf string) string {
-	input := []string{
-		fmt.Sprintf(`	"env_file_name": "%s"`, fileName),
-		fmt.Sprintf(`	"project_slug": "%s"`, projectSlug),
+func (c *set) input(field string, isRequired bool) (string, error) {
+	if isRequired {
+		fmt.Print(field, " *: ")
+		scan := bufio.NewScanner(os.Stdin)
+		scan.Scan()
+		ret := scan.Text()
+		if ret == "" {
+			return "", errors.New(field + " must not be blank")
+		}
+		return ret, nil
 	}
 
-	if orgSlug != "" {
-		input = append(input, fmt.Sprintf(`	"org_slug": "%s"`, orgSlug))
-	}
-	if pre != "" {
-		input = append(input, fmt.Sprintf(`	"pre_sentence": "%s"`, pre))
-	}
-	if suf != "" {
-		input = append(input, fmt.Sprintf(`	"suf_sentence": "%s"`, suf))
-	}
-
-	jsonContent := strings.Join(input, ",\n")
-
-	return fmt.Sprintf("{\n%s\n}\n", jsonContent)
+	fmt.Print(field, ": ")
+	scan := bufio.NewScanner(os.Stdin)
+	scan.Scan()
+	return scan.Text(), nil
 }
