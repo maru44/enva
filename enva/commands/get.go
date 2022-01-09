@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -29,7 +30,7 @@ func (c *get) Run(ctx context.Context, opts ...string) error {
 		}
 
 		for _, d := range body.Data {
-			fmt.Println(fmt.Sprintf("%s = %s", d.Key, d.Value))
+			color.Green(fmt.Sprintf("%s = %s", d.Key, d.Value))
 		}
 
 		return nil
@@ -56,10 +57,10 @@ func (c *get) Run(ctx context.Context, opts ...string) error {
 
 	if kvs != nil {
 		if len(opts) == 1 {
-			fmt.Println(kvs[0].Value)
+			color.Green(kvs[0].Value.String())
 		} else {
 			for _, kv := range kvs {
-				fmt.Printf("%s: %s\n", kv.Key, kv.Value)
+				color.Green("%s: %s\n", kv.Key, kv.Value)
 			}
 			fmt.Print("\n")
 		}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -76,25 +77,25 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 	}
 
 	if diffs != nil {
-		fmt.Print("There are ", len(diffs), " differences.\n\n")
+		color.HiGreen("There are %d differences.", len(diffs))
 		for _, d := range diffs {
-			fmt.Printf("\t%s:\n\t\tr: %s\n\t\tl: %s\n", d.Key, d.RemoteValue, d.LocalValue)
+			fmt.Printf("%s:\n\tremote: %s\n\tlocal: %s\n", d.Key, d.RemoteValue, d.LocalValue)
 		}
 		fmt.Print("\n")
 	}
 
 	if listOnlyLocal != nil {
-		fmt.Println("Local Only: ")
+		color.HiMagenta("Local Only: ")
 		for _, kv := range listOnlyLocal {
-			fmt.Printf("\t%s (%s)\n", kv.Key, kv.Value)
+			fmt.Printf("%s (%s)\n", kv.Key, kv.Value)
 		}
 		fmt.Print("\n")
 	}
 
 	if listOnlyRemote != nil {
-		fmt.Println("Remote Only: ")
+		color.HiCyan("Remote Only: ")
 		for _, kv := range listOnlyRemote {
-			fmt.Printf("\t%s (%s)\n", kv.Key, kv.Value)
+			fmt.Printf("%s (%s)\n", kv.Key, kv.Value)
 		}
 		fmt.Print("\n")
 	}
