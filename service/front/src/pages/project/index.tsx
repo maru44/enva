@@ -75,7 +75,7 @@ const ProjectList: NextPage<PageProps> = (props) => {
       <DeleteModal
         url={`${GetPath.PROJECT_DELETE}?projectId=${state.deleteId}`}
         isOpen={state.isOpenDelete}
-        mutateKey={GetPath.PROJECT_LIST_USER}
+        mutateKey={GetPath.PROJECT_LIST}
         Message={
           <Typography variant="h5">Delete {state.targetKey}?</Typography>
         }

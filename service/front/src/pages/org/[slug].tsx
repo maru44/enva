@@ -9,8 +9,10 @@ import { OrgResponseBody, OrgsResponseBody } from '../../../http/body/org'
 import { projectsResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
+import { Project } from '../../../types/project'
 import { UserUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
+import { DeleteModal } from '../../components/DeleteModal'
 import { InviteFormModal } from '../../components/form/org/InviteFormModal'
 import { MembersList } from '../../components/form/org/MembersList'
 import styles from '../../styles/project.module.css'
@@ -110,6 +112,8 @@ const OrgProjects: React.FC<orgProjectsProps> = ({ id, slug }) => {
     `${GetPath.PROJECT_LIST_ORG}?id=${id}`,
     fetcherGetFromApiUrl
   )
+  const [project, setProject] = useState<Project | undefined>(undefined)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
   if (error) return <div></div>
 
@@ -124,8 +128,19 @@ const OrgProjects: React.FC<orgProjectsProps> = ({ id, slug }) => {
             linkAs={`/project/${slug}/${p.slug}`}
             linkHref="/project/[...slug]"
             styles={styles}
+            startDeleteFunc={() => {
+              setProject(p)
+              setIsOpen(true)
+            }}
           />
         ))}
+      <DeleteModal
+        url={`${GetPath.PROJECT_DELETE}?projectId=${project?.id}`}
+        isOpen={isOpen}
+        mutateKey={`${GetPath.PROJECT_LIST_ORG}?id=${id}`}
+        Message={<Typography variant="h5">Delete {project?.name}?</Typography>}
+        onClose={() => setIsOpen(false)}
+      />
     </Grid>
   )
 }

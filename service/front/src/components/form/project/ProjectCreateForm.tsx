@@ -25,12 +25,13 @@ export type ProjectCreateProps = {
   orgId?: string
 }
 
-export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
+export const ProjectCreateForm: React.FC<ProjectCreateProps> = ({ orgId }) => {
   const [slug, setSlug] = useState<string>('')
+  const [orgSlug, setOrgSlug] = useState<string | undefined>(undefined)
   const router = useRouter()
   const snack = useSnackbar()
 
-  const { data, error } = useSWR<OrgsResponseBody>(
+  const { data, error } = useSWR<OrgsResponseBody, ErrorConstructor>(
     GetPath.ORG_ADMIN_LIST,
     fetcherGetFromApiUrl
   )
@@ -38,7 +39,7 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const t = e.currentTarget
-    const orgs = t.orgs.value === 'user' ? null : t.orgs.value
+    const orgId = t.orgs.value === 'user' ? null : t.orgs.value
     const name = t.project_name.value
     const description = t.description.value === '' ? null : t.description.value
 
@@ -46,14 +47,14 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
       name: name,
       slug: slug,
       description: description,
-      org_id: orgs,
+      org_id: orgId,
     }
     const res = await fetchCreateProject(input)
     const ret: projectCreateResponseBody = await res.json()
     if (res.status === 200) {
       const slug = ret.data
       const path = input.org_id
-        ? `/project/${input.org_id}/${slug}/`
+        ? `/project/${orgSlug}/${slug}/`
         : `/project/${slug}`
       router.push(path)
     } else {
@@ -105,7 +106,13 @@ export const ProjectCreateForm = ({ orgId }: ProjectCreateProps) => {
               {data &&
                 data.data &&
                 data.data.map((o, i) => (
-                  <MenuItem key={i} value={o.id}>
+                  <MenuItem
+                    key={i}
+                    value={o.id}
+                    onClick={() => {
+                      setOrgSlug(o.slug)
+                    }}
+                  >
                     <Box display="flex" flexDirection="row" alignItems="center">
                       <IconButton>
                         <Apartment />

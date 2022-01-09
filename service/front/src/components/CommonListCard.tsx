@@ -57,16 +57,18 @@ export const CommonListCard: React.FC<props> = ({
             <Box flex={1} overflow="hidden">
               {name ?? <Typography variant="h6">{info.name}</Typography>}
             </Box>
-            <Box width={40}>
-              <Tooltip title="delete project" arrow>
-                <IconButton
-                  className={styles.deleteIcon}
-                  onClick={startDeleteFunc}
-                >
-                  <Delete />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            {startDeleteFunc && (
+              <Box width={40}>
+                <Tooltip title="delete project" arrow>
+                  <IconButton
+                    className={styles.deleteIcon}
+                    onClick={startDeleteFunc}
+                  >
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            )}
           </Grid>
           <Grid item xs={12} mt={1} overflow="hidden">
             <Typography maxHeight={theme.spacing(9.5)}>
