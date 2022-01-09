@@ -3,8 +3,8 @@ package commands
 import (
 	"context"
 	"errors"
-	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -43,7 +43,7 @@ func (c *edit) Run(ctx context.Context, opts ...string) error {
 		return err
 	}
 
-	fmt.Printf("%s = %s is updated!\n", key, value)
+	color.Green("%s = %s is updated!", key, value)
 	return nil
 }
 

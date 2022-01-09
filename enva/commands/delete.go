@@ -3,8 +3,8 @@ package commands
 import (
 	"context"
 	"errors"
-	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -38,7 +38,7 @@ func (c *delete) Run(ctx context.Context, opts ...string) error {
 		return err
 	}
 
-	fmt.Printf("%s is deleted!\n", key)
+	color.Green("%s is deleted!", key)
 	return nil
 }
 

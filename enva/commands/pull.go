@@ -2,8 +2,8 @@ package commands
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -30,7 +30,7 @@ func (c *pull) Run(ctx context.Context, opts ...string) error {
 		return err
 	}
 
-	fmt.Print("\nSucceeded to pull remote env!\n\n")
+	color.Green("\nSucceeded to pull remote env!\n\n")
 
 	return nil
 }

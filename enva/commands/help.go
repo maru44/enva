@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -20,7 +21,7 @@ func init() {
 func (c *help) Run(ctx context.Context, opts ...string) error {
 	fmt.Print("\n\n\n\n\n")
 	for name, in := range Commands {
-		fmt.Print(name)
+		color.Green(name)
 		f := in()
 		fmt.Println(f.Explain())
 	}

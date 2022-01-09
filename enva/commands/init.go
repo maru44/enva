@@ -2,8 +2,8 @@ package commands
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -39,7 +39,7 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 		return err
 	}
 
-	fmt.Println("init project is succeded")
+	color.Green("init project is succeded")
 	return nil
 }
 

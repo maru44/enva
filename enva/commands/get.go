@@ -44,13 +44,11 @@ func (c *get) Run(ctx context.Context, opts ...string) error {
 	}
 
 	kvs := []domain.KvValid{}
-	errs := map[string]error{}
 
 	for _, o := range opts {
 		body, err := fetchDetailValid(ctx, o, email, password)
 		if err != nil {
-			errs[o] = err
-			continue
+			return err
 		}
 
 		kvs = append(kvs, body.Data)
@@ -64,12 +62,6 @@ func (c *get) Run(ctx context.Context, opts ...string) error {
 				fmt.Printf("%s: %s\n", kv.Key, kv.Value)
 			}
 			fmt.Print("\n")
-		}
-	}
-
-	if errs != nil {
-		for k, v := range errs {
-			fmt.Printf("ERR: %s\n\t%s\n", k, v)
 		}
 	}
 

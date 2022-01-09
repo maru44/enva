@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -41,7 +42,7 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 	defer file.Close()
 
 	file.WriteString("{\n" + *setting + "\n}\n")
-	fmt.Println("\nSucceeded to create enva.json")
+	color.Green("\nSucceeded to create enva.json")
 
 	return nil
 }
