@@ -30,3 +30,7 @@ type membersMap = { [key: UserType]: CurrentUser[] }
 export type OrgMemberListResponseBody = {
   data: membersMap
 } & errorResponseBody
+
+export type OrgMemberTypeResponseBody = {
+  data: UserType
+} & errorResponseBody

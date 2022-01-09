@@ -1,16 +1,27 @@
 import { AccountCircle } from '@material-ui/icons'
 import { Box, Icon, Tooltip, Typography } from '@mui/material'
+import { useState } from 'react'
 import useSWR from 'swr'
+import { useRequireLogin } from '../../../../hooks/useRequireLogin'
 import { OrgMemberListResponseBody } from '../../../../http/body/org'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
-import { UserType, UserTypesAll } from '../../../../types/user'
+import { CurrentUser, UserType, UserTypesAll } from '../../../../types/user'
+import { MemberDetailModal } from './MemberDetailModal'
 
 type props = {
   id: string
+  currentUserType: UserType
 }
 
-export const MembersList: React.FC<props> = ({ id }) => {
-  const { data, error } = useSWR<OrgMemberListResponseBody>(
+export const MembersList: React.FC<props> = ({ id, currentUserType }) => {
+  useRequireLogin()
+  const [selectedMember, setSelectedMember] = useState<CurrentUser | undefined>(
+    undefined
+  )
+  const [membersType, setMembersType] = useState<UserType | undefined>(
+    undefined
+  )
+  const { data, error } = useSWR<OrgMemberListResponseBody, ErrorConstructor>(
     `${GetPath.ORG_MEMBERS_LIST}?id=${id}`,
     fetcherGetFromApiUrl
   )
@@ -29,7 +40,13 @@ export const MembersList: React.FC<props> = ({ id }) => {
                 <Typography>{type}</Typography>
               </Box>
               {data.data[type].map((u, i) => (
-                <Box key={`${type}_${i}`}>
+                <Box
+                  key={`${type}_${i}`}
+                  onClick={() => {
+                    setSelectedMember(u)
+                    setMembersType(type)
+                  }}
+                >
                   <Tooltip title={u.username}>
                     <Icon>
                       <AccountCircle />
@@ -40,6 +57,15 @@ export const MembersList: React.FC<props> = ({ id }) => {
             </Box>
           )
       )}
+      <MemberDetailModal
+        orgId={id}
+        user={selectedMember}
+        defaultType={membersType}
+        currentUserType={currentUserType}
+        onClose={() => {
+          setSelectedMember(undefined)
+        }}
+      />
     </Box>
   )
 }

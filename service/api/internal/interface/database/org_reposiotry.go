@@ -551,7 +551,20 @@ func (repo *OrgRepository) MemberGetCurrentUserType(ctx context.Context, orgID d
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	return repo.memberGetUserType(ctx, user.ID, orgID)
+	return repo.MemberGetUserType(ctx, user.ID, orgID)
+}
+
+func (repo *OrgRepository) MemberGetUserType(ctx context.Context, userID domain.UserID, orgID domain.OrgID) (*domain.UserType, error) {
+	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, userID)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	var ut *domain.UserType
+	if err := row.Scan(&ut); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	return ut, nil
 }
 
 func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domain.OrgMemberUpdateInput) error {
@@ -573,7 +586,7 @@ func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domai
 	if user.ID == input.UserID {
 		return perr.New("cannot change own user type", perr.Forbidden, "cannot change your user type by yourself")
 	}
-	updatedUserUt, err := repo.memberGetUserType(ctx, input.UserID, input.OrgID)
+	updatedUserUt, err := repo.MemberGetUserType(ctx, input.UserID, input.OrgID)
 	if err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -621,7 +634,7 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 		return perr.Wrap(err, perr.Forbidden)
 	}
 
-	updatedUserUt, err := repo.memberGetUserType(ctx, userID, orgID)
+	updatedUserUt, err := repo.MemberGetUserType(ctx, userID, orgID)
 	if err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -647,23 +660,4 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 	}
 
 	return nil
-}
-
-/*************************
-
-util
-
-*************************/
-
-func (repo *OrgRepository) memberGetUserType(ctx context.Context, userID domain.UserID, orgID domain.OrgID) (*domain.UserType, error) {
-	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, userID)
-	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
-	}
-	var ut *domain.UserType
-	if err := row.Scan(&ut); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
-	}
-
-	return ut, nil
 }

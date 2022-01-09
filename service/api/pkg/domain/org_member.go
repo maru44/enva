@@ -72,8 +72,8 @@ func (o *OrgMemberInput) Validate(ctx context.Context) error {
 
 func (r *OrgMemberUpdateInput) Validate() error {
 	return validation.ValidateStruct(r,
-		validation.Field(r.OrgID, validation.Required, is.UUID),
-		validation.Field(r.UserID, validation.Required, is.UUID),
-		validation.Field(r.UserType, validation.Required, validation.In(UserTypeAdmin, UserTypeGuest, UserTypeOwner, UserTypeUser)),
+		validation.Field(&r.OrgID, validation.Required, is.UUID),
+		validation.Field(&r.UserID, validation.Required, is.UUID),
+		validation.Field(&r.UserType, validation.Required, validation.In(UserTypeAdmin, UserTypeGuest, UserTypeOwner, UserTypeUser)),
 	)
 }

@@ -29,6 +29,7 @@ export enum GetPath {
   ORG_MEMBERS_LIST = '/member',
   ORG_MEMBER_UPDATE_TYPE = '/member/update/type',
   ORG_MEMBER_DELETE = '/member/delete',
+  ORG_MEMBER_TYPE = '/member/type',
 
   USER = '/user',
   USER_CREATE = '/user/create',

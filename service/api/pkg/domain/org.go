@@ -49,6 +49,7 @@ type (
 		MemberCreate(context.Context, OrgMemberInput) error
 		MemberList(context.Context, OrgID) (map[UserType][]User, error)
 		MemberGetCurrentUserType(context.Context, OrgID) (*UserType, error)
+		MemberGetUserType(context.Context, UserID, OrgID) (*UserType, error)
 		MemberUpdateUserType(context.Context, OrgMemberUpdateInput) error
 		MemberDelete(context.Context, UserID, OrgID) error
 	}

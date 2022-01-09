@@ -82,7 +82,7 @@ const OrgDetail: NextPage<PageProps> = (props) => {
             <Box mt={4}>
               <Typography variant="h6">{org.user_count} Members</Typography>
             </Box>
-            <MembersList id={org.id}></MembersList>
+            <MembersList id={org.id} currentUserType={userType}></MembersList>
           </Box>
         </Box>
         <InviteFormModal

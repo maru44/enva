@@ -257,3 +257,22 @@ func (con *OrgController) MemberDeleteView(w http.ResponseWriter, r *http.Reques
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
 	return
 }
+
+func (con *OrgController) MemberGetTypeView(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get(QueryParamsID)
+	orgID := r.URL.Query().Get(QueryParamsOrgID)
+
+	if id == "" || orgID == "" {
+		response(w, r, perr.New("need id and orgId params", perr.BadRequest), nil)
+		return
+	}
+
+	ut, err := con.in.MemberGetUserType(r.Context(), domain.UserID(id), domain.OrgID(orgID))
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		return
+	}
+
+	response(w, r, nil, map[string]interface{}{"data": *ut})
+	return
+}
