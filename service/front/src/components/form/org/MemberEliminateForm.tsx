@@ -62,7 +62,7 @@ export const MemberEliminateForm: React.FC<props> = ({
       {openButton}
       <Box mt={2}>
         <Typography variant="subtitle1">
-          Are you sure to eliminate {user.username}?
+          Are you sure to eliminate <b>{user.username}</b>?
         </Typography>
       </Box>
       <Box textAlign="right" mt={2}>
