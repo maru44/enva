@@ -25,8 +25,7 @@ func fetchDeleteKv(ctx context.Context, key string) (*kvDeleteBody, error) {
 
 	path := fmt.Sprintf("/cli/kv/delete?projectSlug=%s&key=%s", s.ProjectSlug, key)
 	if s.OrgSlug != nil {
-		// @TODO get by org
-		// url =
+		path += "&orgSlug=" + *s.OrgSlug
 	}
 
 	email, password, err := inputEmailPassword()

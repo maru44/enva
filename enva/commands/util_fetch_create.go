@@ -27,8 +27,7 @@ func fetchCreateKv(ctx context.Context, key, value string) (*kvCreateBody, error
 
 	path := "/cli/kv/create?projectSlug=" + s.ProjectSlug
 	if s.OrgSlug != nil {
-		// @TODO get by org
-		// url =
+		path += "&orgSlug=" + *s.OrgSlug
 	}
 
 	email, password, err := inputEmailPassword()

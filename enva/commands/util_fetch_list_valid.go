@@ -30,8 +30,7 @@ func fetchListValid(ctx context.Context) (*kvListBody, error) {
 
 	path := "/cli/kv?projectSlug=" + s.ProjectSlug
 	if s.OrgSlug != nil {
-		// @TODO get by org
-		// url =
+		path += "&orgSlug=" + *s.OrgSlug
 	}
 
 	email, password, err := inputEmailPassword()

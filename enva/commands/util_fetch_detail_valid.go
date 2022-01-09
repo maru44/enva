@@ -27,8 +27,7 @@ func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDeta
 
 	path := fmt.Sprintf("/cli/kv/detail?key=%s&projectSlug=%s", key, s.ProjectSlug)
 	if s.OrgSlug != nil {
-		// @TODO get by org
-		// url =
+		path += "&orgSlug=" + *s.OrgSlug
 	}
 
 	req, err := request(path, http.MethodGet, nil, email, password)

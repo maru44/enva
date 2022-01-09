@@ -48,8 +48,9 @@ func NewCliKvController(sql database.ISqlHandler) *CliKvController {
 func (con *CliKvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
 
-	projectID, err := con.userGuesAccessToProject(ctx, projectSlug)
+	projectID, err := con.userGuestAccessToProject(ctx, projectSlug, orgSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -68,8 +69,9 @@ func (con *CliKvController) DetailView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	key := r.URL.Query().Get(QueryParamsKvKey)
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
 
-	projectID, err := con.userGuesAccessToProject(ctx, projectSlug)
+	projectID, err := con.userGuestAccessToProject(ctx, projectSlug, orgSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -88,6 +90,7 @@ func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
 	var input domain.KvInputWithProjectID
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -95,7 +98,7 @@ func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	projectID, err := con.userAccessToProject(ctx, projectSlug, orgSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -116,6 +119,7 @@ func (con *CliKvController) BulkInsertView(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
 	var inputs []domain.KvInput
 
 	if err := json.NewDecoder(r.Body).Decode(&inputs); err != nil {
@@ -123,7 +127,7 @@ func (con *CliKvController) BulkInsertView(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	projectID, err := con.userAccessToProject(ctx, projectSlug, orgSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -154,10 +158,15 @@ func (con *CliKvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
-	var input domain.KvInputWithProjectID
-	json.NewDecoder(r.Body).Decode(&input)
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
 
-	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	var input domain.KvInputWithProjectID
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+
+	projectID, err := con.userAccessToProject(ctx, projectSlug, orgSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -178,8 +187,9 @@ func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 
 	key := r.URL.Query().Get(QueryParamsKvKey)
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
+	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
 
-	projectID, err := con.userAccessToProject(ctx, projectSlug)
+	projectID, err := con.userAccessToProject(ctx, projectSlug, orgSlug)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
 		return
@@ -195,16 +205,24 @@ func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug string) (*domain.ProjectID, error) {
+func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug, orgSlug string) (*domain.ProjectID, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
 	// find parent project
-	p, err := con.pIn.GetBySlug(ctx, projectSlug)
-	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+	var p *domain.Project
+	if orgSlug == "" {
+		p, err = con.pIn.GetBySlug(ctx, projectSlug)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+		}
+	} else {
+		p, err = con.pIn.GetBySlugAndOrgSlug(ctx, projectSlug, orgSlug)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+		}
 	}
 
 	// validate user can access to project
@@ -225,16 +243,24 @@ func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug
 	return &p.ID, nil
 }
 
-func (con *CliKvController) userGuesAccessToProject(ctx context.Context, projectSlug string) (*domain.ProjectID, error) {
+func (con *CliKvController) userGuestAccessToProject(ctx context.Context, projectSlug, orgSlug string) (*domain.ProjectID, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
 	// find parent project
-	p, err := con.pIn.GetBySlug(ctx, projectSlug)
-	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+	var p *domain.Project
+	if orgSlug == "" {
+		p, err = con.pIn.GetBySlug(ctx, projectSlug)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+		}
+	} else {
+		p, err = con.pIn.GetBySlugAndOrgSlug(ctx, projectSlug, orgSlug)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.NotFound, "Project is not found")
+		}
 	}
 
 	// validate user can access to project

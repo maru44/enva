@@ -26,8 +26,7 @@ func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput) (*kvBulkIn
 
 	path := "/cli/kv/create/bulk?projectSlug=" + s.ProjectSlug
 	if s.OrgSlug != nil {
-		// @TODO get by org
-		// url =
+		path += "&orgSlug=" + *s.OrgSlug
 	}
 
 	email, password, err := inputEmailPassword()
