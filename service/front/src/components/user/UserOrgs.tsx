@@ -41,8 +41,7 @@ export const UserOrgs: React.FC = () => {
         </Link>
       </Box>
       <Grid container mt={1} rowSpacing={2} columnSpacing={2}>
-        {data &&
-          data.data &&
+        {data?.data &&
           data.data.map((o, i) => (
             <CommonListCard
               key={i}

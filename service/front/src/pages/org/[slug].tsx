@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useSWR from 'swr'
 import { useRequireLogin } from '../../../hooks/useRequireLogin'
-import { OrgResponseBody, OrgsResponseBody } from '../../../http/body/org'
+import { OrgResponseBody } from '../../../http/body/org'
 import { projectsResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
@@ -147,8 +147,7 @@ const OrgProjects: React.FC<orgProjectsProps> = ({ id, slug }) => {
 
   return (
     <Grid container rowSpacing={2} columnSpacing={2}>
-      {data &&
-        data.data &&
+      {data?.data &&
         data.data.map((p, i) => (
           <CommonListCard
             info={p}

@@ -108,8 +108,7 @@ export const ProjectCreateForm: React.FC<ProjectCreateProps> = ({ orgId }) => {
                   <Typography>As a user</Typography>
                 </Box>
               </MenuItem>
-              {data &&
-                data.data &&
+              {data?.data &&
                 data.data.map((o, i) => (
                   <MenuItem
                     key={i}

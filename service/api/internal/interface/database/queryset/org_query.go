@@ -34,6 +34,7 @@ const (
 		"JOIN users AS u ON u.id = r.invited_by AND u.is_valid = true " +
 		"WHERE r.user_id = $1 AND r.status = 'new'"
 
+	// only new
 	PastOrgInvitationListQuery = "SELECT " +
 		"r.id " +
 		"FROM org_invitations AS r " +
