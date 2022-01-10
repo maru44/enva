@@ -56,3 +56,10 @@ export const InvitationStatus = {
 }
 export type InvitationStatus =
   typeof InvitationStatus[keyof typeof InvitationStatus]
+
+export const UserTypeDescription: { [key: UserType]: string } = {
+  owner: 'CRUD for org, project, key-value sets',
+  admin: 'CRUD for projects and key-value sets',
+  user: 'CRUD for key-value sets',
+  guest: 'can only get key-value sets',
+}

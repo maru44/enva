@@ -5,6 +5,7 @@ import useSWR from 'swr'
 import { useRequireLogin } from '../../../../hooks/useRequireLogin'
 import { OrgMemberListResponseBody } from '../../../../http/body/org'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
+import { UserTypeDescription } from '../../../../types/org'
 import { CurrentUser, UserType, UserTypesAll } from '../../../../types/user'
 import { MemberDetailModal } from './MemberDetailModal'
 
@@ -36,8 +37,15 @@ export const MembersList: React.FC<props> = ({ id, currentUserType }) => {
         (type) =>
           data.data[type] && (
             <Box key={type} mb={2}>
-              <Box mb={1}>
-                <Typography>{type}</Typography>
+              <Box mb={1} display="flex" alignItems="center">
+                <Box>
+                  <Typography variant="subtitle1">{type}</Typography>
+                </Box>
+                <Box ml={2}>
+                  <Typography variant="caption">
+                    <small>{UserTypeDescription[type]}</small>
+                  </Typography>
+                </Box>
               </Box>
               {data.data[type].map((u, i) => (
                 <Box
