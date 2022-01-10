@@ -40,7 +40,7 @@ export const Cli: React.FC = () => {
           snack.enqueueSnackbar(ret.error, { variant: 'error' })
           return
       }
-    } catch {
+    } catch (e) {
       snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }

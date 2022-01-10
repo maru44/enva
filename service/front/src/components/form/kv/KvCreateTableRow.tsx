@@ -29,26 +29,29 @@ export const KvCreateTableRow = ({ projectId }: KvUpsertProps) => {
   const [value, setValue] = useState<string>('')
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    try {
+      e.preventDefault()
 
-    const input: KvInput = {
-      project_id: projectId,
-      input: {
-        kv_key: key,
-        kv_value: value,
-      },
-    }
-    const res = await fetchCreateKv(input)
-    const ret: kvCreateResponseBody = await res.json()
-    if (res.status === 200) {
-      const id = ret['data']
-      mutate(`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`)
+      const input: KvInput = {
+        project_id: projectId,
+        input: {
+          kv_key: key,
+          kv_value: value,
+        },
+      }
+      const res = await fetchCreateKv(input)
+      const ret: kvCreateResponseBody = await res.json()
+      if (res.status === 200) {
+        mutate(`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`)
 
-      setKey('')
-      setValue('')
-    } else {
-      const message = ret['error']
-      snack.enqueueSnackbar(message, { variant: 'error' })
+        setKey('')
+        setValue('')
+      } else {
+        const message = ret.error
+        snack.enqueueSnackbar(message, { variant: 'error' })
+      }
+    } catch (e) {
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
 

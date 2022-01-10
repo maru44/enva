@@ -7,8 +7,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { mutate } from 'swr'
+import { kvCreateResponseBody } from '../../../../http/body/kv'
 import { GetPath } from '../../../../http/fetcher'
 import { fetchUpdateKv } from '../../../../http/kv'
 import { KvInput } from '../../../../types/kv'
@@ -29,6 +31,7 @@ export const KvUpdateModal: React.FC<props> = ({
   onClose,
 }) => {
   const [val, setVal] = useState<string>(kvValue)
+  const snack = useSnackbar()
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVal(e.currentTarget.value)
@@ -44,18 +47,21 @@ export const KvUpdateModal: React.FC<props> = ({
         },
       }
       const res = await fetchUpdateKv(input)
-      const ret = await res.json()
+      const ret: kvCreateResponseBody = await res.json()
       switch (res.status) {
         case 200:
-          // @TODO success alert
+          snack.enqueueSnackbar('succeeded to update value', {
+            variant: 'success',
+          })
           mutate(`${GetPath.KVS_BY_PROJECT}?projectId=${projectId}`)
+          break
         default:
+          snack.enqueueSnackbar(ret.error, { variant: 'error' })
+          break
       }
-
       onClose()
     } catch (e) {
-      // @TODO alert 500
-      console.log(e)
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
 

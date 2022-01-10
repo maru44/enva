@@ -3,6 +3,7 @@ import React from 'react'
 import useSWR from 'swr'
 import { kvsResponseBody } from '../../../http/body/kv'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
+import { ErrorComponent } from '../error/ErrorComponent'
 import { KvListTable } from './KvListTable'
 
 export type KvListProps = {
@@ -15,7 +16,8 @@ export const KvList: React.FC<KvListProps> = ({ projectId }) => {
     fetcherGetFromApiUrl
   )
 
-  if (error) console.log(error)
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   return (
     <Box>

@@ -15,6 +15,7 @@ import { OrgInvitationListResponseBody } from '../../../../http/body/org'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
 import { InvitationStatusBadge } from './InvitationStatusBadge'
 import styles from '../../../styles/org.module.css'
+import { ErrorComponent } from '../../error/ErrorComponent'
 
 type props = {
   orgId: string
@@ -31,8 +32,6 @@ export const InvitationHistoryModal: React.FC<props> = ({
     OrgInvitationListResponseBody,
     ErrorConstructor
   >(`${GetPath.ORG_INVITATION_LIST}?id=${orgId}`, fetcherGetFromApiUrl)
-
-  if (!data?.data) return <></>
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="lg">
@@ -56,7 +55,7 @@ export const InvitationHistoryModal: React.FC<props> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.data.map((inv, i) => (
+                {data?.data.map((inv, i) => (
                   <TableRow key={i}>
                     <TableCell>
                       <Typography className="breakAll">

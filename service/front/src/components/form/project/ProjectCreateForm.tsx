@@ -37,29 +37,34 @@ export const ProjectCreateForm: React.FC<ProjectCreateProps> = ({ orgId }) => {
   )
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const t = e.currentTarget
-    const orgId = t.orgs.value === 'user' ? null : t.orgs.value
-    const name = t.project_name.value
-    const description = t.description.value === '' ? null : t.description.value
+    try {
+      e.preventDefault()
+      const t = e.currentTarget
+      const orgId = t.orgs.value === 'user' ? null : t.orgs.value
+      const name = t.project_name.value
+      const description =
+        t.description.value === '' ? null : t.description.value
 
-    const input: ProjectInput = {
-      name: name,
-      slug: slug,
-      description: description,
-      org_id: orgId,
-    }
-    const res = await fetchCreateProject(input)
-    const ret: projectCreateResponseBody = await res.json()
-    if (res.status === 200) {
-      const slug = ret.data
-      const path = input.org_id
-        ? `/project/${orgSlug}/${slug}/`
-        : `/project/${slug}`
-      router.push(path)
-    } else {
-      const message = ret.error
-      snack.enqueueSnackbar(message, { variant: 'error' })
+      const input: ProjectInput = {
+        name: name,
+        slug: slug,
+        description: description,
+        org_id: orgId,
+      }
+      const res = await fetchCreateProject(input)
+      const ret: projectCreateResponseBody = await res.json()
+      if (res.status === 200) {
+        const slug = ret.data
+        const path = input.org_id
+          ? `/project/${orgSlug}/${slug}/`
+          : `/project/${slug}`
+        router.push(path)
+      } else {
+        const message = ret.error
+        snack.enqueueSnackbar(message, { variant: 'error' })
+      }
+    } catch (e) {
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
 

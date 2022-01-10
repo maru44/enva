@@ -34,20 +34,24 @@ export const UpdateUserTypeForm: React.FC<props> = ({
   const snack = useSnackbar()
 
   const onSubmit = async () => {
-    const res = await fetchUpdateMemberUserType(input)
-    const ret: OrgInviteResponseBody = await res.json()
+    try {
+      const res = await fetchUpdateMemberUserType(input)
+      const ret: OrgInviteResponseBody = await res.json()
 
-    switch (res.status) {
-      case 200:
-        mutate(`${GetPath.ORG_MEMBERS_LIST}?id=${orgId}`)
-        mutate(`${GetPath.ORG_MEMBER_TYPE}?id=${user?.id}&orgId=${orgId}`)
-        snack.enqueueSnackbar('Success to update user type', {
-          variant: 'success',
-        })
-        break
-      default:
-        snack.enqueueSnackbar(ret.error, { variant: 'error' })
-        break
+      switch (res.status) {
+        case 200:
+          mutate(`${GetPath.ORG_MEMBERS_LIST}?id=${orgId}`)
+          mutate(`${GetPath.ORG_MEMBER_TYPE}?id=${user?.id}&orgId=${orgId}`)
+          snack.enqueueSnackbar('Success to update user type', {
+            variant: 'success',
+          })
+          break
+        default:
+          snack.enqueueSnackbar(ret.error, { variant: 'error' })
+          break
+      }
+    } catch (e) {
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
 

@@ -13,9 +13,19 @@ export const UserOrgs: React.FC = () => {
     fetcherGetFromApiUrl
   )
 
-  //   @TODO if empty
   if (data && data.data && data.data.length === 0) {
-    return <Box></Box>
+    return (
+      <Box width="100%" alignItems="center" display="flex" justifyContent="end">
+        <Link href="/org/create" passHref>
+          <Box>
+            <IconButton>
+              <AddCircle />
+            </IconButton>
+            Create Org
+          </Box>
+        </Link>
+      </Box>
+    )
   }
 
   return (

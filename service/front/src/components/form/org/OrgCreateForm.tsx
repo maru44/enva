@@ -13,17 +13,21 @@ export const OrgCreateForm = () => {
   const snack = useSnackbar()
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!input.slug) return
+    try {
+      e.preventDefault()
+      if (!input.slug) return
 
-    const res = await fetchCreateOrg(input)
-    const ret: OrgCreateResponseBody = await res.json()
-    if (res.status === 200) {
-      const slug = ret.data
-      router.push(`/org/${slug}`)
-    } else {
-      const message = ret.error
-      snack.enqueueSnackbar(message, { variant: 'error' })
+      const res = await fetchCreateOrg(input)
+      const ret: OrgCreateResponseBody = await res.json()
+      if (res.status === 200) {
+        const slug = ret.data
+        router.push(`/org/${slug}`)
+      } else {
+        const message = ret.error
+        snack.enqueueSnackbar(message, { variant: 'error' })
+      }
+    } catch (e) {
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
   }
 

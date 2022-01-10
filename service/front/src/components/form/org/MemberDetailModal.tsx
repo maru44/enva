@@ -13,6 +13,7 @@ import useSWR from 'swr'
 import { OrgMemberTypeResponseBody } from '../../../../http/body/org'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
 import { CurrentUser, UserType } from '../../../../types/user'
+import { ErrorComponent } from '../../error/ErrorComponent'
 import { MemberEliminateForm } from './MemberEliminateForm'
 import { UpdateUserTypeForm } from './UpdateUserTypeForm'
 
@@ -37,6 +38,8 @@ export const MemberDetailModal: React.FC<props> = ({
   )
 
   if (!user) return <></>
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   const canEdit =
     currentUserType === UserType.OWNER ||

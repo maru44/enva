@@ -7,6 +7,7 @@ import { OrgMemberListResponseBody } from '../../../../http/body/org'
 import { fetcherGetFromApiUrl, GetPath } from '../../../../http/fetcher'
 import { UserTypeDescription } from '../../../../types/org'
 import { CurrentUser, UserType, UserTypesAll } from '../../../../types/user'
+import { ErrorComponent } from '../../error/ErrorComponent'
 import { MemberDetailModal } from './MemberDetailModal'
 
 type props = {
@@ -27,15 +28,14 @@ export const MembersList: React.FC<props> = ({ id, currentUserType }) => {
     fetcherGetFromApiUrl
   )
 
-  if (!data || !data.data) {
-    return <div></div>
-  }
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   return (
     <Box>
       {UserTypesAll.map(
         (type) =>
-          data.data[type] && (
+          data?.data[type] && (
             <Box key={type} mb={2}>
               <Box mb={1} display="flex" alignItems="center">
                 <Box>

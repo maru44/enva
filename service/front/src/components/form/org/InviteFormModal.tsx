@@ -34,36 +34,40 @@ export const InviteFormModal: React.FC<props> = ({
   const snack = useSnackbar()
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsPosting(true)
-    const email = e.currentTarget.email.value
-    const userType = e.currentTarget.user_type.value
+    try {
+      e.preventDefault()
+      setIsPosting(true)
+      const email = e.currentTarget.email.value
+      const userType = e.currentTarget.user_type.value
 
-    const input: OrgInvitationInput = {
-      org_id: orgId,
-      org_name: orgName,
-      email: email,
-      user_type: userType,
+      const input: OrgInvitationInput = {
+        org_id: orgId,
+        org_name: orgName,
+        email: email,
+        user_type: userType,
+      }
+
+      const res = await fetchOrgInvite(input)
+      const ret: OrgInviteResponseBody = await res.json()
+
+      switch (res.status) {
+        case 200:
+          snack.enqueueSnackbar(`success to invite ${email}`, {
+            variant: 'success',
+          })
+          mutate(`${GetPath.ORG_INVITATION_LIST}?id=${orgId}`)
+          onClose()
+          break
+        default:
+          snack.enqueueSnackbar(ret.error, {
+            variant: 'error',
+          })
+          break
+      }
+      setIsPosting(false)
+    } catch (e) {
+      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
     }
-
-    const res = await fetchOrgInvite(input)
-    const ret: OrgInviteResponseBody = await res.json()
-
-    switch (res.status) {
-      case 200:
-        snack.enqueueSnackbar(`success to invite ${email}`, {
-          variant: 'success',
-        })
-        mutate(`${GetPath.ORG_INVITATION_LIST}?id=${orgId}`)
-        onClose()
-        break
-      default:
-        snack.enqueueSnackbar(ret.error, {
-          variant: 'error',
-        })
-        break
-    }
-    setIsPosting(false)
   }
 
   return (
