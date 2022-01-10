@@ -15,6 +15,7 @@ import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { CommonListCard } from '../../components/CommonListCard'
 import styles from '../../styles/project.module.css'
 import Link from 'next/link'
+import { ErrorComponent } from '../../components/error/ErrorComponent'
 
 const ProjectList: NextPage<PageProps> = (props) => {
   useRequireLogin()
@@ -28,8 +29,8 @@ const ProjectList: NextPage<PageProps> = (props) => {
     initialProjectListState
   )
 
-  // @TODO error handling
-  if (error) console.log(error)
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   return (
     <Box mt={6} width="100%">

@@ -13,6 +13,7 @@ import { Project } from '../../../types/project'
 import { UserUserTypes } from '../../../types/user'
 import { CommonListCard } from '../../components/CommonListCard'
 import { DeleteModal } from '../../components/DeleteModal'
+import { ErrorComponent } from '../../components/error/ErrorComponent'
 import { InvitationHistoryModal } from '../../components/form/org/InvitationHistoryModal'
 import { InviteFormModal } from '../../components/form/org/InviteFormModal'
 import { MembersList } from '../../components/form/org/MembersList'
@@ -35,6 +36,8 @@ const OrgDetail: NextPage<PageProps> = (props) => {
     router.push('/500')
     return <div></div>
   }
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   if (data?.data) {
     const org = data.data.org

@@ -30,9 +30,15 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 	w.WriteHeader(status)
 	var mess map[string]interface{}
 	if perror, ok := perr.IsPerror(err); ok {
-		mess = map[string]interface{}{"error": perror.Output().Error()}
+		mess = map[string]interface{}{
+			"error":  perror.Output().Error(),
+			"status": status,
+		}
 	} else {
-		mess = map[string]interface{}{"error": err.Error()}
+		mess = map[string]interface{}{
+			"error":  err.Error(),
+			"status": status,
+		}
 	}
 
 	if config.IsEnvDevelopment {

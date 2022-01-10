@@ -8,6 +8,7 @@ import { useRequireLogin } from '../../../hooks/useRequireLogin'
 import { projectResponseBody } from '../../../http/body/project'
 import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
+import { ErrorComponent } from '../../components/error/ErrorComponent'
 import { KvList } from '../../components/kv/KvList'
 
 const ProjectDetail: NextPage<PageProps> = (props) => {
@@ -31,7 +32,8 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
     fetcherGetFromApiUrl
   )
 
-  if (error) console.log(error)
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   return (
     <Box mt={6}>

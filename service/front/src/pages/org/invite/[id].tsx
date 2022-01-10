@@ -4,6 +4,10 @@ import { useRouter } from 'next/router'
 import useSWR from 'swr'
 import { useRequireLogin } from '../../../../hooks/useRequireLogin'
 import {
+  errorResponseBody,
+  internalServerErrorInFront,
+} from '../../../../http/body/error'
+import {
   OrgInvitationDetailBody,
   OrgInviteResponseBody,
 } from '../../../../http/body/org'
@@ -13,6 +17,7 @@ import {
   fetchDenyInvitation,
 } from '../../../../http/org'
 import { OrgMemberInput } from '../../../../types/org'
+import { ErrorComponent } from '../../../components/error/ErrorComponent'
 
 const OrgInvitationDetailPage: NextPage = () => {
   useRequireLogin()
@@ -62,7 +67,8 @@ const OrgInvitationDetailPage: NextPage = () => {
     }
   }
 
-  if (error) return <Box></Box>
+  if (error) return <ErrorComponent />
+  if (data?.error) return <ErrorComponent errBody={data} />
 
   if (data?.data)
     return (
