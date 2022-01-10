@@ -71,7 +71,7 @@ export const CommonListCard: React.FC<props> = ({
             )}
           </Grid>
           <Grid item xs={12} mt={1} overflow="hidden">
-            <Typography maxHeight={theme.spacing(9.5)}>
+            <Typography className="breakAll" maxHeight={theme.spacing(9.5)}>
               {info.description}
             </Typography>
           </Grid>

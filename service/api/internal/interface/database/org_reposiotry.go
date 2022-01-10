@@ -313,17 +313,10 @@ func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitatio
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
-	membersByType, err := repo.MemberList(ctx, input.OrgID)
-	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
-	}
-	for _, ms := range membersByType {
-		for _, m := range ms {
-			if m.Email == input.Eamil {
-				errStr := "user already belongs to " + input.OrgName
-				return perr.New(errStr, perr.BadRequest, errStr)
-			}
-		}
+	// if user have input's email exists already
+	if _, err := repo.memberGetUserTypeByEmail(ctx, input.OrgID, input.Eamil); err == nil {
+		errStr := "user already belongs to " + input.OrgName
+		return perr.New(errStr, perr.BadRequest, errStr)
 	}
 
 	cu, err := domain.UserFromCtx(ctx)
@@ -686,4 +679,26 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 	}
 
 	return nil
+}
+
+/*********************
+
+util
+
+*********************/
+
+func (repo *OrgRepository) memberGetUserTypeByEmail(ctx context.Context, orgID domain.OrgID, email string) (*domain.UserType, error) {
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgUserTypeByEmailQuery,
+		orgID, email,
+	)
+	if err := row.Err(); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+	var ut *domain.UserType
+	if err := row.Scan(&ut); err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	return ut, nil
 }

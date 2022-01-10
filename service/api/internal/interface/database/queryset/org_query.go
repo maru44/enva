@@ -132,6 +132,13 @@ const (
 		"FROM rel_org_members AS r " +
 		"WHERE r.org_id = $1 AND r.user_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL"
 
+	OrgUserTypeByEmailQuery = "SELECT " +
+		"r.user_type " +
+		"FROM users AS u " +
+		"JOIN rel_org_members AS r ON r.org_id = $1 AND r.user_id = u.id AND r.is_valid = true AND r.deleted_at IS NULL " +
+		"JOIN orgs AS o ON o.id = $1 AND o.is_valid = true " +
+		"WHERE u.email = $2"
+
 	// if updated user's origin user type is 'owner'
 	// validate is current user 'owner'
 	OrgEliminateMemberQuery = "UPDATE rel_org_members " +
