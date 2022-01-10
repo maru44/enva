@@ -10,7 +10,9 @@ import {
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import { FormEvent, useState } from 'react'
+import { mutate } from 'swr'
 import { OrgInviteResponseBody } from '../../../../http/body/org'
+import { GetPath } from '../../../../http/fetcher'
 import { fetchOrgInvite } from '../../../../http/org'
 import { OrgInvitationInput } from '../../../../types/org'
 import { UserType, UserTypesAll } from '../../../../types/user'
@@ -52,6 +54,7 @@ export const InviteFormModal: React.FC<props> = ({
         snack.enqueueSnackbar(`success to invite ${email}`, {
           variant: 'success',
         })
+        mutate(`${GetPath.ORG_INVITATION_LIST}?id=${orgId}`)
         onClose()
         break
       default:

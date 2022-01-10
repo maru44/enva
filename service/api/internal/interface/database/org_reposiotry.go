@@ -313,6 +313,19 @@ func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitatio
 		return perr.Wrap(err, perr.BadRequest)
 	}
 
+	membersByType, err := repo.MemberList(ctx, input.OrgID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	for _, ms := range membersByType {
+		for _, m := range ms {
+			if m.Email == input.Eamil {
+				errStr := "user already belongs to " + input.OrgName
+				return perr.New(errStr, perr.BadRequest, errStr)
+			}
+		}
+	}
+
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return perr.Wrap(err, perr.BadRequest)
