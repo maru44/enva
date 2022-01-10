@@ -1,25 +1,19 @@
 package queryset
 
 const (
-	ProjectListQuery = "SELECT " +
-		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
-		"created_at, updated_at " +
-		"FROM projects " +
-		"WHERE is_valid = true AND deleted_at IS NULL"
-
-	ProjectListByUserQuery = "SELECT " +
+	ProjectValidListByUserQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"created_at, updated_at " +
 		"FROM projects " +
 		"WHERE is_valid = true AND deleted_at IS NULL AND owner_user_id = $1"
 
-	ProjectSlugListByUserQuery = "SELECT " +
+	ProjectValidSlugListByUserQuery = "SELECT " +
 		"slug " +
 		"FROM projects " +
 		"WHERE is_valid = true AND deleted_at IS NULL AND owner_user_id = $1"
 
 	// list by organization
-	ProjectListByOrgQuery = "SELECT " +
+	ProjectListValidByOrgQuery = "SELECT " +
 		"p.id, p.name, p.slug, p.description, p.owner_type, p.owner_user_id, p.owner_org_id, " +
 		"p.created_at, p.updated_at " +
 		"FROM projects AS p " +
@@ -28,14 +22,14 @@ const (
 		"WHERE p.is_valid = true AND p.deleted_at IS NULL AND p.owner_org_id = $1"
 
 	// only by user
-	ProjectDetailBySlugQuery = "SELECT " +
+	ProjectValidDetailBySlugQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"is_valid, deleted_at, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE slug = $1 AND owner_user_id = $2 AND deleted_at IS NULL"
+		"WHERE slug = $1 AND owner_user_id = $2 AND is_valid = true AND deleted_at IS NULL"
 
-	ProjectDetailBySlugAndOrgIdQuery = "SELECT " +
+	ProjectValidDetailBySlugAndOrgIdQuery = "SELECT " +
 		"p.id, p.name, p.slug, p.description, p.owner_type, p.owner_user_id, " +
 		"p.is_valid, p.deleted_at, " +
 		"p.created_at, p.updated_at, " +
@@ -43,24 +37,24 @@ const (
 		"FROM projects AS p " +
 		"JOIN rel_org_members AS r ON r.user_id = $1 AND r.org_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL " +
 		"JOIN orgs AS o ON o.id = $2 AND o.is_valid = true " +
-		"WHERE p.slug = $3 AND p.owner_org_id = $2 AND p.deleted_at IS NULL"
+		"WHERE p.slug = $3 AND p.owner_org_id = $2 AND is_valid = true AND p.deleted_at IS NULL"
 
-	ProjectDetailBySlugAndOrgSlugQuery = "SELECT " +
+	ProjectValidDetailBySlugAndOrgSlugQuery = "SELECT " +
 		"p.id, p.name, p.slug, p.description, p.owner_type, p.owner_user_id, " +
 		"p.is_valid, p.deleted_at, " +
 		"p.created_at, p.updated_at, " +
 		"o.id, o.name " +
 		"FROM orgs AS o " +
-		"JOIN projects AS p ON p.slug = $3 AND p.owner_org_id = o.id AND p.deleted_at IS NULL " +
+		"JOIN projects AS p ON p.slug = $3 AND p.owner_org_id = o.id AND p.is_valid = true AND p.deleted_at IS NULL " +
 		"JOIN rel_org_members AS r ON r.user_id = $1 AND r.org_id = o.id AND r.is_valid = true AND r.deleted_at IS NULL " +
 		"WHERE o.is_valid = true AND o.slug= $2"
 
-	ProjectDetailByIDQuery = "SELECT " +
+	ProjectValidDetailByIDQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"is_valid, deleted_at, " +
 		"created_at, updated_at " +
 		"FROM projects " +
-		"WHERE id = $1"
+		"WHERE id = $1 AND is_valid = true AND deleted_at IS NULL"
 
 	ProjectCreateQuery = "INSERT INTO " +
 		"projects(name, slug, description, owner_type, owner_user_id, owner_org_id) " +

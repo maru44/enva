@@ -35,7 +35,7 @@ const (
 		"WHERE r.user_id = $1 AND r.status = 'new'"
 
 	// only new
-	PastOrgInvitationListQuery = "SELECT " +
+	NewOrgInvitationListQuery = "SELECT " +
 		"r.id " +
 		"FROM org_invitations AS r " +
 		"WHERE r.org_id = $1 AND r.email = $2 AND status = 'new'"
@@ -71,8 +71,8 @@ const (
 
 	*************************/
 
-	// filtered by user
-	OrgListQuery = "SELECT " +
+	// filtered by user and filtered by valid
+	OrgValidListQuery = "SELECT " +
 		"o.id, o.slug, o.name, o.description, o.created_at, o.updated_at, " +
 		"r.user_type " +
 		"FROM rel_org_members AS r " +
@@ -80,8 +80,9 @@ const (
 		"WHERE r.user_id = $1 AND r.is_valid = true AND r.deleted_at IS NULL"
 
 	// filter orgs is_valid on repo or con
+	// this is unused
 	OrgDetailQuery = "SELECT " +
-		"o.id, o.slug, o.name, o.description, o.is_valid, o.created_by, o.created_at, o.updated_at, " +
+		"o.id, o.slug, o.name, o.description, o.is_valid, o.created_by, o.created_at, o.updated_at, o.deleted_at, " +
 		"COUNT(DISTINCT rs.id), r.user_type " +
 		"LEFT JOIN rel_org_members AS rs ON o.id = rs.org_id AND rs.is_valid = true " +
 		// eliminate if relation does not exists
@@ -90,14 +91,14 @@ const (
 		"WHERE o.id = $2"
 
 	// filter orgs is_valid on repo or con
-	OrgDetailBySlugQuery = "SELECT " +
-		"o.id, o.slug, o.name, o.description, o.is_valid, o.created_by, o.created_at, o.updated_at, " +
+	OrgValidDetailBySlugQuery = "SELECT " +
+		"o.id, o.slug, o.name, o.description, o.is_valid, o.created_by, o.created_at, o.updated_at, o.deleted_at, " +
 		"COUNT(DISTINCT rs.id), r.user_type " +
 		"FROM orgs AS o " +
 		"LEFT JOIN rel_org_members AS rs ON o.id = rs.org_id AND rs.is_valid = true " +
 		// eliminate if relation does not exists
 		"JOIN rel_org_members AS r ON r.user_id = $1 AND o.id = r.org_id AND r.is_valid = true " +
-		"WHERE o.slug = $2 " +
+		"WHERE o.slug = $2 AND o.is_valid = true AND o.deleted_at IS NULL " +
 		"GROUP BY o.id, r.id"
 
 	OrgCreateQuery = "INSERT INTO orgs " +
@@ -139,7 +140,7 @@ const (
 		"r.user_type " +
 		"FROM users AS u " +
 		"JOIN rel_org_members AS r ON r.org_id = $1 AND r.user_id = u.id AND r.is_valid = true AND r.deleted_at IS NULL " +
-		"JOIN orgs AS o ON o.id = $1 AND o.is_valid = true " +
+		"JOIN orgs AS o ON o.id = $1 AND o.is_valid = true AND o.deleted_at IS NULL " +
 		"WHERE u.email = $2"
 
 	// if updated user's origin user type is 'owner'

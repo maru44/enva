@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -63,4 +64,15 @@ func (o *OrgInput) Validate() error {
 		validation.Field(&o.Slug, validation.Required, validation.Length(1, 64)),
 		validation.Field(&o.Name, validation.Required, validation.Length(1, 64)),
 	)
+}
+
+var (
+	ErrOrgIsNotValid = errors.New("Org is not valid")
+)
+
+func (o *Org) Valid() error {
+	if !o.IsValid || o.DeletedAt != nil {
+		return ErrOrgIsNotValid
+	}
+	return nil
 }

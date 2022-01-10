@@ -101,6 +101,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return
 		}
+
 		response(w, r, nil, map[string]interface{}{"data": p})
 		return
 	}
@@ -113,6 +114,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 			response(w, r, perr.Wrap(err, perr.NotFound), nil)
 			return
 		}
+
 		response(w, r, nil, map[string]interface{}{"data": p})
 		return
 	}

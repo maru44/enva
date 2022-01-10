@@ -21,7 +21,7 @@ func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgListQuery, user.ID,
+		queryset.OrgValidListQuery, user.ID,
 	)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
@@ -55,7 +55,7 @@ func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, er
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgListQuery, user.ID,
+		queryset.OrgValidListQuery, user.ID,
 	)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
@@ -121,7 +121,7 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 	}
 	row := repo.QueryRowContext(
 		ctx,
-		queryset.OrgDetailBySlugQuery,
+		queryset.OrgValidDetailBySlugQuery,
 		user.ID, slug,
 	)
 	if err := row.Err(); err != nil {
@@ -134,7 +134,7 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 	)
 	if err := row.Scan(
 		&o.ID, &o.Slug, &o.Name, &o.Description, &o.IsValid,
-		&u.ID, &o.CreatedAt, &o.UpdatedAt, &o.UserCount,
+		&u.ID, &o.CreatedAt, &o.UpdatedAt, &o.DeletedAt, &o.UserCount,
 		&ut,
 	); err != nil {
 		return nil, nil, perr.Wrap(err, perr.NotFound)
@@ -353,7 +353,7 @@ func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.PastOrgInvitationListQuery,
+		queryset.NewOrgInvitationListQuery,
 		orgID, cu.Email,
 	)
 	if err != nil {
@@ -478,7 +478,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 
 	// past invitation ids
 	rows, err := tx.QueryContext(ctx,
-		queryset.PastOrgInvitationListQuery,
+		queryset.NewOrgInvitationListQuery,
 		input.OrgID, cu.Email,
 	)
 	if err != nil {

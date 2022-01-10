@@ -92,6 +92,13 @@ const (
 var (
 	ErrProjectSlugAlreadyExistsUser = errors.New("Slug duplicated: Project slug has already exists for user")         // 400
 	ErrProjectSlugAlreadyExistsOrg  = errors.New("Slug duplicated: Project slug has already exists for organization") // 400
+
+	ErrProjectIsNotValid = errors.New("Project is not valid")
 )
 
-// func (p *Project) ValidateUserPost()
+func (p *Project) Valid() error {
+	if !p.IsValid || p.DeletedAt != nil {
+		return ErrProjectIsNotValid
+	}
+	return nil
+}
