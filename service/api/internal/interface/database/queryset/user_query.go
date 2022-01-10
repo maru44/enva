@@ -7,18 +7,24 @@ const (
 		"RETURNING id"
 
 	UserUpdateCliPasswordQuery = "UPDATE users " +
-		"SET cli_password = $1 " +
+		"SET cli_password = $1, updated_at = now() " +
 		"WHERE id = $2"
 
 	UserGetByIDQuery = "SELECT " +
-		"id, email, username, image_url, cli_password, is_valid, is_email_verified, created_at, updated_at " +
-		"FROM users " +
-		"WHERE id = $1"
+		"u.id, u.email, u.username, u.image_url, u.cli_password, u.is_valid, u.is_email_verified, u.created_at, u.updated_at, " +
+		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
+		"s.stripe_product_id, s.stripe_subscription_status " +
+		"FROM users AS u " +
+		"LEFT JOIN subscriptions AS s ON s.user_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
+		"WHERE u.id = $1"
 
 	UserGetByEmailQuery = "SELECT " +
-		"id, email, username, image_url, cli_password, is_valid, is_email_verified, created_at, updated_at " +
-		"FROM users " +
-		"WHERE email = $1"
+		"u.id, u.email, u.username, u.image_url, u.cli_password, u.is_valid, u.is_email_verified, u.created_at, u.updated_at, " +
+		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
+		"s.stripe_product_id, s.stripe_subscription_status " +
+		"FROM users AS u " +
+		"LEFT JOIN subscriptions AS s ON s.user_id = u.id AND s.is_valid = true AND s.deleted_at IS NULL " +
+		"WHERE u.email = $1"
 
 	UserExistsQuery = "SELECT " +
 		"id " +

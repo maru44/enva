@@ -23,15 +23,29 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 	}
 
 	u := &domain.User{}
+	var sID, sSubScriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
 	if err := row.Scan(
 		&u.ID, &u.Email, &u.Username, &u.ImageURL, &u.CliPassword,
 		&u.IsValid, &u.IsEmailVerified, &u.CreatedAt, &u.UpdatedAt,
+		&sID, &sSubScriptionID, &sCustomerID,
+		&sProductID, &sSubscriptionStatus,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 
 	if u.CliPassword != nil {
 		u.HasCliPassword = true
+	}
+
+	if sID != nil {
+		sub := &domain.Subscription{
+			ID:                       *sID,
+			StripeSubscriptionID:     *sSubScriptionID,
+			StripeCustomerID:         *sCustomerID,
+			StripeProductID:          *sProductID,
+			StripeSubscriptionStatus: *sSubscriptionStatus,
+		}
+		u.Subscription = sub
 	}
 
 	return u, nil
@@ -44,15 +58,29 @@ func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*doma
 	}
 
 	u := &domain.User{}
+	var sID, sSubScriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
 	if err := row.Scan(
 		&u.ID, &u.Email, &u.Username, &u.ImageURL, &u.CliPassword,
 		&u.IsValid, &u.IsEmailVerified, &u.CreatedAt, &u.UpdatedAt,
+		&sID, &sSubScriptionID, &sCustomerID,
+		&sProductID, &sSubscriptionStatus,
 	); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 
 	if u.CliPassword != nil {
 		u.HasCliPassword = true
+	}
+
+	if sID != nil {
+		sub := &domain.Subscription{
+			ID:                       *sID,
+			StripeSubscriptionID:     *sSubScriptionID,
+			StripeCustomerID:         *sCustomerID,
+			StripeProductID:          *sProductID,
+			StripeSubscriptionStatus: *sSubscriptionStatus,
+		}
+		u.Subscription = sub
 	}
 
 	return u, nil

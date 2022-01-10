@@ -55,26 +55,27 @@ export const InvitationHistoryModal: React.FC<props> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data?.data.map((inv, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <Typography className="breakAll">
-                        {inv.user.username !== ''
-                          ? inv.user.username
-                          : inv.user.email}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{inv.user_type}</TableCell>
-                    <TableCell>
-                      <InvitationStatusBadge status={inv.status} />
-                    </TableCell>
-                    {/* <TableCell>
+                {data?.data &&
+                  data.data.map((inv, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Typography className="breakAll">
+                          {inv.user.username !== ''
+                            ? inv.user.username
+                            : inv.user.email}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{inv.user_type}</TableCell>
+                      <TableCell>
+                        <InvitationStatusBadge status={inv.status} />
+                      </TableCell>
+                      {/* <TableCell>
                       <Typography className="breakAll">
                         {inv.created_at}
                       </Typography>
                     </TableCell> */}
-                  </TableRow>
-                ))}
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </Box>

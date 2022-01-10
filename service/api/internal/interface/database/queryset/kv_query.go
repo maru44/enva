@@ -22,10 +22,10 @@ const (
 		"WHERE env_key = $1 AND project_id = $2 AND is_valid = true"
 
 	KvDeactivateQuery = "UPDATE kvs " +
-		"SET is_valid = false, updated_by = $1 " +
+		"SET is_valid = false, updated_by = $1, updated_at = now() " +
 		"WHERE project_id = $2 AND env_key = $3 AND is_valid = true"
 
 	KvDeactivateByIdQuery = "UPDATE kvs " +
-		"SET is_valid = false, updated_by = $1 " +
+		"SET is_valid = false, updated_by = $1, updated_at = now() " +
 		"WHERE project_id = $2 AND id = $3 AND is_valid = true"
 )

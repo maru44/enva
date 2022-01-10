@@ -68,7 +68,7 @@ const (
 		"RETURNING slug"
 
 	ProjectDeleteQuery = "UPDATE projects " +
-		"SET deleted_at = now(), is_valid = false " +
+		"SET deleted_at = now(), is_valid = false, updated_at = now() " +
 		"WHERE id = $1"
 
 	// @TODO: add query list of slug

@@ -27,6 +27,8 @@ type (
 
 		HasCliPassword bool `json:"has_cli_password"`
 		// SshPubKeys []string `json:"ssh_pub_keys"`
+
+		Subscription *Subscription `json:"subscription"`
 	}
 
 	UserInput struct {

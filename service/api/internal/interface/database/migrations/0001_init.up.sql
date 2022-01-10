@@ -29,12 +29,31 @@ CREATE TABLE orgs (
     created_by uuid NULL REFERENCES users (id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 
     PRIMARY KEY (id)
 );
 -- tmp: user can create only one orgs
 CREATE UNIQUE INDEX ON orgs (created_by) WHERE (is_valid = true);
 
+CREATE TABLE subscriptions (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NULL REFERENCES users (id) ON DELETE CASCADE,
+    org_id uuid NULL REFERENCES orgs (id) ON DELETE CASCADE,
+
+    stripe_subscription_id VARCHAR(63) NOT NULL,
+    stripe_customer_id VARCHAR(63) NOT NULL,
+    stripe_product_id VARCHAR(63) NOT NULL,
+    stripe_subscription_status VARCHAR(63) DEFAULT NULL,
+
+    is_valid BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+
+    PRIMARY KEY (id),
+    CONSTRAINT subscription_owner CHECK (user_id IS NOT NULL OR org_id IS NOT NULL)
+);
 
 CREATE TABLE ssh_keys (
     id uuid DEFAULT gen_random_uuid() NOT NULL,

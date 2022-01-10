@@ -1,5 +1,7 @@
 package queryset
 
+// @TODO:ADD deleted_at IS NULL to orgs
+
 const (
 	/************************
 
@@ -14,7 +16,7 @@ const (
 		"u.id, u.username, r.email, u.image_url, " +
 		"inv.id, inv.username, inv.email, inv.image_url " +
 		"FROM org_invitations AS r " +
-		"JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
+		"JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true AND o.deleted_at IS NULL " +
 		"LEFT JOIN users AS u ON u.id = r.user_id AND u.is_valid = true " + // invited
 		"JOIN users AS inv ON inv.id = r.invited_by AND inv.is_valid = true " + // invitor
 		// eliminate if current user not belong org
@@ -45,7 +47,7 @@ const (
 		"o.id, o.slug, o.name, o.description, " +
 		"u.id, u.username, u.email, u.image_url " + // invitor's information
 		"FROM org_invitations AS r " +
-		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
+		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true AND o.deleted_at IS NULL " +
 		"LEFT JOIN users AS u ON u.id = r.invited_by AND u.is_valid = true " +
 		"WHERE r.id = $1 AND r.email = $2"
 
@@ -73,7 +75,7 @@ const (
 		"o.id, o.slug, o.name, o.description, o.created_at, o.updated_at, " +
 		"r.user_type " +
 		"FROM rel_org_members AS r " +
-		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true " +
+		"LEFT JOIN orgs AS o ON o.id = r.org_id AND o.is_valid = true AND o.deleted_at IS NULL " +
 		"WHERE r.user_id = $1 AND r.is_valid = true AND r.deleted_at IS NULL"
 
 	// filter orgs is_valid on repo or con

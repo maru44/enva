@@ -11,16 +11,19 @@ type (
 	OrgID string
 
 	Org struct {
-		ID          OrgID     `json:"id"`
-		Slug        string    `json:"slug"`
-		Name        string    `json:"name"`
-		Description *string   `json:"description"`
-		IsValid     bool      `json:"is_valid"`
-		CreatedBy   User      `json:"created_by"`
-		CreatedAt   time.Time `json:"created_at"`
-		UpdatedAt   time.Time `json:"updated_at"`
+		ID          OrgID      `json:"id"`
+		Slug        string     `json:"slug"`
+		Name        string     `json:"name"`
+		Description *string    `json:"description"`
+		IsValid     bool       `json:"is_valid"`
+		CreatedBy   User       `json:"created_by"`
+		CreatedAt   time.Time  `json:"created_at"`
+		UpdatedAt   time.Time  `json:"updated_at"`
+		DeletedAt   *time.Time `json:"deleted_at"`
 
 		UserCount int `json:"user_count"`
+
+		Subscription *Subscription `json:"subscription"`
 	}
 
 	OrgInput struct {
@@ -56,12 +59,8 @@ type (
 )
 
 func (o *OrgInput) Validate() error {
-	return validation.ValidateStruct(&o,
-		validation.Field(o.Slug, validation.Required, validation.Length(1, 64)),
-		validation.Field(o.Name, validation.Required, validation.Length(1, 64)),
+	return validation.ValidateStruct(o,
+		validation.Field(&o.Slug, validation.Required, validation.Length(1, 64)),
+		validation.Field(&o.Name, validation.Required, validation.Length(1, 64)),
 	)
 }
-
-var (
-// ValidationErrorOrgMemberInput = perr.New("")
-)
