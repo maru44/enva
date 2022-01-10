@@ -33,10 +33,12 @@ func main() {
 	smtp := &infra.Smtp{}
 
 	kv := controllers.NewKvController(sql)
-	cliKv := controllers.NewCliKvController(sql)
 	project := controllers.NewProjectController(sql)
 	org := controllers.NewOrgController(sql, smtp)
 	user := controllers.NewUserController(sql, pass)
+
+	cliKv := controllers.NewCliKvController(sql)
+	cliProject := controllers.NewCliProjectController(sql)
 	cliU := controllers.NewCliUserController(sql, pass)
 
 	middlewareMap["login"] = base.LoginRequiredMiddleware
@@ -109,6 +111,9 @@ func main() {
 			s("/cli/kv/create/bulk", http.MethodPost, cliKv.BulkInsertView),
 			s("/cli/kv/update", http.MethodPut, cliKv.UpdateView),
 			s("/cli/kv/delete", http.MethodDelete, cliKv.DeleteView),
+
+			/* cli_project */
+			s("/cli/project/create", http.MethodPost, cliProject.CreateView),
 		},
 		"cli", "loginCli",
 	)

@@ -145,6 +145,9 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 }
 
 func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*string, error) {
+	if err := input.Validate(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)

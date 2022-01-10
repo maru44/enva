@@ -1,7 +1,10 @@
 package commands
 
 import (
+	"bufio"
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -35,7 +38,40 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 		inputs[i] = *input
 	}
 
-	if _, err := fetchBulkInsertKvs(ctx, inputs); err != nil {
+	email, password, err := inputEmailPassword()
+	if err != nil {
+		return err
+	}
+
+	if _, err := fetchBulkInsertKvs(ctx, inputs, email, password); err != nil {
+		if err.Error() == "Project is not found" {
+			color.Yellow("Are you create new project? (y/n):")
+			scan := bufio.NewScanner(os.Stdin)
+			scan.Scan()
+			isCreate := scan.Text()
+			if isCreate != "y" && isCreate != "Y" {
+				return err
+			}
+
+			fmt.Print("description (can be blank): ")
+			scan = bufio.NewScanner(os.Stdin)
+			scan.Scan()
+			desc := scan.Text()
+
+			// @TODO post cli kv create
+			// if success retry fetchBulkInsertKvs
+			fmt.Println(desc)
+			if _, err := fetchCreateProject(ctx, desc, email, password); err != nil {
+				return err
+			}
+
+			if _, err := fetchBulkInsertKvs(ctx, inputs, email, password); err != nil {
+				return err
+			}
+
+			color.Green("init project is succeded")
+			return nil
+		}
 		return err
 	}
 

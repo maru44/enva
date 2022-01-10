@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sort"
 
@@ -122,6 +123,8 @@ func (con *CliKvController) BulkInsertView(w http.ResponseWriter, r *http.Reques
 
 	projectSlug := r.URL.Query().Get(QueryParamsProjectSlug)
 	orgSlug := r.URL.Query().Get(QueryParamsOrgSlug)
+	fmt.Println(projectSlug)
+	fmt.Println(orgSlug)
 	var inputs []domain.KvInput
 
 	if err := json.NewDecoder(r.Body).Decode(&inputs); err != nil {

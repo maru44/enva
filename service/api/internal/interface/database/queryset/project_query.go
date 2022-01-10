@@ -50,10 +50,10 @@ const (
 		"p.is_valid, p.deleted_at, " +
 		"p.created_at, p.updated_at, " +
 		"o.id, o.name " +
-		"FROM projects AS p " +
-		"JOIN orgs AS o ON o.slug = $2 AND o.is_valid = true " +
+		"FROM orgs AS o " +
+		"JOIN projects AS p ON p.slug = $3 AND p.owner_org_id = o.id AND p.deleted_at IS NULL " +
 		"JOIN rel_org_members AS r ON r.user_id = $1 AND r.org_id = o.id AND r.is_valid = true AND r.deleted_at IS NULL " +
-		"WHERE p.slug = $3 AND p.deleted_at IS NULL"
+		"WHERE o.is_valid = true AND o.slug= $2"
 
 	ProjectDetailByIDQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +

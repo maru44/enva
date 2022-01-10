@@ -7,15 +7,16 @@ import (
 	"net/http"
 
 	"github.com/maru44/enva/service/api/pkg/domain"
+	"github.com/maru44/enva/service/api/pkg/tools"
 )
 
 type (
-	kvBulkInsertBody struct {
-		Data string `json:"data"`
+	projectCreateBody struct {
+		ID string `json:"data"`
 	}
 )
 
-func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput, email, password string) (*kvBulkInsertBody, error) {
+func fetchCreateProject(ctx context.Context, desc, email, password string) (*projectCreateBody, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -24,12 +25,14 @@ func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput, email, pas
 		return nil, err
 	}
 
-	path := "/cli/kv/create/bulk?projectSlug=" + s.ProjectSlug
-	if s.OrgSlug != nil {
-		path += "&orgSlug=" + *s.OrgSlug
+	path := "/cli/project/create"
+	input := domain.CliProjectInput{
+		Name:        s.ProjectSlug,
+		Slug:        s.ProjectSlug,
+		Description: tools.StringPtr(desc),
+		OrgSlug:     s.OrgSlug,
 	}
-
-	inputJ, err := json.Marshal(inputs)
+	inputJ, err := json.Marshal(input)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +51,10 @@ func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput, email, pas
 
 	switch res.StatusCode {
 	case 200:
-		body := &kvBulkInsertBody{}
+		body := &projectCreateBody{}
 		if err := json.NewDecoder(res.Body).Decode(&body); err != nil {
 			return nil, err
 		}
-
 		return body, nil
 	default:
 		body := &errorBody{}
@@ -62,4 +64,5 @@ func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput, email, pas
 
 		return nil, errors.New(body.Error)
 	}
+
 }

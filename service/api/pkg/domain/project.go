@@ -37,6 +37,13 @@ type (
 		OrgID       *OrgID  `json:"org_id,omitempty"`
 	}
 
+	CliProjectInput struct {
+		Slug        string  `json:"slug"`
+		Name        string  `json:"name"`
+		OrgSlug     *string `json:"org_slug"`
+		Description *string `json:"description"`
+	}
+
 	IProjectInteractor interface {
 		ListAll(context.Context) ([]Project, error)
 		ListByUser(context.Context) ([]Project, error)
@@ -58,6 +65,21 @@ func (p *ProjectInput) Validate() error {
 		validation.Field(&p.Slug, validation.Required, validation.Length(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
 		validation.Field(&p.Name, validation.Required, validation.Length(1, 64)),
 	)
+}
+
+func (p *CliProjectInput) Validate() error {
+	return validation.ValidateStruct(p,
+		validation.Field(&p.Slug, validation.Required, validation.Length(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
+		validation.Field(&p.Name, validation.Required, validation.Length(1, 64)),
+	)
+}
+
+func (p *CliProjectInput) ToProjectInputWithoutOrg() ProjectInput {
+	return ProjectInput{
+		Slug:        p.Slug,
+		Name:        p.Name,
+		Description: p.Description,
+	}
 }
 
 const (

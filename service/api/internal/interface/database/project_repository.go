@@ -356,6 +356,9 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 }
 
 func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectInput) (*string, error) {
+	if err := input.Validate(); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
 	var inputU, slug *string
 
 	ownerType := domain.OwnerTypeUser
