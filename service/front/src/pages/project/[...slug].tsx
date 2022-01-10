@@ -65,7 +65,16 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
               <Typography variant="h5">{data.data.name}</Typography>
             </Box>
           </Box>
-          <KvList projectId={data.data.id} />
+          <Box pl={1} pr={1} mt={4}>
+            {data.data.description && (
+              <Box>
+                <Typography>{data.data.description}</Typography>
+              </Box>
+            )}
+            <Box mt={4}>
+              <KvList projectId={data.data.id} />
+            </Box>
+          </Box>
         </Box>
       )}
     </Box>

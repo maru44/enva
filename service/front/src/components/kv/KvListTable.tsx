@@ -33,7 +33,7 @@ export const KvListTable: React.FC<props> = ({ kvs, projectId }: props) => {
   const [state, dispatch] = useReducer(kvListReducer, initialKvListState)
 
   return (
-    <Box mt={2}>
+    <Box>
       <TableContainer component={Paper} variant="outlined">
         <Table aria-label="key value sets">
           <TableHead>
