@@ -425,45 +425,7 @@ func (repo *ProjectReposotory) CountValidByOrgID(ctx context.Context, orgID doma
 		queryset.ProjectValidCountByOrgID,
 		orgID, cu.ID,
 	)
-	if err := row.Err(); err != nil {
-		return nil, nil, perr.Wrap(err, perr.NotFound)
-	}
-
-	var (
-		count                                                              *int
-		sID, sSubscriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
-		sUserID                                                            *domain.UserID
-		sOrgID                                                             *domain.OrgID
-		sCreatedAt, sUpdatedAt                                             *time.Time
-		s                                                                  *domain.Subscription
-	)
-	if err := row.Scan(
-		&count,
-		&sID, &sSubscriptionID, &sCustomerID,
-		&sProductID, &sSubscriptionStatus,
-		&sUserID, &sOrgID,
-		&sCreatedAt, &sUpdatedAt,
-	); err != nil {
-		return nil, nil, perr.Wrap(err, perr.BadRequest)
-	}
-
-	if sID != nil {
-		s = &domain.Subscription{
-			ID:                       *sID,
-			StripeSubscriptionID:     *sSubscriptionID,
-			StripeCustomerID:         *sCustomerID,
-			StripeProductID:          *sProductID,
-			StripeSubscriptionStatus: *sSubscriptionStatus,
-			UserID:                   sUserID,
-			OrgID:                    sOrgID,
-			CreatedAt:                *sCreatedAt,
-			UpdatedAt:                *sUpdatedAt,
-			IsValid:                  true,
-			DeletedAt:                nil,
-		}
-	}
-
-	return count, s, nil
+	return repo.countValidByRow(row)
 }
 
 func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
@@ -471,50 +433,11 @@ func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug 
 	if err != nil {
 		return nil, nil, perr.Wrap(err, perr.Forbidden)
 	}
-
 	row := repo.QueryRowContext(ctx,
 		queryset.ProjectValidCountByOrgSlug,
 		orgSlug, cu.ID,
 	)
-	if err := row.Err(); err != nil {
-		return nil, nil, perr.Wrap(err, perr.NotFound)
-	}
-
-	var (
-		count                                                              *int
-		sID, sSubscriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
-		sUserID                                                            *domain.UserID
-		sOrgID                                                             *domain.OrgID
-		sCreatedAt, sUpdatedAt                                             *time.Time
-		s                                                                  *domain.Subscription
-	)
-	if err := row.Scan(
-		&count,
-		&sID, &sSubscriptionID, &sCustomerID,
-		&sProductID, &sSubscriptionStatus,
-		&sUserID, &sOrgID,
-		&sCreatedAt, &sUpdatedAt,
-	); err != nil {
-		return nil, nil, perr.Wrap(err, perr.BadRequest)
-	}
-
-	if sID != nil {
-		s = &domain.Subscription{
-			ID:                       *sID,
-			StripeSubscriptionID:     *sSubscriptionID,
-			StripeCustomerID:         *sCustomerID,
-			StripeProductID:          *sProductID,
-			StripeSubscriptionStatus: *sSubscriptionStatus,
-			UserID:                   sUserID,
-			OrgID:                    sOrgID,
-			CreatedAt:                *sCreatedAt,
-			UpdatedAt:                *sUpdatedAt,
-			IsValid:                  true,
-			DeletedAt:                nil,
-		}
-	}
-
-	return count, s, nil
+	return repo.countValidByRow(row)
 }
 
 func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
@@ -522,6 +445,10 @@ func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID doma
 		queryset.ProjectValidCountByUser,
 		userID,
 	)
+	return repo.countValidByRow(row)
+}
+
+func (repo *ProjectReposotory) countValidByRow(row IRow) (*int, *domain.Subscription, error) {
 	if err := row.Err(); err != nil {
 		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}

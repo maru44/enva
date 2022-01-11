@@ -103,6 +103,6 @@ const (
 		"s.created_at, s.updated_at " +
 		"FROM projects AS p " +
 		"LEFT JOIN subscriptions AS s ON s.user_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
-		"WHERE p.owner_user_id = $1 AND p.owner_type = 'user' " +
+		"WHERE p.owner_user_id = $1 AND p.owner_type = 'user' AND p.is_valid = true AND p.deleted_at IS NULL " +
 		"GROUP BY s.id"
 )
