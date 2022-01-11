@@ -4,9 +4,9 @@ import "time"
 
 type (
 	Subscription struct {
-		ID     string `json:"id"`
-		UserID UserID `json:"user_id,omitempty"`
-		OrgID  OrgID  `json:"org_id,omitempty"`
+		ID     string  `json:"id"`
+		UserID *UserID `json:"user_id,omitempty"`
+		OrgID  *OrgID  `json:"org_id,omitempty"`
 
 		StripeSubscriptionID     string `json:"stripe_subscription_id"`
 		StripeCustomerID         string `json:"stripe_customer_id"`

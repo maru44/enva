@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"sort"
+	"time"
 
 	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -359,17 +360,34 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 	if err := input.Validate(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
-	var inputU, slug *string
 
+	var inputU, slug *string
 	ownerType := domain.OwnerTypeUser
 	if input.OrgID != nil {
 		ownerType = domain.OwnerTypeOrg
+		// validate by project capacity
+		count, sub, err := repo.CountValidByOrgID(ctx, *input.OrgID)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.BadRequest)
+		}
+		if err := domain.CanCreateProject(sub, *count, ownerType); err != nil {
+			return nil, perr.Wrap(err, perr.BadRequest, err.Error())
+		}
 	} else {
-		user, err := domain.UserFromCtx(ctx)
+		cu, err := domain.UserFromCtx(ctx)
 		if err != nil {
 			return nil, perr.Wrap(err, perr.Forbidden)
 		}
-		inputU = tools.StringPtr(user.ID.String())
+		// validate by project capacity
+		count, sub, err := repo.CountValidByUser(ctx, cu.ID)
+		if err != nil {
+			return nil, perr.Wrap(err, perr.BadRequest)
+		}
+		if err := domain.CanCreateProject(sub, *count, ownerType); err != nil {
+			return nil, perr.Wrap(err, perr.BadRequest, err.Error())
+		}
+
+		inputU = tools.StringPtr(cu.ID.String())
 	}
 
 	if err := repo.QueryRowContext(
@@ -395,4 +413,152 @@ func (repo *ProjectReposotory) Delete(ctx context.Context, projectID domain.Proj
 	}
 
 	return affected, nil
+}
+
+func (repo *ProjectReposotory) CountValidByOrgID(ctx context.Context, orgID domain.OrgID) (*int, *domain.Subscription, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	row := repo.QueryRowContext(ctx,
+		queryset.ProjectValidCountByOrgID,
+		orgID, cu.ID,
+	)
+	if err := row.Err(); err != nil {
+		return nil, nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		count                                                              *int
+		sID, sSubscriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
+		sUserID                                                            *domain.UserID
+		sOrgID                                                             *domain.OrgID
+		sCreatedAt, sUpdatedAt                                             *time.Time
+		s                                                                  *domain.Subscription
+	)
+	if err := row.Scan(
+		&count,
+		&sID, &sSubscriptionID, &sCustomerID,
+		&sProductID, &sSubscriptionStatus,
+		&sUserID, &sOrgID,
+		&sCreatedAt, &sUpdatedAt,
+	); err != nil {
+		return nil, nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	if sID != nil {
+		s = &domain.Subscription{
+			ID:                       *sID,
+			StripeSubscriptionID:     *sSubscriptionID,
+			StripeCustomerID:         *sCustomerID,
+			StripeProductID:          *sProductID,
+			StripeSubscriptionStatus: *sSubscriptionStatus,
+			UserID:                   sUserID,
+			OrgID:                    sOrgID,
+			CreatedAt:                *sCreatedAt,
+			UpdatedAt:                *sUpdatedAt,
+			IsValid:                  true,
+			DeletedAt:                nil,
+		}
+	}
+
+	return count, s, nil
+}
+
+func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, nil, perr.Wrap(err, perr.Forbidden)
+	}
+
+	row := repo.QueryRowContext(ctx,
+		queryset.ProjectValidCountByOrgSlug,
+		orgSlug, cu.ID,
+	)
+	if err := row.Err(); err != nil {
+		return nil, nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		count                                                              *int
+		sID, sSubscriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
+		sUserID                                                            *domain.UserID
+		sOrgID                                                             *domain.OrgID
+		sCreatedAt, sUpdatedAt                                             *time.Time
+		s                                                                  *domain.Subscription
+	)
+	if err := row.Scan(
+		&count,
+		&sID, &sSubscriptionID, &sCustomerID,
+		&sProductID, &sSubscriptionStatus,
+		&sUserID, &sOrgID,
+		&sCreatedAt, &sUpdatedAt,
+	); err != nil {
+		return nil, nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	if sID != nil {
+		s = &domain.Subscription{
+			ID:                       *sID,
+			StripeSubscriptionID:     *sSubscriptionID,
+			StripeCustomerID:         *sCustomerID,
+			StripeProductID:          *sProductID,
+			StripeSubscriptionStatus: *sSubscriptionStatus,
+			UserID:                   sUserID,
+			OrgID:                    sOrgID,
+			CreatedAt:                *sCreatedAt,
+			UpdatedAt:                *sUpdatedAt,
+			IsValid:                  true,
+			DeletedAt:                nil,
+		}
+	}
+
+	return count, s, nil
+}
+
+func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
+	row := repo.QueryRowContext(ctx,
+		queryset.ProjectValidCountByUser,
+		userID,
+	)
+	if err := row.Err(); err != nil {
+		return nil, nil, perr.Wrap(err, perr.NotFound)
+	}
+
+	var (
+		count                                                              *int
+		sID, sSubscriptionID, sCustomerID, sProductID, sSubscriptionStatus *string
+		sUserID                                                            *domain.UserID
+		sOrgID                                                             *domain.OrgID
+		sCreatedAt, sUpdatedAt                                             *time.Time
+		s                                                                  *domain.Subscription
+	)
+	if err := row.Scan(
+		&count,
+		&sID, &sSubscriptionID, &sCustomerID,
+		&sProductID, &sSubscriptionStatus,
+		&sUserID, &sOrgID,
+		&sCreatedAt, &sUpdatedAt,
+	); err != nil {
+		return nil, nil, perr.Wrap(err, perr.BadRequest)
+	}
+
+	if sID != nil {
+		s = &domain.Subscription{
+			ID:                       *sID,
+			StripeSubscriptionID:     *sSubscriptionID,
+			StripeCustomerID:         *sCustomerID,
+			StripeProductID:          *sProductID,
+			StripeSubscriptionStatus: *sSubscriptionStatus,
+			UserID:                   sUserID,
+			OrgID:                    sOrgID,
+			CreatedAt:                *sCreatedAt,
+			UpdatedAt:                *sUpdatedAt,
+			IsValid:                  true,
+			DeletedAt:                nil,
+		}
+	}
+
+	return count, s, nil
 }

@@ -66,4 +66,43 @@ const (
 		"WHERE id = $1"
 
 	// @TODO: add query list of slug
+
+	ProjectValidCountByOrgID = "SELECT " +
+		"COUNT(DISTINCT p.id)," +
+		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
+		"s.stripe_product_id, s.stripe_subscription_status, " +
+		"s.user_id, s.org_id, " +
+		"s.created_at, s.updated_at " +
+		"FROM orgs AS o " +
+		"LEFT JOIN projects AS p ON p.owner_org_id = o.id AND p.owner_type = 'org' AND p.is_valid = true AND p.deleted_at IS NULL " +
+		"LEFT JOIN subscriptions AS s ON s.org_id = o.id AND s.is_valid = true AND s.deleted_at IS NULL " +
+		// validate current user access
+		"JOIN rel_org_members AS r ON r.org_id = $1 AND r.user_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL " +
+		"WHERE o.id = $1 AND o.is_valid = true AND o.deleted_at IS NULL " +
+		"GROUP BY s.id"
+
+	ProjectValidCountByOrgSlug = "SELECT " +
+		"COUNT(DISTINCT p.id)," +
+		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
+		"s.stripe_product_id, s.stripe_subscription_status, " +
+		"s.user_id, s.org_id, " +
+		"s.created_at, s.updated_at " +
+		"FROM orgs AS o " +
+		"LEFT JOIN projects AS p ON p.owner_org_id = o.id AND p.owner_type = 'org' AND p.is_valid = true AND p.deleted_at IS NULL " +
+		"LEFT JOIN subscriptions AS s ON s.org_id = o.id AND s.is_valid = true AND s.deleted_at IS NULL " +
+		// validate current user access
+		"JOIN rel_org_members AS r ON r.org_id = o.id AND r.user_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL " +
+		"WHERE o.slug = $1 AND o.is_valid = true AND o.deleted_at IS NULL " +
+		"GROUP BY o.id, s.id"
+
+	ProjectValidCountByUser = "SELECT " +
+		"COUNT(DISTINCT p.id), " +
+		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
+		"s.stripe_product_id, s.stripe_subscription_status, " +
+		"s.user_id, s.org_id, " +
+		"s.created_at, s.updated_at " +
+		"FROM projects AS p " +
+		"LEFT JOIN subscriptions AS s ON s.user_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
+		"WHERE p.owner_user_id = $1 AND p.owner_type = 'user' " +
+		"GROUP BY s.id"
 )

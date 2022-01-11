@@ -27,6 +27,10 @@ type IProjectRepository interface {
 	GetByID(context.Context, domain.ProjectID) (*domain.Project, error)
 	Create(context.Context, domain.ProjectInput) (*string, error)
 	Delete(context.Context, domain.ProjectID) (int, error)
+
+	CountValidByOrgID(context.Context, domain.OrgID) (*int, *domain.Subscription, error)
+	CountValidByOrgSlug(context.Context, string) (*int, *domain.Subscription, error)
+	CountValidByUser(context.Context, domain.UserID) (*int, *domain.Subscription, error)
 }
 
 func (in *ProjectInteractor) ListAll(ctx context.Context) ([]domain.Project, error) {
@@ -67,4 +71,18 @@ func (in *ProjectInteractor) Create(ctx context.Context, input domain.ProjectInp
 
 func (in *ProjectInteractor) Delete(ctx context.Context, projectID domain.ProjectID) (int, error) {
 	return in.repo.Delete(ctx, projectID)
+}
+
+// count
+
+func (in *ProjectInteractor) CountValidByOrgID(ctx context.Context, orgID domain.OrgID) (*int, *domain.Subscription, error) {
+	return in.repo.CountValidByOrgID(ctx, orgID)
+}
+
+func (in *ProjectInteractor) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
+	return in.repo.CountValidByOrgSlug(ctx, orgSlug)
+}
+
+func (in *ProjectInteractor) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
+	return in.repo.CountValidByUser(ctx, userID)
 }

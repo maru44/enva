@@ -36,7 +36,6 @@ type (
 	IOrgInteractor interface {
 		List(context.Context) ([]Org, error)
 		ListOwnerAdmin(context.Context) ([]Org, error)
-		Detail(context.Context, OrgID) (*Org, *UserType, error)
 		DetailBySlug(context.Context, string) (*Org, *UserType, error)
 		Create(context.Context, OrgInput) (*string, error)
 

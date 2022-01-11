@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -57,6 +58,10 @@ type (
 		GetByID(context.Context, ProjectID) (*Project, error)
 		Create(context.Context, ProjectInput) (*string, error)
 		Delete(context.Context, ProjectID) (int, error)
+
+		CountValidByOrgID(context.Context, OrgID) (*int, *Subscription, error)
+		CountValidByOrgSlug(context.Context, string) (*int, *Subscription, error)
+		CountValidByUser(context.Context, UserID) (*int, *Subscription, error)
 	}
 )
 
@@ -100,5 +105,23 @@ func (p *Project) Valid() error {
 	if !p.IsValid || p.DeletedAt != nil {
 		return ErrProjectIsNotValid
 	}
+	return nil
+}
+
+func CanCreateProject(s *Subscription, projectCount int, ownerType OwnerType) error {
+	errStr := "Projects count is reached to max value(%d)"
+	switch ownerType {
+	case OwnerTypeOrg:
+		if s == nil && projectCount > 4 {
+			return errors.New(fmt.Sprintf(errStr, 5))
+		}
+	default:
+		if s == nil && projectCount > 4 {
+			return errors.New(fmt.Sprintf(errStr, 5))
+		}
+		// if s.StripeProductID == a {}
+		// if s.StripeProductID == b {}
+	}
+
 	return nil
 }
