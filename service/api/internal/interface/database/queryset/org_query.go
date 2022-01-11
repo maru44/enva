@@ -157,11 +157,15 @@ const (
 	OrgReAddMemberQuery = ""
 
 	// filter by access user
-	// is it needed?
-	// OrgMemberCountByOrgID = "SELECT " +
-	// 	"COUNT(DISTINCT rs.id), s.stripe_product_id " +
-	// 	"FROM rel_org_members AS rs " +
-	// 	"LEFT JOIN subscriptions AS s ON s.org_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
-	// 	"JOIN rel_org_members AS r ON r.user_id = $2 AND r.org_id = $1 AND r.is_valid = true " +
-	// 	"WHERE rs.org_id = $1 AND rs.is_valid = true AND rs.deleted_at IS NULL"
+	OrgMemberCountByOrgID = "SELECT " +
+		"COUNT(DISTINCT rs.id), " +
+		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
+		"s.stripe_product_id, s.stripe_subscription_status, " +
+		"s.user_id, s.org_id, " +
+		"s.created_at, s.updated_at " +
+		"FROM rel_org_members AS rs " +
+		"LEFT JOIN subscriptions AS s ON s.org_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
+		"JOIN rel_org_members AS r ON r.user_id = $2 AND r.org_id = $1 AND r.is_valid = true " +
+		"WHERE rs.org_id = $1 AND rs.is_valid = true AND rs.deleted_at IS NULL " +
+		"GROUP BY s.id"
 )

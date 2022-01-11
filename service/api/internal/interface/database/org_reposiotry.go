@@ -315,6 +315,14 @@ func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitatio
 		return perr.New(errStr, perr.BadRequest, errStr)
 	}
 
+	count, sub, err := repo.MemberValidCount(ctx, input.OrgID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if err := domain.CanCreateOrgMember(sub, *count); err != nil {
+		return perr.Wrap(err, perr.BadRequest, err.Error())
+	}
+
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return perr.Wrap(err, perr.BadRequest)
@@ -429,6 +437,14 @@ member
 func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMemberInput) error {
 	if err := input.Validate(ctx); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	count, sub, err := repo.MemberValidCount(ctx, input.OrgID)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	if err := domain.CanCreateOrgMember(sub, *count); err != nil {
+		return perr.Wrap(err, perr.BadRequest, err.Error())
 	}
 
 	// current user
@@ -675,6 +691,18 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 	}
 
 	return nil
+}
+
+func (repo *OrgRepository) MemberValidCount(ctx context.Context, orgID domain.OrgID) (*int, *domain.Subscription, error) {
+	cu, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return nil, nil, perr.Wrap(err, perr.BadRequest)
+	}
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgMemberCountByOrgID,
+		orgID, cu.ID,
+	)
+	return countValidByRow(row)
 }
 
 /*********************

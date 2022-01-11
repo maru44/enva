@@ -33,8 +33,6 @@ CREATE TABLE orgs (
 
     PRIMARY KEY (id)
 );
--- tmp: user can create only one orgs
-CREATE UNIQUE INDEX ON orgs (created_by) WHERE (is_valid = true);
 
 CREATE TABLE subscriptions (
     id uuid DEFAULT gen_random_uuid() NOT NULL,

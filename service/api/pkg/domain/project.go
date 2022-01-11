@@ -109,7 +109,7 @@ func (p *Project) Valid() error {
 }
 
 func CanCreateProject(s *Subscription, projectCount int, ownerType OwnerType) error {
-	errStr := "Projects count is reached to max value(%d)"
+	errStr := "Projects count reaches maximum (%d)"
 	switch ownerType {
 	case OwnerTypeOrg:
 		if s == nil && projectCount > 4 {

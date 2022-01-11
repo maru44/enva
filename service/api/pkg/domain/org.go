@@ -57,6 +57,7 @@ type (
 		MemberGetUserType(context.Context, UserID, OrgID) (*UserType, error)
 		MemberUpdateUserType(context.Context, OrgMemberUpdateInput) error
 		MemberDelete(context.Context, UserID, OrgID) error
+		MemberValidCount(context.Context, OrgID) (*int, *Subscription, error)
 	}
 )
 
@@ -79,9 +80,21 @@ func (o *Org) Valid() error {
 }
 
 func CanCreateOrg(s *Subscription, orgCount int) error {
-	errStr := "Org count is reached to max value(%d)"
+	errStr := "Orgs count reaches maximum (%d)"
 
 	if s == nil && orgCount > 0 {
+		return errors.New(fmt.Sprintf(errStr, 1))
+	}
+	// if s.StripeProductID == a {}
+	// if s.StripeProductID == b {}
+
+	return nil
+}
+
+func CanCreateOrgMember(s *Subscription, memberCount int) error {
+	errStr := "Members count reaches maximum (%d)"
+
+	if s == nil && memberCount > 4 {
 		return errors.New(fmt.Sprintf(errStr, 1))
 	}
 	// if s.StripeProductID == a {}
