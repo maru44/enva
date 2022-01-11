@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"sort"
 	"time"
 
@@ -425,7 +426,7 @@ func (repo *ProjectReposotory) CountValidByOrgID(ctx context.Context, orgID doma
 		queryset.ProjectValidCountByOrgID,
 		orgID, cu.ID,
 	)
-	return repo.countValidByRow(row)
+	return countValidByRow(row)
 }
 
 func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
@@ -437,7 +438,7 @@ func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug 
 		queryset.ProjectValidCountByOrgSlug,
 		orgSlug, cu.ID,
 	)
-	return repo.countValidByRow(row)
+	return countValidByRow(row)
 }
 
 func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
@@ -445,10 +446,10 @@ func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID doma
 		queryset.ProjectValidCountByUser,
 		userID,
 	)
-	return repo.countValidByRow(row)
+	return countValidByRow(row)
 }
 
-func (repo *ProjectReposotory) countValidByRow(row IRow) (*int, *domain.Subscription, error) {
+func countValidByRow(row IRow) (*int, *domain.Subscription, error) {
 	if err := row.Err(); err != nil {
 		return nil, nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -468,6 +469,9 @@ func (repo *ProjectReposotory) countValidByRow(row IRow) (*int, *domain.Subscrip
 		&sUserID, &sOrgID,
 		&sCreatedAt, &sUpdatedAt,
 	); err != nil {
+		if err == sql.ErrNoRows {
+			return tools.IntPtrAbleZero(0), nil, nil
+		}
 		return nil, nil, perr.Wrap(err, perr.BadRequest)
 	}
 

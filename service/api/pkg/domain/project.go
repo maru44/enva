@@ -115,6 +115,8 @@ func CanCreateProject(s *Subscription, projectCount int, ownerType OwnerType) er
 		if s == nil && projectCount > 4 {
 			return errors.New(fmt.Sprintf(errStr, 5))
 		}
+		// if s.StripeProductID == a {}
+		// if s.StripeProductID == b {}
 	default:
 		if s == nil && projectCount > 4 {
 			return errors.New(fmt.Sprintf(errStr, 5))

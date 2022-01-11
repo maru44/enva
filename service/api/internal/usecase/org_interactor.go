@@ -21,6 +21,7 @@ type IOrgRepository interface {
 	ListOwnerAdmin(context.Context) ([]domain.Org, error)
 	DetailBySlug(context.Context, string) (*domain.Org, *domain.UserType, error)
 	Create(context.Context, domain.OrgInput) (*string, error)
+	OrgValidCount(context.Context, domain.UserID) (*int, *domain.Subscription, error)
 
 	/* invitations */
 	Invite(context.Context, domain.OrgInvitationInput) error
@@ -54,6 +55,10 @@ func (in *OrgInteractor) DetailBySlug(ctx context.Context, slug string) (*domain
 
 func (in *OrgInteractor) Create(ctx context.Context, input domain.OrgInput) (*string, error) {
 	return in.repo.Create(ctx, input)
+}
+
+func (in *OrgInteractor) OrgValidCount(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
+	return in.repo.OrgValidCount(ctx, userID)
 }
 
 /* invitation */

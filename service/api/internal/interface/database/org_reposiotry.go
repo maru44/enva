@@ -130,12 +130,19 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 	if err := input.Validate(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
-	user, err := domain.UserFromCtx(ctx)
+	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	// @TODO confirm org count of owner
+	// validate count org
+	count, sub, err := repo.OrgValidCount(ctx, cu.ID)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest)
+	}
+	if err := domain.CanCreateOrg(sub, *count); err != nil {
+		return nil, perr.Wrap(err, perr.BadRequest, err.Error())
+	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {
@@ -145,7 +152,7 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 	var id, slug *string
 	if err := tx.QueryRowContext(ctx,
 		queryset.OrgCreateQuery,
-		input.Slug, input.Name, input.Description, user.ID,
+		input.Slug, input.Name, input.Description, cu.ID,
 	).Scan(&id, &slug); err != nil {
 		tx.Rollback()
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -154,7 +161,7 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 	var memberID *string
 	if err := tx.QueryRowContext(ctx,
 		queryset.RelOrgMembersInsertQuery,
-		id, user.ID, domain.UserTypeOwner, nil,
+		id, cu.ID, domain.UserTypeOwner, nil,
 	).Scan(&memberID); err != nil {
 		tx.Rollback()
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -163,6 +170,13 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 	tx.Commit()
 
 	return slug, nil
+}
+
+func (repo *OrgRepository) OrgValidCount(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
+	row := repo.QueryRowContext(ctx,
+		queryset.OrgValidCountByOwner, userID,
+	)
+	return countValidByRow(row)
 }
 
 /*************************

@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -38,6 +39,7 @@ type (
 		ListOwnerAdmin(context.Context) ([]Org, error)
 		DetailBySlug(context.Context, string) (*Org, *UserType, error)
 		Create(context.Context, OrgInput) (*string, error)
+		OrgValidCount(context.Context, UserID) (*int, *Subscription, error)
 
 		/* invitations */
 		Invite(context.Context, OrgInvitationInput) error
@@ -73,5 +75,17 @@ func (o *Org) Valid() error {
 	if !o.IsValid || o.DeletedAt != nil {
 		return ErrOrgIsNotValid
 	}
+	return nil
+}
+
+func CanCreateOrg(s *Subscription, orgCount int) error {
+	errStr := "Org count is reached to max value(%d)"
+
+	if s == nil && orgCount > 0 {
+		return errors.New(fmt.Sprintf(errStr, 1))
+	}
+	// if s.StripeProductID == a {}
+	// if s.StripeProductID == b {}
+
 	return nil
 }

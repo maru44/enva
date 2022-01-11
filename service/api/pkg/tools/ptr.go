@@ -6,3 +6,7 @@ func StringPtr(str string) *string {
 	}
 	return &str
 }
+
+func IntPtrAbleZero(in int) *int {
+	return &in
+}
