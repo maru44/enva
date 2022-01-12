@@ -3,3 +3,5 @@
 /tmp
 **/enva.json
 .env
+/bin/**/
+!/bin/**/.gitkeep

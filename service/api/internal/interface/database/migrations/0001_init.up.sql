@@ -77,7 +77,6 @@ CREATE TABLE org_invitations (
 
     PRIMARY KEY (id)
 );
--- CREATE UNIQUE INDEX org_invitations_user_id_org_id ON org_invitations (user_id, org_id) WHERE (status = 'activate');
 
 -- relation org and users
 CREATE TABLE rel_org_members (
