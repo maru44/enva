@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
       mt={2}
     >
       <Grid item>
-        <Typography>&copy; 2021 maru</Typography>
+        <Typography>&copy; 2022 maru</Typography>
       </Grid>
     </Grid>
   )
