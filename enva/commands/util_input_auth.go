@@ -21,7 +21,8 @@ func inputEmailPassword() (string, string, error) {
 
 		if email != "" {
 			fmt.Print("cli password: ")
-			password, err := terminal.ReadPassword(syscall.Stdin)
+			// should be casted to int in GOOS=windows
+			password, err := terminal.ReadPassword(int(syscall.Stdin))
 			if err != nil {
 				return "", "", err
 			}
