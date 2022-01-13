@@ -4,4 +4,6 @@
 **/enva.json
 .env
 /bin/**/
+/bin/*
 !/bin/**/.gitkeep
+!/bin/.gitkeep
