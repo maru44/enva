@@ -83,7 +83,7 @@ func CanCreateOrg(s *Subscription, orgCount int) error {
 	errStr := "Orgs count reaches maximum (%d)"
 
 	if s == nil && orgCount > 0 {
-		return errors.New(fmt.Sprintf(errStr, 1))
+		return fmt.Errorf(errStr, 1)
 	}
 	// if s.StripeProductID == a {}
 	// if s.StripeProductID == b {}
@@ -95,7 +95,7 @@ func CanCreateOrgMember(s *Subscription, memberCount int) error {
 	errStr := "Members count reaches maximum (%d)"
 
 	if s == nil && memberCount > 4 {
-		return errors.New(fmt.Sprintf(errStr, 1))
+		return fmt.Errorf(errStr, 5)
 	}
 	// if s.StripeProductID == a {}
 	// if s.StripeProductID == b {}

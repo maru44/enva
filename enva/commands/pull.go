@@ -37,6 +37,6 @@ func (c *pull) Run(ctx context.Context, opts ...string) error {
 
 func (c *pull) Explain() string {
 	return `
-	Gulling remote values and overwrite your [envfile] is set in enva.json.
+	Pulling remote values and overwrite your [envfile] is set in enva.json.
 `
 }

@@ -4,7 +4,7 @@
 BIN_DIR:=bin/
 BIN_NAME:=enva
 ifeq (${CLI_API_URL}, http://localhost:8080)
-  BIN_NAME=enva_div
+  BIN_NAME=enva_dev
 endif
 
 # FILE

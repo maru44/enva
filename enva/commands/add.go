@@ -50,7 +50,7 @@ func (c *add) Run(ctx context.Context, opts ...string) error {
 func (c *add) Explain() string {
 	return `
 	Add remote and local key-value set.
-	Two args is needed. First arg is key, second arg is value.
+	Two args is needed. First one is key, another is value.
 	ex) enva add [key] [value]
 `
 }

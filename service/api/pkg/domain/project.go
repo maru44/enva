@@ -113,13 +113,13 @@ func CanCreateProject(s *Subscription, projectCount int, ownerType OwnerType) er
 	switch ownerType {
 	case OwnerTypeOrg:
 		if s == nil && projectCount > 4 {
-			return errors.New(fmt.Sprintf(errStr, 5))
+			return fmt.Errorf(errStr, 5)
 		}
 		// if s.StripeProductID == a {}
 		// if s.StripeProductID == b {}
 	default:
 		if s == nil && projectCount > 4 {
-			return errors.New(fmt.Sprintf(errStr, 5))
+			return fmt.Errorf(errStr, 5)
 		}
 		// if s.StripeProductID == a {}
 		// if s.StripeProductID == b {}
