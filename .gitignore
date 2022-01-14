@@ -3,8 +3,7 @@
 /tmp
 **/enva.json
 .env
-/bin/**/enva
-/bin/**/main
-/bin/**/enva_dev
-# !/bin/**/.gitkeep
-# !/bin/.gitkeep
+/bin/**/
+/bin/*
+!/bin/**/.gitkeep
+!/bin/.gitkeep
