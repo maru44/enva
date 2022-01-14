@@ -37,7 +37,9 @@ func fileWriteFromResponse(body kvListBody) error {
 	}
 
 	if s.PreSentence != nil {
-		file.WriteString(*s.PreSentence + "\n")
+		if _, err := file.WriteString(*s.PreSentence + "\n"); err != nil {
+			return err
+		}
 	}
 	for _, d := range body.Data {
 		if _, err := file.WriteString(f(d)); err != nil {
@@ -45,7 +47,9 @@ func fileWriteFromResponse(body kvListBody) error {
 		}
 	}
 	if s.SufSentence != nil {
-		file.WriteString(*s.SufSentence + "\n")
+		if _, err := file.WriteString(*s.SufSentence + "\n"); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -121,7 +125,9 @@ func fileReadAndUpdateKv(key, value string) error {
 	}
 
 	if s.PreSentence != nil {
-		file.WriteString(*s.PreSentence + "\n")
+		if _, err := file.WriteString(*s.PreSentence + "\n"); err != nil {
+			return err
+		}
 	}
 	for _, d := range kvs {
 		if _, err := file.WriteString(fw(d)); err != nil {
@@ -129,7 +135,9 @@ func fileReadAndUpdateKv(key, value string) error {
 		}
 	}
 	if s.SufSentence != nil {
-		file.WriteString(*s.SufSentence + "\n")
+		if _, err := file.WriteString(*s.SufSentence + "\n"); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -190,7 +198,9 @@ func fileReadAndDeleteKv(key string) error {
 	}
 
 	if s.PreSentence != nil {
-		file.WriteString(*s.PreSentence + "\n")
+		if _, err := file.WriteString(*s.PreSentence + "\n"); err != nil {
+			return err
+		}
 	}
 	for _, d := range kvs {
 		if _, err := file.WriteString(fw(d)); err != nil {
@@ -198,7 +208,9 @@ func fileReadAndDeleteKv(key string) error {
 		}
 	}
 	if s.SufSentence != nil {
-		file.WriteString(*s.SufSentence + "\n")
+		if _, err := file.WriteString(*s.SufSentence + "\n"); err != nil {
+			return err
+		}
 	}
 	return nil
 }

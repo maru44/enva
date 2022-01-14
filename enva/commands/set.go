@@ -41,7 +41,9 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 	}
 	defer file.Close()
 
-	file.WriteString("{\n" + *setting + "\n}\n")
+	if _, err := file.WriteString("{\n" + *setting + "\n}\n"); err != nil {
+		return err
+	}
 	color.Green("\nSucceeded to create enva.json")
 
 	return nil

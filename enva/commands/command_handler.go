@@ -19,22 +19,22 @@ var (
 	ApiUrl = os.Getenv("CLI_API_URL")
 )
 
-func Run(ctx context.Context, taskName string, opts ...string) error {
+func Run(ctx context.Context, taskName string, opts ...string) {
 	createCommands, ok := Commands[taskName]
 	if !ok {
 		err := errors.New("No such command")
 		printErr(err)
 		color.Yellow("\nIf you want to know commands, execute `enva help` command.")
-		return err
+		return
 	}
 
 	c := createCommands()
 	if err := c.Run(ctx, opts...); err != nil {
 		printErr(err)
-		return err
+		return
 	}
 
-	return nil
+	return
 }
 
 func printErr(err error) {
