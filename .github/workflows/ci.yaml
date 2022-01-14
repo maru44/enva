@@ -43,6 +43,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: build_enva
         run: make build/cli && make compress
         env:
