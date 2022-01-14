@@ -33,13 +33,16 @@ jobs:
         env:
           CLI_API_URL: http://localhost:8000
       - name: create pull request
-        token: ${{ secrets.GH_BOT_TOKEN }}
-        base: master
-        branch: compiled_cli_binary
-        delete-branch: true
-        commit-message: new cli tar.gz
-        title: update cli bin file
-        body: |
-          cli bin new
-          
-          Auto pushed by bot
+        if: success()
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_BOT_TOKEN }}
+          base: master
+          branch: compiled_cli_binary
+          delete-branch: true
+          commit-message: new cli tar.gz
+          title: update cli bin file
+          body: |
+            cli bin new
+
+            Auto pushed by bot
