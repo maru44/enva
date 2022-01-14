@@ -5,5 +5,6 @@
 .env
 /bin/**/
 /bin/*
-!/bin/**/.gitkeep
-!/bin/.gitkeep
+/bin/**/enva
+/bin/**/main
+/bin/**/enva_dev

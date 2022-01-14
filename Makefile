@@ -50,11 +50,14 @@ blank/tar:
 
 compress:
 	@echo 'Compression ${GOOS_DARWIN}'
-	@tar -C ${BIN_DIR}enva/${GOOS_DARWIN}/ -cvzf ${TAR_DIR}enva_${GOOS_DARWIN}.tar.gz ${BIN_NAME}
+	@tar -C ${BIN_DIR}enva/${GOOS_DARWIN}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${GOOS_DARWIN}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
+	@tar -C ${BIN_DIR}enva/${GOOS_DARWIN}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${GOOS_DARWIN}_${GOARCH_386}.tar.gz ${BIN_NAME}
 	@echo 'Compression ${GOOS_LINUX}'
-	@tar -C ${BIN_DIR}enva/${GOOS_LINUX}/ -cvzf ${TAR_DIR}enva_${GOOS_LINUX}.tar.gz ${BIN_NAME}
+	@tar -C ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${GOOS_LINUX}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
+	@tar -C ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${GOOS_LINUX}_${GOARCH_386}.tar.gz ${BIN_NAME}
 	@echo 'Compression ${GOOS_WINDOWS}'
-	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/ -cvzf ${TAR_DIR}enva_${GOOS_WINDOWS}.tar.gz ${BIN_NAME}
+	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${GOOS_WINDOWS}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
+	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${GOOS_WINDOWS}_${GOARCH_386}.tar.gz ${BIN_NAME}
 
 defrost:
 	@tar -xvzf ${BIN_DIR}enva/enva_darwin.tar.gz 
