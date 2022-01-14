@@ -19,11 +19,15 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			mess, _ := json.Marshal(map[string]interface{}{"message": err.Error()})
-			w.Write(mess)
+			if _, err := w.Write(mess); err != nil {
+				log.Fatal(err)
+			}
 			return
 		}
 		w.WriteHeader(status)
-		w.Write(data)
+		if _, err := w.Write(data); err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
@@ -50,7 +54,9 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 	}
 
 	data, _ := json.Marshal(mess)
-	w.Write(data)
+	if _, err := w.Write(data); err != nil {
+		log.Fatal(err)
+	}
 	return
 }
 

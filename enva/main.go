@@ -13,7 +13,7 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if args == nil || len(args) == 0 {
+	if len(args) == 0 {
 		commands.Run(ctx, "help")
 		return
 	}

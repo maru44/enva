@@ -23,9 +23,6 @@ func init() {
 }
 
 func (c *set) Run(ctx context.Context, opts ...string) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	if _, err := readSettings(); err == nil {
 		return errors.New("enva.json already exists")
 	}
