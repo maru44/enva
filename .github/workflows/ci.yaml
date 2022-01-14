@@ -39,12 +39,3 @@ jobs:
       - uses: actions/checkout@v2
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
-  enva:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: build_enva
-        run: make build/cli && make compress
-        env:
-          CLI_API_URL: http://localhost:8000
