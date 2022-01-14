@@ -38,10 +38,12 @@ build/cli:
 	@echo 'Finish ${GOOS_WINDOWS}!!'
 
 compress:
-	@echo 'Compression darwin'
-	@cd ${BIN_DIR}
-	@tar -cvzf ${BIN_DIR}enva/enva_${GOOS_DARWIN}.tar.gz ./enva/${GOOS_DARWIN}/${BIN_NAME}
-	@cd -
+	@echo 'Compression ${GOOS_DARWIN}'
+	@tar -C ${BIN_DIR}enva/${GOOS_DARWIN}/ -cvzf ${BIN_DIR}enva/enva_${GOOS_DARWIN}.tar.gz ${BIN_NAME}
+	@echo 'Compression ${GOOS_LINUX}'
+	@tar -C ${BIN_DIR}enva/${GOOS_LINUX}/ -cvzf ${BIN_DIR}enva/enva_${GOOS_LINUX}.tar.gz ${BIN_NAME}
+	@echo 'Compression ${GOOS_WINDOWS}'
+	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/ -cvzf ${BIN_DIR}enva/enva_${GOOS_WINDOWS}.tar.gz ${BIN_NAME}
 
 defrost:
 	@tar -xvzf ${BIN_DIR}enva/enva_darwin.tar.gz 
