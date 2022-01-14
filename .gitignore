@@ -3,7 +3,37 @@
 /tmp
 **/enva.json
 .env
-/bin/**/
 /bin/*
-!/bin/**/.gitkeep
-!/bin/.gitkeep
+!/bin/server/
+/bin/server/*
+!/bin/server/.gitkeep
+
+!/bin/enva/
+/bin/enva/*
+# darwin
+!/bin/enva/darwin
+/bin/enva/darwin/*
+!/bin/enva/darwin/386
+/bin/enva/darwin/386/*
+!/bin/enva/darwin/386/.gitkeep
+!/bin/enva/darwin/amd64
+/bin/enva/darwin/amd64/*
+!/bin/enva/darwin/amd64/.gitkeep
+# linux
+!/bin/enva/linux
+/bin/enva/linux/*
+!/bin/enva/linux/386
+/bin/enva/linux/386/*
+!/bin/enva/linux/386/.gitkeep
+!/bin/enva/linux/amd64
+/bin/enva/linux/amd64/*
+!/bin/enva/linux/amd64/.gitkeep
+# win
+!/bin/enva/windows
+/bin/enva/windows/*
+!/bin/enva/windows/386
+/bin/enva/windows/386/*
+!/bin/enva/windows/386/.gitkeep
+!/bin/enva/windows/amd64
+/bin/enva/windows/amd64/*
+!/bin/enva/windows/amd64/.gitkeep
