@@ -18,6 +18,7 @@ GOOS_WINDOWS:=windows
 GOOS_DARWIN:=darwin
 # GOARCH
 GOARCH_AMD:=amd64
+GOARCH_386:=386
 
 # test dirs
 # test dirs
@@ -30,7 +31,8 @@ num:=0
 
 build/cli:
 	@echo 'Start ${GOOS_DARWIN}'
-	@GOOS=${GOOS_DARWIN} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_DARWIN}/${BIN_NAME} ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_DARWIN} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_DARWIN}_${GOARCH_AMD}/${BIN_NAME} ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_DARWIN} GOARCH=${GOARCH_386} go build -o ${BIN_DIR}enva/${GOOS_DARWIN}_${GOARCH_386}/${BIN_NAME} ${ENVA_MAIN_FILE}
 	@echo 'Finish ${GOOS_DARWIN}!!'
 
 	@echo 'Start ${GOOS_LINUX}'
