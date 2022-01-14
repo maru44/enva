@@ -27,8 +27,8 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: build binary and compress
-        uses: actions/checkout@v2
         run: make build/cli && make compress
         env:
           CLI_API_URL: http://localhost:8000
