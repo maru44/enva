@@ -35,9 +35,7 @@ func NewOrgController(sql database.ISqlHandler, smtp mysmtp.ISmtpHandler) *OrgCo
 }
 
 func (con *OrgController) ListView(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	orgs, err := con.in.List(ctx)
+	orgs, err := con.in.List(r.Context())
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -48,9 +46,7 @@ func (con *OrgController) ListView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *OrgController) ListOwnerAdminView(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	orgs, err := con.in.ListOwnerAdmin(ctx)
+	orgs, err := con.in.ListOwnerAdmin(r.Context())
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -79,15 +75,13 @@ func (con *OrgController) DetailBySlugView(w http.ResponseWriter, r *http.Reques
 }
 
 func (con *OrgController) CreateView(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	var input domain.OrgInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}
 
-	slug, err := con.in.Create(ctx, input)
+	slug, err := con.in.Create(r.Context(), input)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
@@ -129,8 +123,7 @@ func (con *OrgController) InvitationListByOrgView(w http.ResponseWriter, r *http
 func (con *OrgController) InvitationDetailView(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get(QueryParamsID)
 
-	ctx := r.Context()
-	inv, err := con.in.InvitationDetail(ctx, domain.OrgInvitationID(id))
+	inv, err := con.in.InvitationDetail(r.Context(), domain.OrgInvitationID(id))
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
@@ -182,10 +175,9 @@ func (con *OrgController) InviteView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *OrgController) DenyView(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
 	id := r.URL.Query().Get(QueryParamsID)
 
-	if err := con.in.InvitationDeny(ctx, domain.OrgInvitationID(id)); err != nil {
+	if err := con.in.InvitationDeny(r.Context(), domain.OrgInvitationID(id)); err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}
@@ -213,10 +205,9 @@ func (con *OrgController) MemberCreateView(w http.ResponseWriter, r *http.Reques
 }
 
 func (con *OrgController) MemberListView(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
 	id := r.URL.Query().Get(QueryParamsID)
 
-	members, err := con.in.MemberList(ctx, domain.OrgID(id))
+	members, err := con.in.MemberList(r.Context(), domain.OrgID(id))
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
