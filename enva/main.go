@@ -7,7 +7,6 @@ import (
 	"github.com/maru44/enva/enva/commands"
 )
 
-// push test
 func main() {
 	ctx := context.Background()
 
