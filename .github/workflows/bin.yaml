@@ -1,0 +1,45 @@
+name: BIN
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'enva/**'
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set up
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+        id: go
+      - name: check out
+        uses: actions/checkout@v2
+      - name: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key:  ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+  enva:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: build binary and compress
+        uses: actions/checkout@v2
+        run: make build/cli && make compress
+        env:
+          CLI_API_URL: http://localhost:8000
+      - name: create pull request
+        token: ${{ secrets.GH_BOT_TOKEN }}
+        base: master
+        branch: compiled_cli_binary
+        delete-branch: true
+        commit-message: new cli tar.gz
+        title: update cli bin file
+        body: |
+          cli bin new
+          
+          Auto pushed by bot
