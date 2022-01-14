@@ -17,9 +17,6 @@ type (
 )
 
 func fetchDetailValid(ctx context.Context, key, email, password string) (*kvDetailBody, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	s, err := readSettings()
 	if err != nil {
 		return nil, err

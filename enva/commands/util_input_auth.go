@@ -7,7 +7,7 @@ import (
 	"os"
 	"syscall"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 func inputEmailPassword() (string, string, error) {
@@ -24,7 +24,7 @@ func inputEmailPassword() (string, string, error) {
 
 	fmt.Print("cli password: ")
 	// should be casted to int in GOOS=windows
-	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	password, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return "", "", err
 	}

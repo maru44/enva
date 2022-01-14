@@ -165,7 +165,6 @@ func (con *OrgController) InviteView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
-	return
 }
 
 func (con *OrgController) DenyView(w http.ResponseWriter, r *http.Request) {
@@ -206,7 +205,6 @@ func (con *OrgController) MemberListView(w http.ResponseWriter, r *http.Request)
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": members})
-	return
 }
 
 func (con *OrgController) MemberUpdateUserTypeView(w http.ResponseWriter, r *http.Request) {

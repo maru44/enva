@@ -20,9 +20,6 @@ type (
 )
 
 func fetchListValid(ctx context.Context) (*kvListBody, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	s, err := readSettings()
 	if err != nil {
 		return nil, err
