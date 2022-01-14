@@ -1,4 +1,4 @@
-.PHONY: build/cli compression defrost test
+.PHONY: build/cli compression defrost test blank/tar
 
 # BIN
 BIN_DIR:=bin/
@@ -26,6 +26,8 @@ TEST_REPOSITORY:=./service/api/internal/interface/database
 TEST_CONTROLLER:=./service/api/internal/interface/controllers
 TEST_INFRA:=./service/api/internal/infra
 
+num:=0
+
 build/cli:
 	@echo 'Start ${GOOS_DARWIN}'
 	@GOOS=${GOOS_DARWIN} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_DARWIN}/${BIN_NAME} ${ENVA_MAIN_FILE}
@@ -38,6 +40,9 @@ build/cli:
 	@echo 'Start ${GOOS_WINDOWS}'
 	@GOOS=${GOOS_WINDOWS} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_WINDOWS}/${BIN_NAME} ${ENVA_MAIN_FILE}
 	@echo 'Finish ${GOOS_WINDOWS}!!'
+
+blank/tar:
+	@echo ${num}
 
 compress:
 	@echo 'Compression ${GOOS_DARWIN}'

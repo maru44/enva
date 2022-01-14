@@ -7,6 +7,7 @@ import (
 	"github.com/maru44/enva/enva/commands"
 )
 
+// test
 func main() {
 	ctx := context.Background()
 	flag.Parse()

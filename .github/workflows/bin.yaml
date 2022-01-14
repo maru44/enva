@@ -28,6 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: gen build num
+        id: buildnum
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{ secrets.GH_BOT_TOKEN }}
+      - name: echo
+        run: make blank/tar num=${{ steps.buildnum.outputs.build_number }}
       - name: build binary and compress
         run: make build/cli && make compress
         env:
