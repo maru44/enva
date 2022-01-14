@@ -31,10 +31,7 @@ func Run(ctx context.Context, taskName string, opts ...string) {
 	c := createCommands()
 	if err := c.Run(ctx, opts...); err != nil {
 		printErr(err)
-		return
 	}
-
-	return
 }
 
 func printErr(err error) {
