@@ -36,7 +36,10 @@ func (repo *CliKvRepository) BulkInsert(ctx context.Context, projectID domain.Pr
 			return perr.Wrap(err, perr.BadRequest)
 		}
 	}
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.InternalServerError)
+	}
 
 	return nil
 }

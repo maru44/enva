@@ -167,7 +167,10 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return nil, perr.Wrap(err, perr.InternalServerError)
+	}
 
 	return slug, nil
 }
@@ -536,7 +539,10 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 		}
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return perr.Wrap(err, perr.InternalServerError)
+	}
 
 	return nil
 }

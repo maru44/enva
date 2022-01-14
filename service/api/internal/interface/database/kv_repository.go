@@ -131,7 +131,10 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return nil, perr.Wrap(err, perr.InternalServerError)
+	}
 
 	ID := domain.KvID(id)
 	return &ID, nil

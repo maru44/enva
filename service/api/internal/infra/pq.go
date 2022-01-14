@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -112,8 +113,11 @@ func (t SqlTx) Commit() error {
 	return t.Tx.Commit()
 }
 
-func (t SqlTx) Rollback() error {
-	return t.Tx.Rollback()
+func (t SqlTx) Rollback() {
+	if err := t.Tx.Rollback(); err != nil {
+		log.Fatalf("failed to rollback: %v", err)
+	}
+	return
 }
 
 func (t SqlTx) QueryContext(ctx context.Context, st string, args ...interface{}) (database.IRows, error) {

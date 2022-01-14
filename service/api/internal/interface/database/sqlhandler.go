@@ -18,7 +18,7 @@ type (
 		QueryContext(context.Context, string, ...interface{}) (IRows, error)
 		QueryRowContext(context.Context, string, ...interface{}) IRow
 		ExecContext(context.Context, string, ...interface{}) (IResult, error)
-		Rollback() error
+		Rollback()
 	}
 
 	IRow interface {
