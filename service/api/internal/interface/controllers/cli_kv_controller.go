@@ -65,7 +65,6 @@ func (con *CliKvController) ListView(w http.ResponseWriter, r *http.Request) {
 	}
 	sort.Slice(kvs, func(i, j int) bool { return kvs[i].Key.String() > kvs[j].Key.String() })
 	response(w, r, nil, map[string]interface{}{"data": kvs})
-	return
 }
 
 func (con *CliKvController) DetailView(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +85,6 @@ func (con *CliKvController) DetailView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response(w, r, nil, map[string]interface{}{"data": kv})
-	return
 }
 
 func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
@@ -115,7 +113,6 @@ func (con *CliKvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }
 
 func (con *CliKvController) BulkInsertView(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +153,6 @@ func (con *CliKvController) BulkInsertView(w http.ResponseWriter, r *http.Reques
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "success"})
-	return
 }
 
 func (con *CliKvController) UpdateView(w http.ResponseWriter, r *http.Request) {
@@ -184,7 +180,6 @@ func (con *CliKvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }
 
 func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +202,6 @@ func (con *CliKvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": affected})
-	return
 }
 
 func (con *CliKvController) userAccessToProject(ctx context.Context, projectSlug, orgSlug string) (*domain.ProjectID, error) {

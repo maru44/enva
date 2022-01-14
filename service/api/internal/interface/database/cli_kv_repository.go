@@ -14,6 +14,9 @@ type CliKvRepository struct {
 
 func (repo *CliKvRepository) BulkInsert(ctx context.Context, projectID domain.ProjectID, inputs []domain.KvInput) error {
 	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		return perr.Wrap(err, perr.Forbidden)
+	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {

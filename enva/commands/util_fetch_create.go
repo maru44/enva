@@ -17,9 +17,6 @@ type (
 )
 
 func fetchCreateKv(ctx context.Context, key, value string) (*kvCreateBody, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	s, err := readSettings()
 	if err != nil {
 		return nil, err

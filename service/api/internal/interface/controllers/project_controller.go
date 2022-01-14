@@ -38,7 +38,6 @@ func (con *ProjectController) ListAllView(w http.ResponseWriter, r *http.Request
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": ps})
-	return
 }
 
 // filtered by user @sql
@@ -50,7 +49,6 @@ func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Requ
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": ps})
-	return
 }
 
 // filtered by user @sql
@@ -68,7 +66,6 @@ func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Reque
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": ps})
-	return
 }
 
 // filtered by user @sql
@@ -80,7 +77,6 @@ func (con *ProjectController) SlugListByUserView(w http.ResponseWriter, r *http.
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": slugs})
-	return
 }
 
 // filtered by user @sql
@@ -126,7 +122,6 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": p})
-	return
 }
 
 // @TODO if orgID not equal null >>
@@ -158,7 +153,6 @@ func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request)
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }
 
 func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request) {
@@ -200,5 +194,4 @@ func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request)
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": affected})
-	return
 }

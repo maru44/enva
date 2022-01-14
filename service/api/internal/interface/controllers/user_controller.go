@@ -39,7 +39,6 @@ func (con *UserController) GetUserView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response(w, r, nil, map[string]interface{}{"data": user})
-	return
 }
 
 func (con *UserController) ExistsCliPasswordView(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +57,6 @@ func (con *UserController) ExistsCliPasswordView(w http.ResponseWriter, r *http.
 	}
 
 	response(w, r, perr.New("Cli password not found", perr.BadRequest, "Cli password not found"), nil)
-	return
 }
 
 func (con *UserController) UpdateCliPasswordView(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +67,6 @@ func (con *UserController) UpdateCliPasswordView(w http.ResponseWriter, r *http.
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": pass})
-	return
 }
 
 func (con *UserController) CreateView(w http.ResponseWriter, r *http.Request) {
@@ -80,5 +77,4 @@ func (con *UserController) CreateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }

@@ -54,7 +54,6 @@ func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 	}
 	sort.Slice(kvs, func(i, j int) bool { return kvs[i].Key.String() > kvs[j].Key.String() })
 	response(w, r, nil, map[string]interface{}{"data": kvs})
-	return
 }
 
 func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +77,6 @@ func (con *KvController) CreateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }
 
 func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +99,6 @@ func (con *KvController) UpdateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }
 
 func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +119,6 @@ func (con *KvController) DeleteView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": affected})
-	return
 }
 
 func (con *KvController) userAccessToProject(ctx context.Context, projectID domain.ProjectID) error {

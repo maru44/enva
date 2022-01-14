@@ -57,7 +57,6 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 	if _, err := w.Write(data); err != nil {
 		log.Fatal(err)
 	}
-	return
 }
 
 func getStatusCode(err error, w http.ResponseWriter) int {
