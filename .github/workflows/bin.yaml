@@ -32,10 +32,6 @@ jobs:
         run: make build/cli && make compress
         env:
           CLI_API_URL: http://localhost:8000
-      - name: commit
-        run: |
-          git add -A
-          git commit -m "make compress"
       - name: create pull request
         if: success()
         uses: peter-evans/create-pull-request@v3

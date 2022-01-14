@@ -9,7 +9,6 @@ import (
 
 func main() {
 	ctx := context.Background()
-
 	flag.Parse()
 	args := flag.Args()
 
