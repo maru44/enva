@@ -66,5 +66,4 @@ func (con *CliProjectController) CreateView(w http.ResponseWriter, r *http.Reque
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
-	return
 }

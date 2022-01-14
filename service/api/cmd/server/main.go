@@ -162,7 +162,6 @@ func sv(ps []pmf, middlewares ...string) {
 
 		router.Handle(p.Path, base.BaseMiddleware(keySet, mmF(f)))
 	}
-	return
 }
 
 func svCli(ps []pmf, middlewares ...string) {
@@ -199,7 +198,6 @@ func svCli(ps []pmf, middlewares ...string) {
 
 		router.Handle(p.Path, mmF(f))
 	}
-	return
 }
 
 func s(path string, method string, fun func(http.ResponseWriter, *http.Request)) pmf {

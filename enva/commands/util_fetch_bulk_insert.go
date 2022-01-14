@@ -16,9 +16,6 @@ type (
 )
 
 func fetchBulkInsertKvs(ctx context.Context, inputs []domain.KvInput, email, password string) (*kvBulkInsertBody, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	s, err := readSettings()
 	if err != nil {
 		return nil, err

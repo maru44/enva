@@ -17,9 +17,6 @@ type (
 )
 
 func fetchCreateProject(ctx context.Context, desc, email, password string) (*projectCreateBody, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	s, err := readSettings()
 	if err != nil {
 		return nil, err

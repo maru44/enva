@@ -42,7 +42,6 @@ func (con *BaseController) GetKeySet() (jwk.Set, error) {
 
 func (con *BaseController) NotFoundView(w http.ResponseWriter, r *http.Request) {
 	response(w, r, perr.New("", perr.NotFound), nil)
-	return
 }
 
 func (con *BaseController) UserTestView(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +49,6 @@ func (con *BaseController) UserTestView(w http.ResponseWriter, r *http.Request) 
 	if ok {
 		response(w, r, nil, map[string]interface{}{"user": user})
 	}
-	return
 }
 
 /********************************
@@ -85,7 +83,6 @@ func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Origin, X-Csrftoken, Accept, Cookie, Id-Token, Refresh-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
 	w.Header().Set("Access-Control-Max-Age", "3600")
-	return
 }
 
 func (con *BaseController) PostOnlyMiddleware(next http.Handler) http.Handler {

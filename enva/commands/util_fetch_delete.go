@@ -15,9 +15,6 @@ type (
 )
 
 func fetchDeleteKv(ctx context.Context, key string) (*kvDeleteBody, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	s, err := readSettings()
 	if err != nil {
 		return nil, err

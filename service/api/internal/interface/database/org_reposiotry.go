@@ -200,7 +200,7 @@ func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID doma
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
-	if rows.Err(); err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 
@@ -247,6 +247,9 @@ func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvi
 		queryset.OrgInvitationListQuery,
 		cu.ID,
 	)
+	if err != nil {
+		return nil, perr.Wrap(err, perr.NotFound)
+	}
 	if err := rows.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}

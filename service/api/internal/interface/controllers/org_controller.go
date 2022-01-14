@@ -42,7 +42,6 @@ func (con *OrgController) ListView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": orgs})
-	return
 }
 
 func (con *OrgController) ListOwnerAdminView(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +52,6 @@ func (con *OrgController) ListOwnerAdminView(w http.ResponseWriter, r *http.Requ
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": orgs})
-	return
 }
 
 func (con *OrgController) DetailBySlugView(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +69,6 @@ func (con *OrgController) DetailBySlugView(w http.ResponseWriter, r *http.Reques
 			"org":               org,
 			"current_user_type": *cuUserType,
 		}})
-	return
 }
 
 func (con *OrgController) CreateView(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +85,6 @@ func (con *OrgController) CreateView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": slug})
-	return
 }
 
 /* inv */
@@ -117,7 +113,6 @@ func (con *OrgController) InvitationListByOrgView(w http.ResponseWriter, r *http
 	sort.Slice(invs, func(i, j int) bool { return invs[i].CreatedAt.String() > invs[j].CreatedAt.String() })
 
 	response(w, r, nil, map[string]interface{}{"data": invs})
-	return
 }
 
 func (con *OrgController) InvitationDetailView(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +131,6 @@ func (con *OrgController) InvitationDetailView(w http.ResponseWriter, r *http.Re
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": inv})
-	return
 }
 
 func (con *OrgController) InviteView(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +165,6 @@ func (con *OrgController) InviteView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
-	return
 }
 
 func (con *OrgController) DenyView(w http.ResponseWriter, r *http.Request) {
@@ -183,7 +176,6 @@ func (con *OrgController) DenyView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
-	return
 }
 
 /* member */
@@ -201,7 +193,6 @@ func (con *OrgController) MemberCreateView(w http.ResponseWriter, r *http.Reques
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
-	return
 }
 
 func (con *OrgController) MemberListView(w http.ResponseWriter, r *http.Request) {
@@ -214,7 +205,6 @@ func (con *OrgController) MemberListView(w http.ResponseWriter, r *http.Request)
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": members})
-	return
 }
 
 func (con *OrgController) MemberUpdateUserTypeView(w http.ResponseWriter, r *http.Request) {
@@ -230,7 +220,6 @@ func (con *OrgController) MemberUpdateUserTypeView(w http.ResponseWriter, r *htt
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
-	return
 }
 
 func (con *OrgController) MemberDeleteView(w http.ResponseWriter, r *http.Request) {
@@ -248,7 +237,6 @@ func (con *OrgController) MemberDeleteView(w http.ResponseWriter, r *http.Reques
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
-	return
 }
 
 func (con *OrgController) MemberGetTypeView(w http.ResponseWriter, r *http.Request) {
@@ -267,5 +255,4 @@ func (con *OrgController) MemberGetTypeView(w http.ResponseWriter, r *http.Reque
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": *ut})
-	return
 }
