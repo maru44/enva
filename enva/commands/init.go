@@ -42,7 +42,7 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 
 	if _, err := fetchBulkInsertKvs(ctx, inputs, email, password); err != nil {
 		if err.Error() == "Project is not found" {
-			color.Yellow("Are you create new project? (y/n):")
+			color.Yellow("Do you want to create a new project? (y/n):")
 			scan := bufio.NewScanner(os.Stdin)
 			scan.Scan()
 			isCreate := scan.Text()
@@ -57,8 +57,11 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 
 			// @TODO post cli kv create
 			// if success retry fetchBulkInsertKvs
-			fmt.Println(desc)
-			if _, err := fetchCreateProject(ctx, desc, email, password); err != nil {
+			s, err := readSettings()
+			if err != nil {
+				return err
+			}
+			if _, err := fetchCreateProject(ctx, s.OrgSlug, s.ProjectSlug, desc, email, password); err != nil {
 				return err
 			}
 
@@ -66,7 +69,18 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 				return err
 			}
 
-			color.Green("init project is succeded")
+			var path string
+			if s.OrgSlug == nil {
+				path = "project/" + s.ProjectSlug
+			} else {
+				path = "project/" + *s.OrgSlug + "/" + s.ProjectSlug
+			}
+			color.Green("Project created!\nURL: ")
+			color.Blue(
+				"%s%s%s/%s",
+				os.Getenv("FRONT_PROTOCOL"), os.Getenv("FRONT_HOST"), os.Getenv("FRONT_PORT"),
+				path,
+			)
 			return nil
 		}
 		return err
@@ -79,6 +93,8 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 func (c *initialize) Explain() string {
 	return `
 	Setting key-value sets of remote based on local env file written in enva.json.
+	If project written in enva.json does not exists, you can create project and set key-value sets of remote based on local env file. (This is optional. You can deny it.)
+
 	This command is so powerful that you can't execute if any remote key-value is set in the project.
 `
 }

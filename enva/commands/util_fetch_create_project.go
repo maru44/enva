@@ -16,18 +16,13 @@ type (
 	}
 )
 
-func fetchCreateProject(ctx context.Context, desc, email, password string) (*projectCreateBody, error) {
-	s, err := readSettings()
-	if err != nil {
-		return nil, err
-	}
-
+func fetchCreateProject(ctx context.Context, orgSlug *string, slug, desc, email, password string) (*projectCreateBody, error) {
 	path := "/cli/project/create"
 	input := domain.CliProjectInput{
-		Name:        s.ProjectSlug,
-		Slug:        s.ProjectSlug,
+		Name:        slug,
+		Slug:        slug,
 		Description: tools.StringPtr(desc),
-		OrgSlug:     s.OrgSlug,
+		OrgSlug:     orgSlug,
 	}
 	inputJ, err := json.Marshal(input)
 	if err != nil {
