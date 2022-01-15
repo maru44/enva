@@ -1,1 +1,1 @@
-[]
+[{"version":"v1.0.0","oss":[{"os":"darwin","archs":["amd64"]},{"os":"linux","archs":["amd64","386"]},{"os":"windows","archs":["amd64","386"]}]}]
