@@ -8,6 +8,12 @@ import { SnackbarProvider } from 'notistack'
 import { currentUserState } from '../../hooks/useCurrentUser'
 import { useEffect } from 'react'
 import { fetchCurrentUser } from '../../http/auth'
+import Amplify, { Auth } from 'aws-amplify'
+import awsConfig from '../../config/aws'
+import { AmplifyProvider } from '@aws-amplify/ui-react'
+
+Amplify.configure(awsConfig)
+Auth.configure(awsConfig)
 
 const AppInit = () => {
   const [, setCurrentUser] = useRecoilState(currentUserState)
@@ -31,9 +37,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <RecoilRoot>
       <ThemeProvider theme={theme}>
         <SnackbarProvider maxSnack={2} autoHideDuration={5000}>
-          <Box>
-            <BaseLayout main={<Component {...pageProps} />} />
-          </Box>
+          <AmplifyProvider>
+            <Box>
+              <BaseLayout main={<Component {...pageProps} />} />
+            </Box>
+          </AmplifyProvider>
         </SnackbarProvider>
       </ThemeProvider>
       <AppInit />
