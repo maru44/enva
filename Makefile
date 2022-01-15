@@ -1,9 +1,9 @@
-.PHONY: build/cli compression defrost test touch/tar version
+.PHONY: build/cli compression defrost test touch/tar json/version
 
 # BIN
 BIN_DIR:=bin/
 BIN_NAME:=enva
-TAR_DIR:=./tar/
+TAR_DIR:=./service/front/public/enva/
 ifeq (${CLI_API_URL}, http://localhost:8080)
   BIN_NAME=enva_dev
   TAR_DIR=${BIN_DIR}enva/
@@ -60,6 +60,9 @@ compress:
 	@echo 'Compression ${GOOS_WINDOWS}'
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_386}.tar.gz ${BIN_NAME}
+
+json/version:
+	@go run ./version/internal/main.go ${VERSION}
 
 defrost:
 	@tar -xvzf ${BIN_DIR}enva/enva_darwin.tar.gz 

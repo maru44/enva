@@ -21,9 +21,6 @@ func init() {
 }
 
 func (c *initialize) Run(ctx context.Context, opts ...string) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	kvs, err := fileReadAndCreateKvs()
 	if err != nil {
 		return err
