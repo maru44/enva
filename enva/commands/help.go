@@ -15,7 +15,7 @@ type (
 var AllCommands = []string{
 	"pull", "get", "add", "edit",
 	"delete", "diff", "init", "set",
-	// "help", "version",
+	"help", "version",
 }
 
 func init() {
