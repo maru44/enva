@@ -13,9 +13,6 @@
 # darwin
 !/bin/enva/darwin
 /bin/enva/darwin/*
-!/bin/enva/darwin/386
-/bin/enva/darwin/386/*
-!/bin/enva/darwin/386/.gitkeep
 !/bin/enva/darwin/amd64
 /bin/enva/darwin/amd64/*
 !/bin/enva/darwin/amd64/.gitkeep

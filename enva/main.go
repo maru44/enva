@@ -14,6 +14,7 @@ func main() {
 	args := flag.Args()
 
 	if len(args) == 0 {
+		commands.Run(ctx, "version")
 		commands.Run(ctx, "help")
 		return
 	}

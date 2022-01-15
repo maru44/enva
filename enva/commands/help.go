@@ -19,7 +19,7 @@ func init() {
 }
 
 func (c *help) Run(ctx context.Context, opts ...string) error {
-	fmt.Print("\n\n\n\n\n")
+	fmt.Print("\n==============================\n== How to use enva commands ==\n==============================\n\n")
 	for name, in := range Commands {
 		color.Green(name)
 		f := in()
