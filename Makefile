@@ -74,8 +74,7 @@ endif
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_386}.tar.gz ${BIN_NAME}
 ifeq (${CLI_API_URL}, http://localhost:8080)
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_WINDOWS} ${GOARCH_AMD}
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_WINDOWS} ${GOARCH_386}
+	@echo 'local'
 else
 	@go run ./version/internal/main.go ${VERSION} ${GOOS_WINDOWS} ${GOARCH_AMD}
 	@go run ./version/internal/main.go ${VERSION} ${GOOS_WINDOWS} ${GOARCH_386}
