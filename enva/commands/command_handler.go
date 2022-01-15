@@ -19,48 +19,7 @@ var (
 	ApiUrl = os.Getenv("CLI_API_URL")
 )
 
-func init() {
-	Commands["pull"] = func() domain.ICommandInteractor {
-		return &pull{}
-	}
-
-	Commands["get"] = func() domain.ICommandInteractor {
-		return &get{}
-	}
-
-	Commands["add"] = func() domain.ICommandInteractor {
-		return &add{}
-	}
-
-	Commands["edit"] = func() domain.ICommandInteractor {
-		return &edit{}
-	}
-
-	Commands["delete"] = func() domain.ICommandInteractor {
-		return &delete{}
-	}
-
-	Commands["diff"] = func() domain.ICommandInteractor {
-		return &diff{}
-	}
-
-	Commands["init"] = func() domain.ICommandInteractor {
-		return &initialize{}
-	}
-
-	Commands["set"] = func() domain.ICommandInteractor {
-		return &set{}
-	}
-
-	Commands["help"] = func() domain.ICommandInteractor {
-		return &help{}
-	}
-
-	Commands["version"] = func() domain.ICommandInteractor {
-		return &version{}
-	}
-}
-
+// add to command is written in z_initialize.go
 func Run(ctx context.Context, taskName string, opts ...string) {
 	createCommands, ok := Commands[taskName]
 	if !ok {
