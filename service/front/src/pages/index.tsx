@@ -12,19 +12,14 @@ import {
 } from '@mui/material'
 import {
   Apartment,
-  CastConnected,
   Eco,
   Group,
-  Keyboard,
   Lock,
   MonetizationOn,
-  NetworkCell,
-  NetworkCheck,
   NetworkWifi,
   Pages,
   Security,
   Share,
-  ShareSharp,
   Timer,
 } from '@material-ui/icons'
 import { ReactNode } from 'react'

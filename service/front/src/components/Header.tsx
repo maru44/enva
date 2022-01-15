@@ -1,10 +1,8 @@
 import {
   AccountCircle,
-  Add,
   AddCircle,
-  Computer,
   ComputerOutlined,
-  ComputerRounded,
+  Keyboard,
 } from '@material-ui/icons'
 import {
   Box,
@@ -44,7 +42,7 @@ export const Header: React.FC = () => {
               <Link href="/cli" passHref>
                 <Tooltip arrow title="download cli">
                   <IconButton color="primary">
-                    <ComputerOutlined />
+                    <Keyboard />
                   </IconButton>
                 </Tooltip>
               </Link>
@@ -75,7 +73,7 @@ export const Header: React.FC = () => {
               <Link href="/cli" passHref>
                 <Tooltip arrow title="download cli">
                   <IconButton color="primary">
-                    <ComputerOutlined />
+                    <Keyboard />
                   </IconButton>
                 </Tooltip>
               </Link>
