@@ -20,15 +20,13 @@ func main() {
 		panic(err)
 	}
 	defer file.Close()
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
 
 	fi, _ := file.Stat()
 	leng := fi.Size()
 	if leng == 0 {
-		file.Write([]byte(fmt.Sprintf(`["%s"]`, version)))
+		if _, err := file.Write([]byte(fmt.Sprintf(`["%s"]`, version))); err != nil {
+			panic(err)
+		}
 	} else {
 		var versions []string
 		data, err := ioutil.ReadFile(fileName)
@@ -44,6 +42,8 @@ func main() {
 			}
 		}
 
-		file.WriteAt([]byte(fmt.Sprintf(`,"%s"]`, version)), leng-1)
+		if _, err := file.WriteAt([]byte(fmt.Sprintf(`,"%s"]`, version)), leng-1); err != nil {
+			panic(err)
+		}
 	}
 }
