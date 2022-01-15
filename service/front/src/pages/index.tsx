@@ -32,6 +32,11 @@ const Home: NextPage = () => {
           Welcome to <span className={styles.service}>Envassador</span>!
         </Typography>
       </Box>
+      <Box mt={3}>
+        <Typography variant="h4" textAlign="center">
+          The ambassador of environmental variables.
+        </Typography>
+      </Box>
       <Box mt={6}>
         <List disablePadding className={styles.list}>
           <ListItem>

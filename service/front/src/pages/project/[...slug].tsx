@@ -1,5 +1,5 @@
-import { ArrowBack } from '@material-ui/icons'
-import { Box, IconButton, Typography } from '@mui/material'
+import { ArrowBack, FileCopy } from '@material-ui/icons'
+import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,6 +10,7 @@ import { fetcherGetFromApiUrl, GetPath } from '../../../http/fetcher'
 import { PageProps } from '../../../types/page'
 import { ErrorComponent } from '../../components/error/ErrorComponent'
 import { KvList } from '../../components/kv/KvList'
+import styles from '../../styles/project.module.css'
 
 const ProjectDetail: NextPage<PageProps> = (props) => {
   useRequireLogin()
@@ -34,6 +35,18 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
 
   if (error) return <ErrorComponent />
   if (data?.error) return <ErrorComponent errBody={data} />
+
+  const sampleJson = `{
+  "env_file_name": ".env",
+  "projectSlug": "${data?.data.slug}",${
+    data?.data.org
+      ? `
+  "org_slug": "${data?.data.org.slug}",`
+      : ''
+  }
+  "pre_sentence": "# this is optional value\\n# you can write any thing",
+  "suf_sentence": "# this is optional value\\n# Have a nice day!"
+}`
 
   return (
     <Box mt={6}>
@@ -75,6 +88,31 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
             )}
             <Box mt={4}>
               <KvList projectId={data.data.id} />
+            </Box>
+          </Box>
+          <Box mt={6}>
+            <Typography variant="h6">
+              Sample enva.json for this project
+            </Typography>
+            <Box mt={2}>
+              <Box className={styles.sampleJson} pb={2} pr={3} pl={3}>
+                <Box textAlign="right" pt={1}>
+                  <Tooltip title="copy" arrow>
+                    <IconButton
+                      onClick={() => {
+                        navigator.clipboard.writeText(sampleJson)
+                      }}
+                    >
+                      <FileCopy />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <Typography>
+                  <pre>
+                    <code>{sampleJson}</code>
+                  </pre>
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </Box>

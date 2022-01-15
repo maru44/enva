@@ -39,7 +39,7 @@ const CliIndex: NextPage<PageProps> = (props) => {
               display="flex"
             >
               <code>
-                rm -f /usr/local/bin/enva -C /usr/local/bin -xvzf
+                rm -f /usr/local/bin/enva {`&&`} tar -C /usr/local/bin -xvzf
                 enva_v1.0.0_linux_amd64.tar.gz
               </code>
               <Tooltip title="copy" placement="top" arrow>
