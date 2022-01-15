@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/maru44/enva/enva/commands"
 )
 
 type (
@@ -27,6 +29,9 @@ func main() {
 	if os.Getenv("CLI_API_URL") == "http://localhost:8080" {
 		fmt.Println("skip to overwrite tar.json")
 		return
+	}
+	if len(commands.Commands) != len(commands.AllCommands) {
+		panic("commands length not correspond\ncommands.Commands with commands.AllCommands")
 	}
 
 	flag.Parse()
