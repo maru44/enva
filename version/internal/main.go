@@ -22,6 +22,11 @@ type (
 const fileName = "./service/front/public/enva/tar.json"
 
 func main() {
+	// if env is local skip
+	if os.Getenv("CLI_API_URL") == "http://localhost:8080" {
+		return
+	}
+
 	flag.Parse()
 	args := flag.Args()
 
