@@ -33,8 +33,10 @@ const ProjectList: NextPage<PageProps> = (props) => {
   if (data?.error) return <ErrorComponent errBody={data} />
 
   return (
-    <Box mt={6} width="100%">
-      <Typography variant="h5">Projects</Typography>
+    <Box width="100%">
+      <Box mt={6}>
+        <Typography variant="h5">Projects</Typography>
+      </Box>
       <Grid container mt={1} rowSpacing={2} columnSpacing={2}>
         {data?.data &&
           data.data.map((p, i) => (
