@@ -5,18 +5,11 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	help struct{}
 )
-
-func init() {
-	Commands["help"] = func() domain.ICommandInteractor {
-		return &help{}
-	}
-}
 
 func (c *help) Run(ctx context.Context, opts ...string) error {
 	fmt.Print("\n==============================\n== How to use enva commands ==\n==============================\n\n")

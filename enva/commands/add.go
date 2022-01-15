@@ -5,18 +5,11 @@ import (
 	"errors"
 
 	"github.com/fatih/color"
-	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	add struct{}
 )
-
-func init() {
-	Commands["add"] = func() domain.ICommandInteractor {
-		return &add{}
-	}
-}
 
 func (c *add) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
@@ -49,8 +42,8 @@ func (c *add) Run(ctx context.Context, opts ...string) error {
 
 func (c *add) Explain() string {
 	return `
-	Add remote and local key-value set.
-	Two args is needed. First one is key, another is value.
+	Adding remote and local key-value set.
+	Two args are required. First one is key, another is value.
 	ex) enva add [key] [value]
 `
 }

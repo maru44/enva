@@ -14,12 +14,6 @@ type (
 	initialize struct{}
 )
 
-func init() {
-	Commands["init"] = func() domain.ICommandInteractor {
-		return &initialize{}
-	}
-}
-
 func (c *initialize) Run(ctx context.Context, opts ...string) error {
 	kvs, err := fileReadAndCreateKvs()
 	if err != nil {
@@ -78,7 +72,7 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 
 func (c *initialize) Explain() string {
 	return `
-	Set key-value sets of remote based on local env file.
+	Setting key-value sets of remote based on local env file written in enva.json.
 	This command is so powerful that you can't execute if any remote key-value is set in the project.
 `
 }

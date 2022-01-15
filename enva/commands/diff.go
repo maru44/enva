@@ -18,12 +18,6 @@ type (
 	}
 )
 
-func init() {
-	Commands["diff"] = func() domain.ICommandInteractor {
-		return &diff{}
-	}
-}
-
 func (c *diff) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -105,6 +99,6 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 
 func (c *diff) Explain() string {
 	return `
-	Get the difference between remote and local key-values and output in command line
+	Getting the difference between remote and local key-value sets and output them.
 `
 }

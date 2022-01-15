@@ -5,18 +5,11 @@ import (
 	"errors"
 
 	"github.com/fatih/color"
-	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	delete struct{}
 )
-
-func init() {
-	Commands["delete"] = func() domain.ICommandInteractor {
-		return &delete{}
-	}
-}
 
 func (c *delete) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
@@ -44,7 +37,7 @@ func (c *delete) Run(ctx context.Context, opts ...string) error {
 
 func (c *delete) Explain() string {
 	return `
-	Remove remote and local key-value set. An arg is needed.
+	Removing remote and local key-value set. An arg is needed.
 	ex) enva delete [key]
 `
 }

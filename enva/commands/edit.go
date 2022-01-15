@@ -5,18 +5,11 @@ import (
 	"errors"
 
 	"github.com/fatih/color"
-	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	edit struct{}
 )
-
-func init() {
-	Commands["edit"] = func() domain.ICommandInteractor {
-		return &edit{}
-	}
-}
 
 func (c *edit) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
@@ -49,7 +42,7 @@ func (c *edit) Run(ctx context.Context, opts ...string) error {
 
 func (c *edit) Explain() string {
 	return `
-	Edit remote and local value. Two args is needed. First one is key, another is value.
+	Editing remote and local value. Two args are required. First one is key, another is value.
 	ex) enva edit [key] [value]
 `
 }
