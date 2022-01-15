@@ -12,6 +12,12 @@ type (
 	get struct{}
 )
 
+func init() {
+	Commands["get"] = func() domain.ICommandInteractor {
+		return &get{}
+	}
+}
+
 func (c *get) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

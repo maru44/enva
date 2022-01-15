@@ -5,11 +5,18 @@ import (
 	"errors"
 
 	"github.com/fatih/color"
+	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	edit struct{}
 )
+
+func init() {
+	Commands["edit"] = func() domain.ICommandInteractor {
+		return &edit{}
+	}
+}
 
 func (c *edit) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)

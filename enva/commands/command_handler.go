@@ -19,7 +19,7 @@ var (
 	ApiUrl = os.Getenv("CLI_API_URL")
 )
 
-// add to command is written in z_initialize.go
+// if added commands add the name to AllCommands
 func Run(ctx context.Context, taskName string, opts ...string) {
 	createCommands, ok := Commands[taskName]
 	if !ok {

@@ -18,6 +18,12 @@ type (
 	}
 )
 
+func init() {
+	Commands["diff"] = func() domain.ICommandInteractor {
+		return &diff{}
+	}
+}
+
 func (c *diff) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

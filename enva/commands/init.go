@@ -14,6 +14,12 @@ type (
 	initialize struct{}
 )
 
+func init() {
+	Commands["init"] = func() domain.ICommandInteractor {
+		return &initialize{}
+	}
+}
+
 func (c *initialize) Run(ctx context.Context, opts ...string) error {
 	kvs, err := fileReadAndCreateKvs()
 	if err != nil {

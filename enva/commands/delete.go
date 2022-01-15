@@ -5,11 +5,18 @@ import (
 	"errors"
 
 	"github.com/fatih/color"
+	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	delete struct{}
 )
+
+func init() {
+	Commands["delete"] = func() domain.ICommandInteractor {
+		return &delete{}
+	}
+}
 
 func (c *delete) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)

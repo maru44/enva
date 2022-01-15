@@ -5,6 +5,8 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+
+	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 //go:embed version.json
@@ -18,6 +20,12 @@ type (
 		Updation string `json:"updation"`
 	}
 )
+
+func init() {
+	Commands["version"] = func() domain.ICommandInteractor {
+		return &version{}
+	}
+}
 
 func (c *version) Run(ctx context.Context, opts ...string) error {
 	var info versionInfo

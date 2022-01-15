@@ -7,8 +7,11 @@ import (
 	"github.com/maru44/enva/enva/commands"
 )
 
-//
 func main() {
+	if len(commands.Commands) != len(commands.AllCommands) {
+		panic("commands length not correspond")
+	}
+
 	ctx := context.Background()
 	flag.Parse()
 	args := flag.Args()

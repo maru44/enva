@@ -9,11 +9,18 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
 type (
 	set struct{}
 )
+
+func init() {
+	Commands["set"] = func() domain.ICommandInteractor {
+		return &set{}
+	}
+}
 
 func (c *set) Run(ctx context.Context, opts ...string) error {
 	if _, err := readSettings(); err == nil {
