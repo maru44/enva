@@ -2,10 +2,10 @@ name: BIN
 on:
   - workflow_dispatch: {}
   - push:
-    branches:
-      - master
-    paths:
-      - "enva/**"
+      branches:
+        - master
+      paths:
+        - "enva/**"
 jobs:
   enva:
     runs-on: ubuntu-latest
