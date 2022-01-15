@@ -37,7 +37,7 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   if (data?.error) return <ErrorComponent errBody={data} />
 
   const sampleJson = `{
-  "env_file_name": ".env",
+  "env_file_name": ".envrc",
   "projectSlug": "${data?.data.slug}",${
     data?.data.org
       ? `
@@ -90,7 +90,7 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
               <KvList projectId={data.data.id} />
             </Box>
           </Box>
-          <Box mt={6}>
+          <Box mt={6} pl={1} pr={1}>
             <Typography variant="h6">
               Sample enva.json for this project
             </Typography>
