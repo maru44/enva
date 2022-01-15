@@ -3,47 +3,105 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 )
 
-const fileName = "./service/front/public/enva/version.json"
+type (
+	versionOs struct {
+		Name  string   `json:"os"`
+		Archs []string `json:"archs"`
+	}
+
+	version struct {
+		Version string      `json:"version"`
+		Oss     []versionOs `json:"oss"`
+	}
+)
+
+const fileName = "./service/front/public/enva/tar.json"
 
 func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	version := args[0]
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, 0600)
+	if len(args) != 3 {
+		panic("invalid args: need 3 args")
+	}
+	inputVersion := args[0]
+	inputOs := args[1]
+	inputArch := args[2]
+
+	var (
+		vs                []version
+		idxVersion, idxOs int = -1, -1
+	)
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		panic(err)
+	}
+	if err := json.Unmarshal(data, &vs); err != nil {
+		panic(err)
+	}
+	for i, v := range vs {
+		if v.Version == inputVersion {
+			idxVersion = i
+			break
+		}
+	}
+
+	// if input version does not ex
+	if idxVersion == -1 {
+		newValue := version{
+			Version: inputVersion,
+			Oss: []versionOs{
+				{
+					Name: inputOs,
+					Archs: []string{
+						inputArch,
+					},
+				},
+			},
+		}
+		vs = append(vs, newValue)
+	}
+
+	// if input version ex
+	if idxVersion != -1 {
+		for i, o := range vs[idxVersion].Oss {
+			if o.Name == inputOs {
+				idxOs = i
+				break
+			}
+		}
+
+		// if input os does not ex
+		if idxOs == -1 {
+			vs[idxVersion].Oss = append(vs[idxVersion].Oss, versionOs{Name: inputOs, Archs: []string{inputArch}})
+		} else {
+			// if input os ex
+			for _, a := range vs[idxVersion].Oss[idxOs].Archs {
+				// if input arch ex
+				if a == inputArch {
+					return
+				}
+			}
+			// if arch not ex
+			vs[idxVersion].Oss[idxOs].Archs = append(vs[idxVersion].Oss[idxOs].Archs, inputArch)
+		}
+	}
+
+	j, err := json.Marshal(vs)
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
-
-	fi, _ := file.Stat()
-	leng := fi.Size()
-	if leng == 0 {
-		if _, err := file.Write([]byte(fmt.Sprintf(`["%s"]`, version))); err != nil {
-			panic(err)
-		}
-	} else {
-		var versions []string
-		data, err := ioutil.ReadFile(fileName)
-		if err != nil {
-			panic(err)
-		}
-		if err := json.Unmarshal(data, &versions); err != nil {
-			panic(err)
-		}
-		for _, v := range versions {
-			if v == version {
-				return
-			}
-		}
-
-		if _, err := file.WriteAt([]byte(fmt.Sprintf(`,"%s"]`, version)), leng-1); err != nil {
-			panic(err)
-		}
+	if _, err := file.WriteAt(j, 0); err != nil {
+		panic(err)
 	}
 }

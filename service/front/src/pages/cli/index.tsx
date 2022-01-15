@@ -1,32 +1,22 @@
 import { Box, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { PageProps } from '../../../types/page'
-import Versions from '../../../public/enva/version.json'
-import { OsArch } from '../../../types/os'
+import Versions from '../../../public/enva/tar.json'
 import { SyntheticEvent, useState } from 'react'
 import Link from 'next/link'
 import { CloudDownload, FileCopy } from '@material-ui/icons'
 import styles from '../../styles/cli.module.css'
+import { tarJson } from '../../../types/os'
 
-type tab = 'linux' | 'mac' | 'windows'
-
-type props = {
-  version: string
-}
-
-const osArch: { [key: string]: string[] } = {
-  mac: ['amd64'],
-  linux: ['386', 'amd64'],
-  windows: ['386', 'amd64'],
-}
+type tab = 'linux' | 'darwin' | 'windows'
 
 const CliIndex: NextPage<PageProps> = (props) => {
   // sort desc
-  const vs = Versions ? Versions.sort((a, b) => b.localeCompare(a)) : []
+  const vs: tarJson[] = Versions
+    ? Versions.sort((a, b) => b.version.localeCompare(a.version))
+    : []
 
   const [tab, setTab] = useState<tab | 'history'>('linux')
-  const [isCopied, setIsCopied] = useState<boolean>(false)
-
   const handleChange = (e: SyntheticEvent, newValue: tab) => {
     setTab(newValue)
   }
@@ -71,19 +61,13 @@ const CliIndex: NextPage<PageProps> = (props) => {
         <Box mt={6}>
           <Tabs value={tab} onChange={handleChange} className={styles.tabs}>
             <Tab key="linux" value="linux" label="Linux" />
-            <Tab key="mac" value="mac" label="Mac" />
+            <Tab key="darwin" value="darwin" label="Mac" />
             <Tab key="windows" value="windows" label="Windows" />
             <Tab key="history" value="history" label="history" />
           </Tabs>
           {tab !== 'history' && (
             <Box mt={6}>
-              <Box>
-                {osArch[tab].map((a, i) => (
-                  <Box key={i}>
-                    <TarHref fileName={fileName(tab, a, vs[0])} />
-                  </Box>
-                ))}
-              </Box>
+              <TarHrefs version={vs[0]} tab={tab} />
             </Box>
           )}
           {tab === 'history' && (
@@ -91,27 +75,43 @@ const CliIndex: NextPage<PageProps> = (props) => {
               {vs.map((v, i) => (
                 <Box key={i} mb={2}>
                   <Box>
-                    <Typography variant="h6">{v}</Typography>
+                    <Typography variant="h6">{v.version}</Typography>
                   </Box>
-                  {OsArch.map((oa, ii) => (
-                    <TarHref key={ii} fileName={`enva_${v}_${oa}.tar.gz`} />
-                  ))}
+                  <TarHrefs version={v} />
                 </Box>
               ))}
             </Box>
           )}
         </Box>
       )}
-      {}
     </Box>
   )
 }
 
-type tarProps = {
-  fileName: string
+const TarHrefs: React.FC<{ version: tarJson; tab?: tab }> = ({
+  version,
+  tab,
+}) => {
+  return (
+    <Box>
+      {version.oss &&
+        version.oss.map((os, i) => (
+          <Box key={i}>
+            {(!tab || os.os === tab) &&
+              os.archs &&
+              os.archs.map((a, i) => (
+                <TarHref
+                  key={i}
+                  fileName={fileName(os.os, a, version.version)}
+                />
+              ))}
+          </Box>
+        ))}
+    </Box>
+  )
 }
 
-const TarHref: React.FC<tarProps> = ({ fileName }) => {
+const TarHref: React.FC<{ fileName: string }> = ({ fileName }) => {
   return (
     <Box display="flex" alignItems="center">
       <Typography>{fileName}</Typography>
@@ -126,7 +126,7 @@ const TarHref: React.FC<tarProps> = ({ fileName }) => {
   )
 }
 
-const fileName = (os: tab, arch: string, version: string) =>
+const fileName = (os: string, arch: string, version: string) =>
   `enva_${version}_${os}_${arch}.tar.gz`
 
 export default CliIndex

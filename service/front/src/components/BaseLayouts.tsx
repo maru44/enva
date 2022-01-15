@@ -44,7 +44,6 @@ export const BaseLayout: React.FC<props> = ({ main }) => {
         width="100%"
         flexDirection="column"
         minHeight="100vh"
-        className="main"
       >
         <Header />
         <Container className="main">{main}</Container>

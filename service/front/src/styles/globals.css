@@ -21,6 +21,9 @@ a {
 
 .header {
   background-color: #525252;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 .header .title a {
   color: #ff9800 !important;
@@ -35,6 +38,7 @@ a {
   flex: 1;
   overflow-x: hidden;
   width: 100%;
+  padding-top: 82px;
 }
 
 /********************

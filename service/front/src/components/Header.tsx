@@ -1,5 +1,19 @@
-import { AccountCircle, Add, AddCircle } from '@material-ui/icons'
-import { Box, Button, Grid, IconButton, Typography } from '@mui/material'
+import {
+  AccountCircle,
+  Add,
+  AddCircle,
+  Computer,
+  ComputerOutlined,
+  ComputerRounded,
+} from '@material-ui/icons'
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import Link from 'next/link'
 import { loginUrl } from '../../config/aws'
 import { useCurrentUser } from '../../hooks/useCurrentUser'
@@ -27,26 +41,50 @@ export const Header: React.FC = () => {
         {currentUser && (
           <Box display="flex" flexDirection="row">
             <Box mr={1}>
+              <Link href="/cli" passHref>
+                <Tooltip arrow title="download cli">
+                  <IconButton color="primary">
+                    <ComputerOutlined />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+            </Box>
+            <Box mr={1}>
               <Link href="/user" passHref>
-                <IconButton color="primary">
-                  <AccountCircle />
-                </IconButton>
+                <Tooltip arrow title="user info">
+                  <IconButton color="primary">
+                    <AccountCircle />
+                  </IconButton>
+                </Tooltip>
               </Link>
             </Box>
             <Box mr={1}>
               <Link href="/project/create" passHref>
-                <IconButton color="primary">
-                  <AddCircle />
-                </IconButton>
+                <Tooltip arrow title="add project">
+                  <IconButton color="primary">
+                    <AddCircle />
+                  </IconButton>
+                </Tooltip>
               </Link>
             </Box>
           </Box>
         )}
         {!isAuthChecking && !currentUser && (
-          <Box mr={2}>
-            <Link href={loginUrl} passHref>
-              <Button>Sign in</Button>
-            </Link>
+          <Box display="flex" flexDirection="row">
+            <Box mr={1}>
+              <Link href="/cli" passHref>
+                <Tooltip arrow title="download cli">
+                  <IconButton color="primary">
+                    <ComputerOutlined />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+            </Box>
+            <Box mr={2}>
+              <Link href={loginUrl} passHref>
+                <Button>Sign in</Button>
+              </Link>
+            </Box>
           </Box>
         )}
       </Grid>
