@@ -27,8 +27,10 @@ import {
 } from '@material-ui/icons'
 import { ReactNode } from 'react'
 import Link from 'next/link'
+import { IsProduction } from '../../config/env'
 
 const Home: NextPage = () => {
+  console.log(IsProduction) // @TODO delete
   return (
     <Box className={styles.container}>
       <Box mt={12}>
