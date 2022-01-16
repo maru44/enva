@@ -47,8 +47,7 @@ func (c *set) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *set) Explain() string {
-	return `
-	create enva.json (only if enva.json does not exists)
+	return `	create enva.json (only if enva.json does not exists in current directory)
 `
 }
 

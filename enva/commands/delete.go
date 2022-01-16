@@ -43,8 +43,7 @@ func (c *delete) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *delete) Explain() string {
-	return `
-	Removing remote and local key-value set. An arg is needed.
+	return `	Removing remote and local key-value set. An arg is needed.
 	ex) enva delete [key]
 `
 }

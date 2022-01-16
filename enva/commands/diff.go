@@ -104,7 +104,6 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *diff) Explain() string {
-	return `
-	Getting the difference between remote and local key-value sets and output them.
+	return `	Getting the difference between remote and local key-value sets and output them.
 `
 }

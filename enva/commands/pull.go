@@ -36,7 +36,6 @@ func (c *pull) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *pull) Explain() string {
-	return `
-	Pulling remote key-value sets and overwrite your env file written in enva.json.
+	return `	Pulling remote key-value sets and overwrite your env file written in enva.json.
 `
 }

@@ -48,8 +48,7 @@ func (c *edit) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *edit) Explain() string {
-	return `
-	Editing remote and local value. Two args are required. First one is key, another is value.
+	return `	Editing remote and local value. Two args are required. First one is key, another is value.
 	ex) enva edit [key] [value]
 `
 }
