@@ -21,7 +21,9 @@ import {
   Pages,
   Security,
   Share,
+  Sync,
   Timer,
+  YouTube,
 } from '@material-ui/icons'
 import { ReactNode } from 'react'
 import Link from 'next/link'
@@ -75,17 +77,28 @@ const Home: NextPage = () => {
           </Typography>
         </Box>
         <Box mt={4}>
-          <List>
+          <List className={styles.list}>
+            <ListItem>
+              <ListItemIcon>
+                <Sync />
+              </ListItemIcon>
+              <ListItemText>
+                You can share environmental vairables with your team or your
+                other devices instantly via <b>envassador.com</b>.<br />
+                If you use <b>enva</b> CLI written in following, you can develop
+                more effectively.
+              </ListItemText>
+            </ListItem>
             <ListItem>
               <ListItemIcon>
                 <Keyboard />
               </ListItemIcon>
               <ListItemText>
-                We supply a convenient cli. <br /> You can install it from{' '}
+                We supply a convenient cli. You can install it from{' '}
                 <Link href="/cli" passHref>
                   <a>this page</a>
                 </Link>
-                .<br /> And{' '}
+                . And{' '}
                 <Link href="/cli?page=commands" passHref>
                   <a>here</a>
                 </Link>{' '}
@@ -159,6 +172,12 @@ const Home: NextPage = () => {
                 <MonetizationOn />
               </ListItemIcon>
               <ListItemText>Paid plan.</ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <YouTube />
+              </ListItemIcon>
+              <ListItemText>Demonstration video for introduction.</ListItemText>
             </ListItem>
             <ListItem>
               <ListItemIcon>
