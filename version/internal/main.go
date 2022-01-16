@@ -20,16 +20,19 @@ type (
 		Version string      `json:"version"`
 		Oss     []versionOs `json:"oss"`
 	}
+
+	explain struct {
+		Name    string `json:"command"`
+		Explain string `json:"explain"`
+	}
 )
 
-const fileName = "./service/front/public/enva/tar.json"
+const (
+	tarFile     = "./service/front/public/enva/tar.json"
+	explainFile = "./service/front/src/components/cli/explain.json"
+)
 
 func main() {
-	// if env is local skip
-	if os.Getenv("CLI_API_URL") == "http://localhost:8080" {
-		fmt.Println("skip to overwrite tar.json")
-		return
-	}
 	if len(commands.Commands) != len(commands.AllCommands) {
 		panic("commands length not correspond\ncommands.Commands with commands.AllCommands")
 	}
@@ -37,18 +40,61 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if len(args) != 3 {
-		panic("invalid args: need 3 args")
-	}
-	inputVersion := args[0]
-	inputOs := args[1]
-	inputArch := args[2]
+	if args[0] == "tar/json" {
+		// if env is local skip
+		if os.Getenv("CLI_API_URL") == "http://localhost:8080" {
+			fmt.Println("skip to overwrite tar.json")
+			return
+		}
 
+		if len(args) != 4 {
+			panic("invalid args: need 3 args")
+		}
+
+		updateFrontVersionFile(args[1], args[2], args[3])
+		return
+	}
+
+	if args[0] == "explain/json" {
+		overwriteExplainFile()
+		return
+	}
+
+	panic("no such commands")
+}
+
+func overwriteExplainFile() {
+	explains := make([]explain, len(commands.AllCommands))
+	for i, name := range commands.AllCommands {
+		cmd := commands.Commands[name]
+		exp := explain{
+			Name:    name,
+			Explain: cmd().Explain(),
+		}
+		explains[i] = exp
+	}
+
+	j, err := json.Marshal(explains)
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.OpenFile(explainFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	if _, err := file.WriteAt(j, 0); err != nil {
+		panic(err)
+	}
+}
+
+func updateFrontVersionFile(inputVersion, inputOs, inputArch string) {
 	var (
 		vs                []version
 		idxVersion, idxOs int = -1, -1
 	)
-	data, err := ioutil.ReadFile(fileName)
+	data, err := ioutil.ReadFile(tarFile)
 	if err != nil {
 		panic(err)
 	}
@@ -108,7 +154,7 @@ func main() {
 		panic(err)
 	}
 
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
+	file, err := os.OpenFile(tarFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
 	if err != nil {
 		panic(err)
 	}

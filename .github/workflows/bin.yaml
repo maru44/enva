@@ -23,6 +23,8 @@ jobs:
         run: make build/cli && make compress
         env:
           CLI_API_URL: http://localhost:8000
+      - name: gen explain.json
+        run: make explain/json
       - name: create pull request
         if: success()
         uses: peter-evans/create-pull-request@v3
