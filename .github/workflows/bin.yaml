@@ -22,7 +22,8 @@ jobs:
       - name: build binary and compress
         run: make build/cli && make compress
         env:
-          CLI_API_URL: http://localhost:8000
+          CLI_API_URL: https://api.envassador.com
+          FRONT_URL: https://envassador.com
       - name: gen explain.json
         run: make explain/json
       - name: create pull request

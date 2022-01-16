@@ -14,6 +14,7 @@ import {
   Apartment,
   Eco,
   Group,
+  Keyboard,
   Lock,
   MonetizationOn,
   NetworkWifi,
@@ -23,6 +24,7 @@ import {
   Timer,
 } from '@material-ui/icons'
 import { ReactNode } from 'react'
+import Link from 'next/link'
 
 const Home: NextPage = () => {
   return (
@@ -67,9 +69,31 @@ const Home: NextPage = () => {
         </List>
       </Box>
       <Box mt={12}>
-        <Typography variant="h4">
-          <b>Demo</b>
-        </Typography>
+        <Box>
+          <Typography textAlign="center" variant="h4">
+            <b>Features</b>
+          </Typography>
+        </Box>
+        <Box mt={4}>
+          <List>
+            <ListItem>
+              <ListItemIcon>
+                <Keyboard />
+              </ListItemIcon>
+              <ListItemText>
+                We supply a convenient cli. <br /> You can install it from{' '}
+                <Link href="/cli" passHref>
+                  <a>this page</a>
+                </Link>
+                .<br /> And{' '}
+                <Link href="/cli?page=commands" passHref>
+                  <a>here</a>
+                </Link>{' '}
+                is how to use it.
+              </ListItemText>
+            </ListItem>
+          </List>
+        </Box>
       </Box>
       <Box mt={12}>
         <Box>
