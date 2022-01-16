@@ -82,8 +82,11 @@ export const CliInstallations: React.FC = (props) => {
                 <Box mt={6}>
                   {vs.map((v, i) => (
                     <Box key={i} mb={2}>
-                      <Box>
+                      <Box display="flex" alignItems="center">
                         <Typography variant="h6">{v.version}</Typography>
+                        <Typography variant="h6" ml={2}>
+                          {v.updated_at}
+                        </Typography>
                       </Box>
                       <TarHrefs version={v} />
                     </Box>

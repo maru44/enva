@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/maru44/enva/enva/commands"
 )
@@ -17,8 +18,9 @@ type (
 	}
 
 	version struct {
-		Version string      `json:"version"`
-		Oss     []versionOs `json:"oss"`
+		Version   string      `json:"version"`
+		Oss       []versionOs `json:"oss"`
+		UpdatedAt string      `json:"updated_at"`
 	}
 
 	explain struct {
@@ -41,7 +43,7 @@ func main() {
 	args := flag.Args()
 
 	if args[0] == "tar/json" {
-		// if env is local skip
+		// if env is local, skip gen tar.json
 		if os.Getenv("CLI_API_URL") == "http://localhost:8080" {
 			fmt.Println("skip to overwrite tar.json")
 			return
@@ -98,7 +100,7 @@ func updateFrontVersionFile(inputVersion, inputOs, inputArch string) {
 	if err != nil {
 		panic(err)
 	}
-	if err := json.Unmarshal(data, &vs); err != nil {
+	if err := json.Unmarshal(data, &vs); err != nil && len(data) != 0 {
 		panic(err)
 	}
 	for i, v := range vs {
@@ -120,6 +122,7 @@ func updateFrontVersionFile(inputVersion, inputOs, inputArch string) {
 					},
 				},
 			},
+			UpdatedAt: time.Now().Format("Jan 2, 2006"),
 		}
 		vs = append(vs, newValue)
 	}
