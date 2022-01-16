@@ -23,7 +23,9 @@ jobs:
         run: make build/cli && make compress
         env:
           CLI_API_URL: https://api.envassador.com
-          FRONT_URL: https://envassador.com
+          FRONT_PROTOCOL: https://
+          FRONT_HOST: envassador.com
+          FRONT_PORT: ""
       - name: gen explain.json
         run: make explain/json
       - name: create pull request

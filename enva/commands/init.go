@@ -77,8 +77,9 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 			}
 			color.Green("Project created!\nURL: ")
 			color.Blue(
-				"%s/%s",
-				os.Getenv("FRONT_URL"), path,
+				"%s%s%s/%s",
+				os.Getenv("FRONT_PROTOCOL"), os.Getenv("FRONT_HOST"), os.Getenv("FRONT_PORT"),
+				path,
 			)
 			return nil
 		}

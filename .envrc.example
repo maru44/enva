@@ -5,7 +5,6 @@ export API_PORT=":8080"
 export FRONT_PROTOCOL="http://"
 export FRONT_HOST="localhost"
 export FRONT_PORT=":3000"
-export FRONT_URL="http://localhost:3000"
 
 export POSTGRES_URL=
 export POSTGRES_MAX_CONNECTIONS="2"
