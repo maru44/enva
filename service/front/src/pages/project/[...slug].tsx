@@ -107,10 +107,8 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
                     </IconButton>
                   </Tooltip>
                 </Box>
-                <Typography>
-                  <pre>
-                    <code>{sampleJson}</code>
-                  </pre>
+                <Typography className={styles.preWrap}>
+                  <code>{sampleJson}</code>
                 </Typography>
               </Box>
             </Box>

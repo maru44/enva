@@ -70,9 +70,9 @@ func (c *get) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *get) Explain() string {
-	return `	Getting remote key-value sets and output in command line.
-	If count of args is larger than 1, get the value of keys designated in args.
+	return `	Getting remote key-value sets and output them in command line.
+	If count of args is more than or equal 1, get value of the keys (key) designated in args.
 	ex1) enva get
-	ex2) enva get [key1] [key2]
+	ex2) enva get [keys...]
 `
 }

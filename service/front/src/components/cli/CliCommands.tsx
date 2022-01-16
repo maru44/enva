@@ -1,5 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material'
 import commands from './explain.json'
+import styles from '../../styles/cli.module.css'
 
 type Command = {
   command: string
@@ -21,10 +22,12 @@ export const CliCommands: React.FC = () => {
             {cmds &&
               cmds.length > 0 &&
               cmds.map((c, i) => (
-                <Box mb={2} key={i}>
-                  <Typography variant="h6">{c.command}</Typography>
-                  <Typography mt={1}>
-                    <pre>{deleteTab(c.explain)}</pre>
+                <Box mb={4} key={i}>
+                  <Typography variant="h6" mb={1}>
+                    <b>{c.command}</b>
+                  </Typography>
+                  <Typography className={styles.preWrap} mt={1}>
+                    {deleteTab(c.explain)}
                   </Typography>
                 </Box>
               ))}
