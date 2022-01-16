@@ -8,8 +8,9 @@ import { UserProfile } from '../../components/user/UserProfile'
 import { Cli } from '../../components/user/Cli'
 import styles from '../../styles/user.module.css'
 import { UserOrgs } from '../../components/user/UserOrgs'
+import { SignOut } from '../../components/user/SignOut'
 
-type tab = 'profile' | 'cli' | 'orgs'
+type tab = 'profile' | 'cli' | 'orgs' | 'out'
 
 export type UserPageProps = {
   tabSelect?: tab
@@ -18,9 +19,7 @@ export type UserPageProps = {
 const UserPage: NextPage<UserPageProps> = (props) => {
   useRequireLogin()
   const { currentUser } = useCurrentUser()
-  const [tab, setTab] = useState<'profile' | 'cli' | 'orgs'>(
-    props.tabSelect ?? 'profile'
-  )
+  const [tab, setTab] = useState<tab>(props.tabSelect ?? 'profile')
 
   const handleChange = (e: SyntheticEvent, newValue: tab) => {
     setTab(newValue)
@@ -32,6 +31,7 @@ const UserPage: NextPage<UserPageProps> = (props) => {
         <Tab key="profile" value="profile" label="Profile" />
         <Tab key="cli" value="cli" label="CLI" />
         <Tab key="orgs" value="orgs" label="Orgs" />
+        <Tab key="out" value="out" label="Sign out" />
       </Tabs>
       <Box mt={6}>
         {currentUser && tab === 'profile' && (
@@ -39,6 +39,7 @@ const UserPage: NextPage<UserPageProps> = (props) => {
         )}
         {currentUser && tab === 'cli' && <Cli />}
         {currentUser && tab === 'orgs' && <UserOrgs />}
+        {currentUser && tab === 'out' && <SignOut />}
       </Box>
     </Box>
   )

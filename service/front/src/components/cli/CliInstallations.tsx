@@ -7,8 +7,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { NextPage } from 'next'
-import { PageProps } from '../../../types/page'
 import Versions from '../../../public/enva/tar.json'
 import { SyntheticEvent, useState } from 'react'
 import Link from 'next/link'
@@ -35,12 +33,12 @@ export const CliInstallations: React.FC = (props) => {
         <Grid item xs={1} />
         <Grid item xs={10}>
           <Box>
-            <Typography variant="h5">Cli Binaries</Typography>
+            <Typography variant="h5">CLI Binaries</Typography>
           </Box>
           <Box mt={2}>
             <Box mt={2}>
               <Typography>
-                A sample code to install enva cli command.
+                A sample code to install enva CLI command.
               </Typography>
             </Box>
             <Box mt={2} p={2} className={styles.code}>

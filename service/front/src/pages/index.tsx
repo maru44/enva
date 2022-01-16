@@ -94,7 +94,7 @@ const Home: NextPage = () => {
                 <Keyboard />
               </ListItemIcon>
               <ListItemText>
-                We supply a convenient cli. You can install it from{' '}
+                We supply a convenient CLI. You can install it from{' '}
                 <Link href="/cli" passHref>
                   <a>this page</a>
                 </Link>
