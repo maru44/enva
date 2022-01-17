@@ -7,6 +7,7 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/golang-jwt/jwt/v4 v4.1.0
+	github.com/joho/godotenv v1.4.0
 	github.com/lestrrat-go/jwx v1.2.12
 	github.com/lib/pq v1.10.4
 	github.com/maru44/perr v1.1.7
@@ -34,3 +35,5 @@ require (
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
+
+replace github.com/joho/godotenv v1.4.0 => github.com/maru44/godotenv v1.0.3
