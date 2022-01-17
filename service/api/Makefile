@@ -1,6 +1,6 @@
 .PHONY: run build exe test
 
-BIN_DIR:=bin/
+BIN_DIR:=../../bin/
 BIN_NAME:=main
 CMD_DIR:=cmd/
 
