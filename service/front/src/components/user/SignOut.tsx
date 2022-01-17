@@ -1,27 +1,11 @@
 import { Box, Button, Grid, Paper, Typography } from '@mui/material'
-import { useSnackbar } from 'notistack'
-import { useRecoilState } from 'recoil'
-import { ThisUrl } from '../../../config/env'
-import { currentUserState } from '../../../hooks/useCurrentUser'
+import { useRouter } from 'next/router'
+import { logoutUrl } from '../../../config/aws'
 
 export const SignOut: React.FC = () => {
-  const snack = useSnackbar()
-  const [, setCurrentUser] = useRecoilState(currentUserState)
-  const onSignOut = async () => {
-    try {
-      const res = await fetch(`${ThisUrl}/api/auth/signout`, {
-        method: 'GET',
-        credentials: 'include',
-      })
-      if (res.status === 200) {
-        snack.enqueueSnackbar('signed out', { variant: 'info' })
-        setCurrentUser(null)
-        return
-      }
-      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
-    } catch {
-      snack.enqueueSnackbar('Internal Server Error', { variant: 'error' })
-    }
+  const router = useRouter()
+  const onSignOut = () => {
+    router.push(logoutUrl)
   }
 
   return (
