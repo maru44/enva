@@ -1,8 +1,5 @@
 BEGIN;
 
--- @TODO add username and email and cli password table
--- OR make custome field to aws cognito
-
 CREATE TABLE users (
     id uuid NOT NULL,
     email VARCHAR(255),

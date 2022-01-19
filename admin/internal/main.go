@@ -62,6 +62,10 @@ func main() {
 		return
 	}
 
+	if args[0] == "update/privacy" {
+		return
+	}
+
 	panic("no such commands")
 }
 
