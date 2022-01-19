@@ -2,6 +2,7 @@ package privacy
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,7 +10,7 @@ import (
 
 type (
 	notionResponse struct {
-		Results []notionResult `json:"resutls"`
+		Results []notionResult `json:"results"`
 		HasMore bool           `json:"has_more"`
 	}
 
@@ -38,7 +39,7 @@ func getByAPI(token, notionDBID string) ([]privacy, error) {
 	var privacies []privacy
 
 	url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -53,13 +54,16 @@ func getByAPI(token, notionDBID string) ([]privacy, error) {
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != 200 {
+		return nil, errors.New("failed to request")
+	}
 	var data notionResponse
 	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
 		return nil, err
 	}
 
 	for _, d := range data.Results {
-		if d.Properties.ConEn.RichText != nil || len(d.Properties.ConEn.RichText) == 0 {
+		if d.Properties.ConEn.RichText == nil || len(d.Properties.ConEn.RichText) == 0 {
 			continue
 		}
 		content := d.Properties.ConEn.RichText[0].Text.Content
