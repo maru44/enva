@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type (
@@ -32,8 +33,6 @@ type (
 		} `json:"Content"`
 	}
 )
-
-const dateSignal = "[date]"
 
 func getByAPI(token, notionDBID string) ([]Privacy, error) {
 	var privacies []Privacy
@@ -64,6 +63,9 @@ func getByAPI(token, notionDBID string) ([]Privacy, error) {
 			continue
 		}
 		content := d.Properties.ConEn.RichText[0].Text.Content
+		for _, r := range Replacer {
+			content = strings.ReplaceAll(content, fmt.Sprintf("[%s]", r.Signal), r.To)
+		}
 		p := Privacy{
 			Content: content,
 		}

@@ -4,13 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 )
 
 type (
 	Privacy struct {
 		Content string `json:"content"`
 	}
+
+	Replace struct {
+		Signal string
+		To     string
+	}
 )
+
+var Replacer = []Replace{
+	{
+		Signal: "date",
+		To:     time.Now().Format("Jan 2, 2006"),
+	},
+}
 
 func GenPrivacyJson() error {
 	notionDBID := os.Getenv("N_PRIVACY_TABLE")
