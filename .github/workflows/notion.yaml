@@ -18,8 +18,8 @@ jobs:
       - name: update json
         run: make privacy/json
         env:
-          N_PRIVACY_TABLE: ${{ secret.N_PRIVACY_TABLE }}
-          N_READ_TOKEN: ${{ secret.N_READ_TOKEN }}
+          N_PRIVACY_TABLE: ${{ secrets.N_PRIVACY_TABLE }}
+          N_READ_TOKEN: ${{ secrets.N_READ_TOKEN }}
       - name: create pull request
         if: success()
         uses: peter-evans/create-pull-request@v3
