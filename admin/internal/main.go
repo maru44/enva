@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/maru44/enva/admin/internal/privacy"
 	"github.com/maru44/enva/enva/commands"
 )
 
@@ -62,8 +63,8 @@ func main() {
 		return
 	}
 
-	if args[0] == "update/privacy" {
-		return
+	if args[0] == "privacy/json" {
+		privacy.GenPrivacyJson()
 	}
 
 	panic("no such commands")

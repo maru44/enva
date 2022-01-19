@@ -34,8 +34,8 @@ type (
 	}
 )
 
-func getByAPI(token, notionDBID string) ([]Privacy, error) {
-	var privacies []Privacy
+func getByAPI(token, notionDBID string) ([]privacy, error) {
+	var privacies []privacy
 
 	url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -63,10 +63,10 @@ func getByAPI(token, notionDBID string) ([]Privacy, error) {
 			continue
 		}
 		content := d.Properties.ConEn.RichText[0].Text.Content
-		for _, r := range Replacer {
+		for _, r := range replacer {
 			content = strings.ReplaceAll(content, fmt.Sprintf("[%s]", r.Signal), r.To)
 		}
-		p := Privacy{
+		p := privacy{
 			Content: content,
 		}
 		privacies = append(privacies, p)

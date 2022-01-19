@@ -8,17 +8,19 @@ import (
 )
 
 type (
-	Privacy struct {
+	privacy struct {
 		Content string `json:"content"`
 	}
 
-	Replace struct {
+	replace struct {
 		Signal string
 		To     string
 	}
 )
 
-var Replacer = []Replace{
+const privacyJson = "./service/front/src/components/static/rule/privacy.json"
+
+var replacer = []replace{
 	{
 		Signal: "date",
 		To:     time.Now().Format("Jan 2, 2006"),
@@ -44,8 +46,14 @@ func GenPrivacyJson() error {
 		return err
 	}
 
-	fmt.Println(string(j))
-	// @TODO write to json file
+	file, err := os.OpenFile(privacyJson, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	if _, err := file.Write(j); err != nil {
+		panic(err)
+	}
 
 	return nil
 }

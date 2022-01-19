@@ -76,3 +76,6 @@ test:
 
 explain/json:
 	@go run ./admin/internal/main.go explain/json
+
+privacy/json:
+	@go run ./admin/internal/main.go privacy/json
