@@ -64,7 +64,9 @@ func main() {
 	}
 
 	if args[0] == "privacy/json" {
-		privacy.GenPrivacyJson()
+		if err := privacy.GenPrivacyJson(); err != nil {
+			panic(err)
+		}
 	}
 
 	panic("no such commands")

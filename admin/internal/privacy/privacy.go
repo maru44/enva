@@ -48,12 +48,11 @@ func GenPrivacyJson() error {
 
 	file, err := os.OpenFile(privacyJson, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer file.Close()
 	if _, err := file.Write(j); err != nil {
-		panic(err)
+		return err
 	}
-
 	return nil
 }
