@@ -14,15 +14,19 @@ import {
   Apartment,
   Eco,
   Group,
+  Keyboard,
   Lock,
   MonetizationOn,
   NetworkWifi,
   Pages,
   Security,
   Share,
+  Sync,
   Timer,
+  YouTube,
 } from '@material-ui/icons'
 import { ReactNode } from 'react'
+import Link from 'next/link'
 
 const Home: NextPage = () => {
   return (
@@ -67,9 +71,42 @@ const Home: NextPage = () => {
         </List>
       </Box>
       <Box mt={12}>
-        <Typography variant="h4">
-          <b>Demo</b>
-        </Typography>
+        <Box>
+          <Typography textAlign="center" variant="h4">
+            <b>Features</b>
+          </Typography>
+        </Box>
+        <Box mt={4}>
+          <List className={styles.list}>
+            <ListItem>
+              <ListItemIcon>
+                <Sync />
+              </ListItemIcon>
+              <ListItemText>
+                You can share environmental vairables with your team or your
+                other devices instantly via <b>envassador.com</b>.<br />
+                If you use <b>enva</b> CLI written in following, you can develop
+                more effectively.
+              </ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <Keyboard />
+              </ListItemIcon>
+              <ListItemText>
+                We supply a convenient CLI. You can install it from{' '}
+                <Link href="/cli" passHref>
+                  <a>this page</a>
+                </Link>
+                . And{' '}
+                <Link href="/cli?page=commands" passHref>
+                  <a>here</a>
+                </Link>{' '}
+                is how to use it.
+              </ListItemText>
+            </ListItem>
+          </List>
+        </Box>
       </Box>
       <Box mt={12}>
         <Box>
@@ -135,6 +172,12 @@ const Home: NextPage = () => {
                 <MonetizationOn />
               </ListItemIcon>
               <ListItemText>Paid plan.</ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <YouTube />
+              </ListItemIcon>
+              <ListItemText>Demonstration video for introduction.</ListItemText>
             </ListItem>
             <ListItem>
               <ListItemIcon>

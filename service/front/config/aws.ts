@@ -1,4 +1,4 @@
-import { IsDevelopment } from './env'
+import { IsDevelopment, ThisUrl } from './env'
 import { randomSlug } from '../utils/random'
 
 const awsConfig = {
@@ -22,3 +22,5 @@ export const loginUrl = `${cognitoUrl}login?response_type=${
 }&state=${randomSlug(
   12
 )}&scope=openid%20email%20profile&redirect_uri=${encodeURI(callbackUrl)}`
+
+export const logoutUrl = `${cognitoUrl}logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_USERPOOLWEBCLIENTID}&logout_uri=${ThisUrl}/auth/signout`

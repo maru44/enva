@@ -4,3 +4,6 @@
 .code {
   background-color: #f1f1f1;
 }
+.preWrap {
+  white-space: pre-wrap;
+}

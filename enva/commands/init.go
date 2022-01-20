@@ -91,10 +91,9 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *initialize) Explain() string {
-	return `
-	Setting key-value sets of remote based on local env file written in enva.json.
+	return `	Setting key-value sets of remote based on local env file written in enva.json.
 	If project written in enva.json does not exists, you can create project and set key-value sets of remote based on local env file. (This is optional. You can deny it.)
 
-	This command is so powerful that you can't execute if any remote key-value is set in the project.
+	* This command is so powerful that you can't execute if any remote key-value is set in the project.
 `
 }

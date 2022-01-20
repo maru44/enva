@@ -42,7 +42,6 @@ Updation: %s
 }
 
 func (c *version) Explain() string {
-	return `
-	Showing version and information of updation.
+	return `	Showing version and information of updation.
 `
 }

@@ -4,4 +4,5 @@ export type tarJson = {
     os: string
     archs: string[]
   }[]
+  updated_at: string
 }

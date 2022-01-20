@@ -54,22 +54,28 @@ touch/tar:
 compress:
 	@echo 'Compression ${GOOS_DARWIN}'
 	@tar -C ${BIN_DIR}enva/${GOOS_DARWIN}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_DARWIN}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_DARWIN} ${GOARCH_AMD}
+	@go run ./admin/internal/main.go tar/json ${VERSION} ${GOOS_DARWIN} ${GOARCH_AMD}
 
 	@echo 'Compression ${GOOS_LINUX}'
 	@tar -C ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_LINUX}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
 	@tar -C ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_LINUX}_${GOARCH_386}.tar.gz ${BIN_NAME}
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_LINUX} ${GOARCH_AMD}
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_LINUX} ${GOARCH_386}
+	@go run ./admin/internal/main.go tar/json ${VERSION} ${GOOS_LINUX} ${GOARCH_AMD}
+	@go run ./admin/internal/main.go tar/json ${VERSION} ${GOOS_LINUX} ${GOARCH_386}
 
 	@echo 'Compression ${GOOS_WINDOWS}'
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_386}.tar.gz ${BIN_NAME}
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_WINDOWS} ${GOARCH_AMD}
-	@go run ./version/internal/main.go ${VERSION} ${GOOS_WINDOWS} ${GOARCH_386}
+	@go run ./admin/internal/main.go tar/json ${VERSION} ${GOOS_WINDOWS} ${GOARCH_AMD}
+	@go run ./admin/internal/main.go tar/json ${VERSION} ${GOOS_WINDOWS} ${GOARCH_386}
 
 defrost:
 	@tar -xvzf ${BIN_DIR}enva/enva_darwin.tar.gz 
 
 test:
 	@go test $(TEST_REPOSITORY) $(TEST_CONTROLLER) $(TEST_USECASE) $(TEST_INFRA)
+
+explain/json:
+	@go run ./admin/internal/main.go explain/json
+
+privacy/json:
+	@go run ./admin/internal/main.go privacy/json

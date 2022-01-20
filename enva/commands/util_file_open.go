@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
@@ -230,26 +231,16 @@ func fileReadAndCreateKvs() ([]domain.KvValid, error) {
 		fileName = path + "/" + fileName
 	}
 
-	file, err := os.OpenFile(fileName, os.O_RDONLY, 0600)
+	var kvs []domain.KvValid
+	ms, err := godotenv.Read(fileName)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-
-	ext := filepath.Ext(s.EnvFileName)
-	f, ok := fileReadMap[ext]
-	if !ok {
-		f = readOneLineNormal
-	}
-
-	scanner := bufio.NewScanner(file)
-
-	var kvs []domain.KvValid
-	for scanner.Scan() {
-		kv := f(scanner.Text())
-		if kv != nil {
-			kvs = append(kvs, *kv)
-		}
+	for k, v := range ms {
+		kvs = append(kvs, domain.KvValid{
+			Key:   domain.KvKey(k),
+			Value: domain.KvValue(v),
+		})
 	}
 	return kvs, nil
 }

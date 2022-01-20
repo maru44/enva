@@ -1,0 +1,36 @@
+name: Notion
+on:
+  workflow_dispatch: {}
+  # push:
+  #   branches:
+  #     - master
+jobs:
+  enva:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set up
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+        id: go
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: update json
+        run: make privacy/json
+        env:
+          N_PRIVACY_TABLE: ${{ secrets.N_PRIVACY_TABLE }}
+          N_READ_TOKEN: ${{ secrets.N_READ_TOKEN }}
+      - name: create pull request
+        if: success()
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_BOT_TOKEN }}
+          base: master
+          branch: privacy_json
+          delete-branch: true
+          commit-message: new privacy.json
+          title: update privacy.json
+          body: |
+            new privacy policy
+
+            Auto pushed by bot

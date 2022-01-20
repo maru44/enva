@@ -29,15 +29,14 @@ func (c *help) Run(ctx context.Context, opts ...string) error {
 	for _, name := range AllCommands {
 		color.Green(name)
 		cmd := Commands[name]
-		fmt.Println(cmd().Explain())
+		fmt.Println("\n", cmd().Explain())
 	}
 	fmt.Print("\n\n")
 	return nil
 }
 
 func (c *help) Explain() string {
-	return `
-	Help! I need somebody.
+	return `	Help! I need somebody.
 	Help! Not just anybody.
 `
 }

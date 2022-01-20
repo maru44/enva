@@ -48,8 +48,7 @@ func (c *add) Run(ctx context.Context, opts ...string) error {
 }
 
 func (c *add) Explain() string {
-	return `
-	Adding remote and local key-value set.
+	return `	Adding remote and local key-value set.
 	Two args are required. First one is key, another is value.
 	ex) enva add [key] [value]
 `
