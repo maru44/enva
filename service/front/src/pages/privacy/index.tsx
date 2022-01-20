@@ -13,18 +13,25 @@ const PrivacyPage: NextPage<PageProps> = (props) => {
   console.log(ps)
   return (
     <Box>
-      <Box mt={4}>
+      <Box
+        mt={4}
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography variant="h5">Privacy Policy</Typography>
+        <Typography variant="h6">{ps?.date}</Typography>
       </Box>
-      <Box mt={4}>
+      <Box mt={6}>
         {ps &&
           ps.contents &&
           ps.contents.map((c, i) => (
-            <Box mb={2}>
-              <Typography key={i}>{c}</Typography>
+            <Box key={i} mb={2}>
+              <Typography>{c}</Typography>
             </Box>
           ))}
       </Box>
+      <Box mt={12}></Box>
     </Box>
   )
 }
