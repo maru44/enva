@@ -37,11 +37,20 @@ type (
 				PlainText string `json:"plain_text"`
 			} `json:"rich_text"`
 		} `json:"Content"`
+		Num struct {
+			Number int `json:"number"`
+		} `json:"Num"`
+	}
+
+	notionSort struct {
+		Property  string `json:"property"`
+		Direction string `json:"direction"`
 	}
 
 	notionRequestBody struct {
-		StartCursor *string `json:"start_cursor,omitempty"`
-		PageSize    int32   `json:"page_size,omitempty"`
+		StartCursor *string      `json:"start_cursor,omitempty"`
+		PageSize    int32        `json:"page_size,omitempty"`
+		Sorts       []notionSort `json:"sorts,omitempty"`
 	}
 )
 
@@ -56,6 +65,12 @@ func getByAPI(token, notionDBID string) (*privacy, error) {
 		input := notionRequestBody{
 			StartCursor: tools.StringPtr(startCursor),
 			PageSize:    100,
+			Sorts: []notionSort{
+				{
+					Property:  "Num",
+					Direction: "ascending",
+				},
+			},
 		}
 		inputJ, err := json.Marshal(input)
 		if err != nil {
@@ -80,6 +95,7 @@ func getByAPI(token, notionDBID string) (*privacy, error) {
 		if res.StatusCode != 200 {
 			return nil, errors.New("failed to request")
 		}
+
 		var data notionResponse
 		if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
 			return nil, err
