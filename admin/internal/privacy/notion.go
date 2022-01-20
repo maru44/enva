@@ -49,15 +49,18 @@ func getByAPI(token, notionDBID string) (*privacy, error) {
 	var (
 		contents    []string
 		startCursor string
+		url         = fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
 	)
 
 	for {
-		url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
 		input := notionRequestBody{
 			StartCursor: tools.StringPtr(startCursor),
 			PageSize:    100,
 		}
 		inputJ, err := json.Marshal(input)
+		if err != nil {
+			return nil, err
+		}
 
 		req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(inputJ))
 		if err != nil {
