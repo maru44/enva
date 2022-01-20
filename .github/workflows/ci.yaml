@@ -3,6 +3,7 @@ on:
   push:
     branches-ignore:
       - compiled_cli_binary
+      - privacy_json
 jobs:
   setup:
     runs-on: ubuntu-latest
