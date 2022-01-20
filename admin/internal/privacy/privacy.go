@@ -9,7 +9,8 @@ import (
 
 type (
 	privacy struct {
-		Content string `json:"content"`
+		Contents []string `json:"contents"`
+		Date     string   `json:"date"`
 	}
 
 	replace struct {

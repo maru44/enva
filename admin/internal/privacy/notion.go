@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type (
@@ -35,8 +36,8 @@ type (
 	}
 )
 
-func getByAPI(token, notionDBID string) ([]privacy, error) {
-	var privacies []privacy
+func getByAPI(token, notionDBID string) (*privacy, error) {
+	var contents []string
 
 	url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
 	req, err := http.NewRequest(http.MethodPost, url, nil)
@@ -70,11 +71,11 @@ func getByAPI(token, notionDBID string) ([]privacy, error) {
 		for _, r := range replacer {
 			content = strings.ReplaceAll(content, fmt.Sprintf("[%s]", r.Signal), r.To)
 		}
-		p := privacy{
-			Content: content,
-		}
-		privacies = append(privacies, p)
+		contents = append(contents, content)
 	}
 
-	return privacies, nil
+	return &privacy{
+		Contents: contents,
+		Date:     time.Now().Format("Jan 2, 2006"),
+	}, nil
 }
