@@ -1,18 +1,22 @@
 package privacy
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/maru44/enva/service/api/pkg/tools"
 )
 
 type (
 	notionResponse struct {
-		Results []notionResult `json:"results"`
-		HasMore bool           `json:"has_more"`
+		Results    []notionResult `json:"results"`
+		HasMore    bool           `json:"has_more"`
+		NextCursor *string        `json:"next_cursor"`
 	}
 
 	notionResult struct {
@@ -34,44 +38,65 @@ type (
 			} `json:"rich_text"`
 		} `json:"Content"`
 	}
+
+	notionRequestBody struct {
+		StartCursor *string `json:"start_cursor,omitempty"`
+		PageSize    int32   `json:"page_size,omitempty"`
+	}
 )
 
 func getByAPI(token, notionDBID string) (*privacy, error) {
-	var contents []string
+	var (
+		contents    []string
+		startCursor string
+	)
 
-	url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Notion-Version", "2021-08-16")
-	req.Header.Set("Content-Type", "application/json")
-
-	cli := http.Client{}
-	res, err := cli.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		return nil, errors.New("failed to request")
-	}
-	var data notionResponse
-	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-
-	for _, d := range data.Results {
-		if d.Properties.ConEn.RichText == nil || len(d.Properties.ConEn.RichText) == 0 {
-			continue
+	for {
+		url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", notionDBID)
+		input := notionRequestBody{
+			StartCursor: tools.StringPtr(startCursor),
+			PageSize:    100,
 		}
-		content := d.Properties.ConEn.RichText[0].Text.Content
-		for _, r := range replacer {
-			content = strings.ReplaceAll(content, fmt.Sprintf("[%s]", r.Signal), r.To)
+		inputJ, err := json.Marshal(input)
+
+		req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(inputJ))
+		if err != nil {
+			return nil, err
 		}
-		contents = append(contents, content)
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Notion-Version", "2021-08-16")
+		req.Header.Set("Content-Type", "application/json")
+
+		cli := http.Client{}
+		res, err := cli.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer res.Body.Close()
+
+		if res.StatusCode != 200 {
+			return nil, errors.New("failed to request")
+		}
+		var data notionResponse
+		if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+			return nil, err
+		}
+
+		for _, d := range data.Results {
+			if d.Properties.ConEn.RichText == nil || len(d.Properties.ConEn.RichText) == 0 {
+				continue
+			}
+			content := d.Properties.ConEn.RichText[0].Text.Content
+			for _, r := range replacer {
+				content = strings.ReplaceAll(content, fmt.Sprintf("[%s]", r.Signal), r.To)
+			}
+			contents = append(contents, content)
+		}
+
+		if !data.HasMore || data.NextCursor == nil {
+			break
+		}
+		startCursor = *data.NextCursor
 	}
 
 	return &privacy{
