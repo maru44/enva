@@ -1,15 +1,15 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Dialog, Typography } from '@mui/material'
 import { termly } from './termly'
 
-export const TermsOfUse: React.FC = () => {
+export const TermsOfUse: React.FC<{ onClose: () => void; isOpen: boolean }> = ({
+  onClose,
+  isOpen,
+}) => {
   return (
-    <Box>
-      <Box mt={2}>
-        <Typography variant="h4">Terms of use</Typography>
-      </Box>
-      <Box mt={4}>
+    <Dialog onClose={onClose} open={isOpen} fullWidth maxWidth="md">
+      <Box p={3}>
         <div dangerouslySetInnerHTML={{ __html: termly }} />
       </Box>
-    </Box>
+    </Dialog>
   )
 }

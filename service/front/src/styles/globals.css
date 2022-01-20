@@ -85,3 +85,8 @@ a {
 .breakAll {
   word-break: break-all;
 }
+.likeLink {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
