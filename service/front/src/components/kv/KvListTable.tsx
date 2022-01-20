@@ -14,7 +14,7 @@ import React, { useReducer } from 'react'
 import {
   initialKvListState,
   kvListReducer,
-} from '../../../hooks/kvs/useListTable'
+} from '../../../states/kvs/useListTable'
 import { Kv } from '../../../types/kv'
 import { sortKvs } from '../../../utils/kv'
 import { KvCreateTableRow } from '../form/kv/KvCreateTableRow'
