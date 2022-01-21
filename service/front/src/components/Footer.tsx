@@ -1,5 +1,4 @@
 import { Box, Grid, Typography } from '@mui/material'
-import Link from 'next/link'
 import { useState } from 'react'
 import { TermsOfUse } from './static/rule/TermsOfUse'
 
