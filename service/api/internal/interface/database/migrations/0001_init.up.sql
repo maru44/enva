@@ -1,5 +1,7 @@
 BEGIN;
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE users (
     id uuid NOT NULL,
     email VARCHAR(255),
