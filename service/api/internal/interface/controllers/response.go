@@ -17,6 +17,7 @@ import (
 
 func response(w http.ResponseWriter, r *http.Request, err error, body map[string]interface{}) {
 	status := getStatusCode(err, w)
+	ctx := r.Context()
 
 	if status == http.StatusOK {
 		data, err := json.Marshal(body)
@@ -24,51 +25,32 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 			w.WriteHeader(http.StatusInternalServerError)
 			mess, _ := json.Marshal(map[string]interface{}{"message": err.Error()})
 			if _, err := w.Write(mess); err != nil {
-				log.Fatal(err)
+				sendSentryErr(ctx, err)
 			}
 			return
 		}
 		w.WriteHeader(status)
 		if _, err := w.Write(data); err != nil {
-			log.Fatal(err)
+			sendSentryErr(ctx, err)
 		}
 		return
 	}
 
 	w.WriteHeader(status)
-	var mess map[string]interface{}
-	if perror, ok := perr.IsPerror(err); ok {
-		mess = map[string]interface{}{
-			"error":  perror.Output().Error(),
-			"status": status,
-		}
-
-		if config.IsEnvDevelopment {
-			log.Println(err)
-			fmt.Println("stack traces:\n", perror.Traces())
-		}
-	} else {
-		mess = map[string]interface{}{
-			"error":  err.Error(),
-			"status": status,
-		}
-
-		if config.IsEnvDevelopment {
-			log.Println(err)
-		}
+	mess := map[string]interface{}{
+		"status": status,
 	}
-
-	// only production env
-	if !config.IsEnvDevelopment {
-		sendSentry(r.Context(), err)
+	if perror, ok := perr.IsPerror(err); ok {
+		mess["error"] = perror.Output().Error()
+		sendSentryPerror(ctx, perror)
+	} else {
+		mess["error"] = err.Error()
+		sendSentryErr(ctx, err)
 	}
 
 	data, _ := json.Marshal(mess)
 	if _, err := w.Write(data); err != nil {
-		// only production env
-		if !config.IsEnvDevelopment {
-			sendSentry(r.Context(), err)
-		}
+		sendSentryErr(ctx, err)
 	}
 }
 
@@ -126,7 +108,13 @@ func getStatusCode(err error, w http.ResponseWriter) int {
 	}
 }
 
-func sendSentry(ctx context.Context, err error) {
+func sendSentryPerror(ctx context.Context, err perr.Perror) {
+	if config.IsEnvDevelopment {
+		log.Println(err)
+		fmt.Println("stack traces:\n", err.Traces())
+		return
+	}
+
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn: os.Getenv("SENTRY_DSN"),
 	}); err != nil {
@@ -134,50 +122,67 @@ func sendSentry(ctx context.Context, err error) {
 	}
 
 	var (
-		message   string
-		data      = map[string]interface{}{}
-		sLevel    = sentry.LevelWarning
-		cat       = "Unexpected Error"
-		timeStamp = time.Now()
+		sLevel = sentry.LevelWarning
+		pm     = err.Map()
+		cat    = "Error"
 	)
-	if perror, ok := perr.IsPerror(err); ok {
-		switch perror.Level() {
-		case perr.ErrLevelAlert:
-			sLevel = sentry.LevelWarning
-		case perr.ErrLevelInternal:
-			sLevel = sentry.LevelError
-		case perr.ErrLevelExternal:
-			sLevel = sentry.LevelInfo
-		default:
-			panic("must not reach here")
-		}
-
-		cat = "Error"
-		pm := perror.Map()
-
-		sentry.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetTags(map[string]string{
-				"category": cat,
-			})
-			scope.SetTag("level", string(perror.Level()))
-		})
-		message = perror.Unwrap().Error()
-		timeStamp = pm.OccurredAt
-		data["treated_as"] = perror.Output().Error()
-	} else {
-		sentry.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetTags(map[string]string{
-				"category": cat,
-			})
-		})
+	switch err.Level() {
+	case perr.ErrLevelAlert:
+		sLevel = sentry.LevelWarning
+	case perr.ErrLevelInternal:
+		sLevel = sentry.LevelError
+	case perr.ErrLevelExternal:
+		sLevel = sentry.LevelInfo
+	default:
+		panic("must not reach here")
 	}
 
+	sentry.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetTags(map[string]string{
+			"category": cat,
+		})
+		scope.SetTag("level", string(err.Level()))
+	})
 	sentry.AddBreadcrumb(&sentry.Breadcrumb{
 		Category:  cat,
 		Level:     sLevel,
-		Message:   message,
-		Timestamp: timeStamp,
-		Data:      data,
+		Message:   err.Unwrap().Error(),
+		Timestamp: pm.OccurredAt,
+		Data: map[string]interface{}{
+			"treated_as": err.Output().Error(),
+		},
+	})
+
+	defer sentry.Flush(3 * time.Second)
+}
+
+func sendSentryErr(ctx context.Context, err error) {
+	if config.IsEnvDevelopment {
+		log.Println(err)
+		return
+	}
+
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn: os.Getenv("SENTRY_DSN"),
+	}); err != nil {
+		panic(err)
+	}
+
+	var (
+		sLevel = sentry.LevelWarning
+		cat    = "Unexpected Error"
+	)
+
+	sentry.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetTags(map[string]string{
+			"category": cat,
+		})
+	})
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{
+		Category:  cat,
+		Level:     sLevel,
+		Message:   err.Error(),
+		Timestamp: time.Now(),
 	})
 
 	defer sentry.Flush(3 * time.Second)
