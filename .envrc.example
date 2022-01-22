@@ -20,3 +20,5 @@ export EMAIL_HOST=""
 export EMAIL_HOST_USER=""
 export EMAIL_HOST_PASS=""
 export EMAIL_PORT=""
+
+export SENTRY_DSN=""
