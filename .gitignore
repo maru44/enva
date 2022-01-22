@@ -3,6 +3,10 @@
 /tmp
 **/enva.json
 .env
+
+/buckup/*
+!/buckup/.gitkeep
+
 /bin/*
 !/bin/server/
 /bin/server/*

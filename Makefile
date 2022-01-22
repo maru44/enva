@@ -1,4 +1,4 @@
-.PHONY: build/cli compression defrost test touch/tar json/version
+.PHONY: build/cli compression defrost test touch/tar json/version buckup
 
 # BIN
 BIN_DIR:=bin/
@@ -79,3 +79,6 @@ explain/json:
 
 privacy/json:
 	@go run ./admin/internal/main.go privacy/json
+
+buckup:
+	@go run ./admin/internal/main.go buckup

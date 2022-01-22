@@ -3,7 +3,6 @@ package infra
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -43,7 +42,7 @@ const (
 ***************************/
 
 func NewSqlHandler() database.ISqlHandler {
-	conn, err := sql.Open("postgres", fmt.Sprintf(config.POSTGRES_URL))
+	conn, err := sql.Open("postgres", config.POSTGRES_URL)
 	if err != nil {
 		panic(err)
 	}

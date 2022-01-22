@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/maru44/enva/admin/internal/buckup"
 	"github.com/maru44/enva/admin/internal/privacy"
 	"github.com/maru44/enva/enva/commands"
 )
@@ -67,6 +68,14 @@ func main() {
 		if err := privacy.GenPrivacyJson(); err != nil {
 			panic(err)
 		}
+		return
+	}
+
+	if args[0] == "buckup" {
+		if err := buckup.BuckUpPq(); err != nil {
+			panic(err)
+		}
+		fmt.Println("succeeded to buckup db!")
 		return
 	}
 
