@@ -23,6 +23,7 @@ import {
   Share,
   Sync,
   Timer,
+  Update,
   YouTube,
 } from '@material-ui/icons'
 import { ReactNode } from 'react'
@@ -33,7 +34,9 @@ const Home: NextPage = () => {
     <Box className={styles.container}>
       <Box mt={12}>
         <Typography textAlign="center" variant="h1" className={styles.title}>
-          Welcome to <span className={styles.service}>Envassador</span>!
+          <b>
+            Welcome to <span className={styles.service}>Envassador</span>!
+          </b>
         </Typography>
       </Box>
       <Box mt={3}>
@@ -85,7 +88,7 @@ const Home: NextPage = () => {
               <ListItemText>
                 You can share environmental vairables with your team or your
                 other devices instantly via <b>envassador.com</b>.<br />
-                If you use <b>enva</b> CLI written in following, you can develop
+                If you use <b>enva CLI</b> written in following, you can develop
                 more effectively.
               </ListItemText>
             </ListItem>
@@ -175,6 +178,12 @@ const Home: NextPage = () => {
             </ListItem>
             <ListItem>
               <ListItemIcon>
+                <Update />
+              </ListItemIcon>
+              <ListItemText>Improving sign in(up) UI.</ListItemText>
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
                 <YouTube />
               </ListItemIcon>
               <ListItemText>Demonstration video for introduction.</ListItemText>
@@ -193,8 +202,8 @@ const Home: NextPage = () => {
                 <Lock />
               </ListItemIcon>
               <ListItemText>
-                Public-Key authentication for cli (now only with username +
-                Cli-Password authentication).
+                Public-Key authentication for cli like github (now only with
+                username + Cli-Password authentication).
               </ListItemText>
             </ListItem>
           </List>
