@@ -3,6 +3,7 @@
 /tmp
 **/enva.json
 .env
+.env.prod
 
 /buckup/*
 !/buckup/.gitkeep
@@ -11,6 +12,24 @@
 !/bin/server/
 /bin/server/*
 !/bin/server/.gitkeep
+
+# 
+# tf
+# 
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# 
+# cli binary
+# 
 
 !/bin/enva/
 /bin/enva/*

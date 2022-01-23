@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  api:
+    container_name: enva-api
+    env_file:
+      - .env.prod
+    build:
+      context: .
+      dockerfile: ./infra/docker/go/Dockerfile
+      target: prod
+    tty: true
+    volumes:
+      - .:/enva
+    depends_on:
+      - postgres
