@@ -13,3 +13,7 @@ plan:
 apply:
 	@echo "terraform apply -var-file ${VAR_FILE}"
 	@cd ${ENV} && terraform apply -var-file ${VAR_FILE}
+
+destroy:
+	@echo "terraform destroy -var-file ${VAR_FILE}"
+	@cd ${ENV} && terraform destroy -var-file ${VAR_FILE}
