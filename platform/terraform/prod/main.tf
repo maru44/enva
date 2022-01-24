@@ -63,6 +63,22 @@ resource "aws_subnet" "public_1c" {
 }
 
 /********************************
+**         rds module          **
+********************************/
+
+# module "rds" {
+#   source = "./rds"
+#   name = "${var.rds_name}"
+
+#   vpc_id = aws_vpc.main.id
+#   subnet_ids = ["${aws_subnet.private_1a.id}"]
+
+#   database_name = ""
+#   master_user = ""
+#   master_password = ""
+# }
+
+/********************************
 **              nat             **
 ********************************/
 
