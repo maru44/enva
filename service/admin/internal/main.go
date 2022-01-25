@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/maru44/enva/admin/internal/buckup"
-	"github.com/maru44/enva/admin/internal/privacy"
 	"github.com/maru44/enva/enva/commands"
+	"github.com/maru44/enva/service/admin/internal/backup"
+	"github.com/maru44/enva/service/admin/internal/privacy"
 )
 
 type (
@@ -71,11 +71,11 @@ func main() {
 		return
 	}
 
-	if args[0] == "buckup" {
-		if err := buckup.BuckUpPq(); err != nil {
+	if args[0] == "backup" {
+		if err := backup.BackUp(); err != nil {
 			panic(err)
 		}
-		fmt.Println("succeeded to buckup db!")
+		fmt.Println("succeeded to backup db!")
 		return
 	}
 

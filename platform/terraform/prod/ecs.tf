@@ -79,20 +79,6 @@ resource "aws_ecs_service" "main" {
   task_definition = "${aws_ecs_task_definition.main.arn}"
 }
 
-# resource "aws_acm_certificate" "main" {
-#   domain_name = var.api_domain
-# #   subject_alternative_names = [ "value" ]
-#   validation_method = "DNS"
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-
-#   tags = {
-#     Name = "enva_acm"
-#   }
-# }
-
 resource "aws_acm_certificate_validation" "main" {
   certificate_arn = var.api_cert_arn
 }

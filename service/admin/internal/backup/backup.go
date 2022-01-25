@@ -1,4 +1,4 @@
-package buckup
+package backup
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 const buckUpMainDBFile = "./buckup/main_%s.sql"
 
-func BuckUpPq() error {
+func BackUp() error {
 	cmd := exec.Command(
 		"pg_dump",
 		os.Getenv("POSTGRES_URL"),
