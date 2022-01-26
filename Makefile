@@ -87,6 +87,7 @@ backup:
 	@go run ${ADMIN} backup
 
 container/build:
+	@echo build api
 	@docker-compose -f docker-compose.go.build.yaml build
 
 container/image:
