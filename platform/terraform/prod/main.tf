@@ -63,20 +63,16 @@ resource "aws_subnet" "public_1c" {
 }
 
 /********************************
-**         rds module          **
+**             ecr             **
 ********************************/
 
-module "rds" {
-  source = "./rds"
-  name = "${var.rds_name}"
+resource "aws_ecr_repository" "api" {
+  name = "enva0"
+  image_tag_mutability = "MUTABLE"
 
-  vpc_id = aws_vpc.main.id
-  vpc_main_cidr_blocks = [ "10.0.0.0/16" ]
-  subnet_ids = ["${aws_subnet.private_1a.id}","${aws_subnet.private_1c.id}"]
-
-  database_name = var.database_name
-  master_user = var.database_user
-  master_password = var.database_password
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 /********************************
@@ -187,3 +183,43 @@ resource "aws_route_table_association" "private_1c" {
   route_table_id = "${aws_route_table.private_1c.id}"
 }
 
+/********************************
+**         rds module          **
+********************************/
+
+module "rds" {
+  source = "./rds"
+  name = "${var.rds_name}"
+
+  vpc_id = aws_vpc.main.id
+  vpc_main_cidr_blocks = [ "10.0.0.0/16" ]
+  subnet_ids = ["${aws_subnet.private_1a.id}","${aws_subnet.private_1c.id}"]
+
+  database_name = var.database_name
+  master_user = var.database_user
+  master_password = var.database_password
+}
+
+/********************************
+**       ecs module           **
+********************************/
+
+resource "aws_ecs_cluster" "main" {
+  name = "enva"
+}
+
+resource "aws_acm_certificate_validation" "main" {
+  certificate_arn = var.api_cert_arn
+}
+
+module "ecs_api" {
+  source = "./ecs_api"
+
+  name = "enva"
+  vpc_id = aws_vpc.main.id
+  subnet_ids = [ "${aws_subnet.public_1a.id}", "${aws_subnet.public_1c.id}" ]
+  https_listener_arn = "${aws_lb_listener.main.arn}"
+  cluster_name = "${aws_ecs_cluster.main.name}"
+
+  db_host = "${module.rds.endpoint}"
+}

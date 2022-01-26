@@ -117,6 +117,21 @@ resource "aws_lb" "main" {
   }
 }
 
+resource "aws_lb_target_group" "main" {
+  name = "enva"
+
+  vpc_id = aws_vpc.main.id
+
+  port = 80
+  protocol = "HTTP"
+  target_type = "ip"
+
+  health_check {
+    port = 80
+    path = "/"
+  }
+}
+
 resource "aws_lb_listener" "main" {
   port = 80
   protocol = "HTTP"
