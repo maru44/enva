@@ -4,6 +4,8 @@ on:
     branches-ignore:
       - compiled_cli_binary
       - privacy_json
+env:
+  AWS_REGION: ap-northeast-1
 jobs:
   setup:
     runs-on: ubuntu-latest

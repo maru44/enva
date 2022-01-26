@@ -1,0 +1,48 @@
+name: CD
+on:
+  push:
+    branches:
+      - master
+env:
+  AWS_REGION: ap-northeast-1
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: set up
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+        id: go
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+    ecr:
+      needs: setup
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: aws credentials
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ env.AWS_REGION }}
+        - name: login to amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v1.3.3
+        - name: build-api
+          needs: setup
+          run:
+            make container/build
+        - name: image and push
+          needs: build-api
+          id: image-and-push
+          run: |
+            make container/image
+            make container/push

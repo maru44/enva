@@ -3,7 +3,7 @@ version: '3'
 services:
   api:
     container_name: enva-build
-    env_file:
+    env_file: # @TODO delete and to github
       - .env.prod
     build:
       context: .
@@ -12,5 +12,3 @@ services:
     tty: true
     volumes:
       - .:/enva
-    depends_on:
-      - postgres

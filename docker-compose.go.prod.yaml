@@ -1,18 +1,8 @@
 version: '3'
 
 services:
-  nginx:
-    build:
-      context: .
-      dockerfile: ./infra/docker/nginx/Dockerfile
-    ports:
-      - 8001:80
-    environment:
-      - LOCAL_HOST: dummy
   api:
     container_name: enva-api
-    env_file: # @TODO delete and to github
-      - .env.prod
     build:
       context: .
       dockerfile: ./infra/docker/go/Dockerfile
@@ -20,5 +10,3 @@ services:
     tty: true
     volumes:
       - .:/enva
-    depends_on:
-      - postgres

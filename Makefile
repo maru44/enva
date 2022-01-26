@@ -1,4 +1,4 @@
-.PHONY: build/cli compression defrost test touch/tar json/version buckup
+.PHONY: build/cli compression defrost test touch/tar json/version buckup container/build container/image
 
 # ADMIN CLI GO FILE
 ADMIN:=./service/admin/internal/main.go
@@ -85,3 +85,16 @@ privacy/json:
 
 backup:
 	@go run ${ADMIN} backup
+
+container/build:
+	@docker-compose -f docker-compose.go.build.yaml build
+
+container/image:
+	@docker compose -f docker-compose.go.prod.yaml build -t ${ECR_REPOSITORY_API}
+	@docker tag ${ECR_REPOSITORY_API}:latest ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
+	@docker-compose -f docker-compose.nginx.yaml build -t ${ECR_REPOSITORY_NGINX}
+	@docker tag ${ECR_REPOSITORY_NGINX}:latest ${ECR_REGISTRY_NGINX}/${ECR_REPOSITORY_NGINX}:latest
+
+container/push:
+	@dokcer push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
+	@docker push ${ECR_REGISTRY_NGINX}/${ECR_REPOSITORY_NGINX}:latest
