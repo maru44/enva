@@ -5,8 +5,8 @@ services:
     container_name: enva-api
     build:
       context: .
-      dockerfile: ./infra/docker/go/Dockerfile
       target: prod
+      dockerfile: ./infra/docker/go/Dockerfile
     tty: true
     volumes:
       - .:/enva
