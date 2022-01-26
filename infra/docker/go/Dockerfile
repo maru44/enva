@@ -8,7 +8,7 @@ RUN apk update && apk add git
 COPY go.mod go.sum ${ROOT}
 RUN go mod tidy
 
-COPY . ${ROOT}/
+COPY . ${ROOT}
 EXPOSE 8080
 
 CMD ["go", "run", "./service/api/cmd/server/"]
@@ -20,10 +20,10 @@ ENV ROOT=/enva
 WORKDIR ${ROOT}
 
 RUN apk update && apk add git
-COPY go.mod go.sum .${ROOT}
+COPY go.mod go.sum ./
 RUN go mod tidy
 
-COPY . .${ROOT}
+COPY . ${ROOT}/
 RUN GOOS=linux go build -o ./bin/server/main ./service/api/cmd/server/main.go
 
 # prod
@@ -32,5 +32,5 @@ ENV ROOT=/enva
 WORKDIR ${ROOT}
 
 RUN apk add --update --no-cache ca-certificates
-COPY --from=builder ${ROOT}/bin ${ROOT}/bin
+COPY --from=builder ${ROOT}/bin ${ROOT}/bin/
 CMD ["/enva/bin/server/main"]
