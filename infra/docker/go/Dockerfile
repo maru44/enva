@@ -5,10 +5,10 @@ ENV ROOT=/enva
 WORKDIR ${ROOT}
 
 RUN apk update && apk add git
-COPY go.mod go.sum ${ROOT}
+COPY go.mod go.sum ./
 RUN go mod tidy
 
-COPY . ${ROOT}
+COPY . ${ROOT}/
 EXPOSE 8080
 
 CMD ["go", "run", "./service/api/cmd/server/"]
