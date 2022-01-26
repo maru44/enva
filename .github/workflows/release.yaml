@@ -38,8 +38,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1.3.3
       - name: build-api
         needs: setup
-        run:
-          make container/build
+        run: make container/build
       - name: image and push
         needs: build-api
         id: image-and-push
