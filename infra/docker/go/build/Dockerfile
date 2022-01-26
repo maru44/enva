@@ -1,5 +1,5 @@
-# dev
-FROM golang:1.17.6-alpine as development
+# build
+FROM golang:1.17.6-alpine
 
 ENV ROOT=/enva
 WORKDIR ${ROOT}
@@ -9,6 +9,4 @@ COPY go.mod go.sum ./
 RUN go mod tidy
 
 COPY . ${ROOT}/
-EXPOSE 8080
-
-CMD ["go", "run", "./service/api/cmd/server/"]
+RUN GOOS=linux go build -o ./bin/server/main ./service/api/cmd/server/main.go

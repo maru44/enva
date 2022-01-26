@@ -91,7 +91,7 @@ container/build:
 	@docker-compose -f docker-compose.go.build.yaml build
 
 container/image:
-	@docker compose -f docker-compose.go.prod.yaml build -t ${ECR_REPOSITORY_API}
+	@docker compose -f docker-compose.go.image.yaml build -t ${ECR_REPOSITORY_API}
 	@docker tag ${ECR_REPOSITORY_API}:latest ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
 	@docker-compose -f docker-compose.nginx.yaml build -t ${ECR_REPOSITORY_NGINX}
 	@docker tag ${ECR_REPOSITORY_NGINX}:latest ${ECR_REGISTRY_NGINX}/${ECR_REPOSITORY_NGINX}:latest

@@ -2,11 +2,10 @@ version: '3'
 
 services:
   api:
-    container_name: enva-api
+    container_name: api
     build:
       context: .
-      target: prod
-      dockerfile: ./infra/docker/go/Dockerfile
+      dockerfile: ./infra/docker/go/image/Dockerfile
     tty: true
     volumes:
       - .:/enva
