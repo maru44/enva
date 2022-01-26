@@ -3,8 +3,8 @@ version: '3'
 services:
   api:
     container_name: enva-build
-    env_file: # @TODO delete and to github
-      - .env.prod
+    # env_file: # @TODO delete and to github
+    #   - .env.prod
     build:
       context: .
       dockerfile: ./infra/docker/go/Dockerfile
