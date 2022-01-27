@@ -5,6 +5,24 @@ on:
       - master
 env:
   AWS_REGION: ap-northeast-1
+  ENV: ${{ secrets.ENV }}
+  API_PROTCOL: ${{ secrets.API_PROTCOL }}
+  API_HOST: ${{ secrets.API_PROTCOL }}
+  API_PORT: 
+  FRONT_PROTOCOL: ${{ secrets.FRONT_PROTOCOL }}
+  FRONT_PORT: 
+  POSTGRES_URL: ${{ secrets.POSTGRES_URL}}
+  POSTGRES_MAX_CONNECTIONS: ${{ secrets.POSTGRES_MAX_CONNECTIONS }}
+  POSTGRES_MAX_IDLE_CONNECTIONS: ${{ secrets.POSTGRES_MAX_IDLE_CONNECTIONS }}
+  COGNITO_REGION: ${{ secrets.COGNITO_REGION }}
+  COGNITO_USERPOOL_ID: ${{ secrets.COGNITO_USERPOOL_ID }}
+  COGNITO_SECRET: ${{ secrets.COGNITO_SECRET }}
+  CLI_API_URL: ${{ secrets.CLI_API_URL }}
+  EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+  EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+  EMAIL_HOST_PASS: ${{ secrets.EMAIL_HOST_PASS }}
+  EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 jobs:
   setup:
     runs-on: ubuntu-latest
