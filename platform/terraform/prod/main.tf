@@ -231,4 +231,7 @@ module "ecs_api" {
   cluster_name = "${aws_ecs_cluster.main.name}"
 
   db_host = "${module.rds.endpoint}"
+
+  nginx_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
+  api_image = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
 }

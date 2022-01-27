@@ -22,6 +22,14 @@ variable "cluster_name" {
   type = string
 }
 
+variable "nginx_image" {
+  type = string
+}
+
+variable "api_image" {
+  type = string
+}
+
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
@@ -51,8 +59,8 @@ resource "aws_ecs_task_definition" "this" {
   family = "api"
   container_definitions = jsonencode([
       {
-        name = "ngix"
-        image = "nginx"
+        name = "nginx"
+        image = "${var.nginx_image}"
         esseitila = true
         tag = "latest"
         cpu = 64
@@ -62,11 +70,19 @@ resource "aws_ecs_task_definition" "this" {
 
         task_role_arn = "${aws_iam_role.task_execution.arn}"
         execution_role_arn = "${aws_iam_role.task_execution.arn}"
+
+        portMapping = [
+          {
+            containerPort = 80
+            hostPort = 8001
+            protocol = "tcp"
+          }
+        ]
       },
       {
         name = "${local.name}"
+        image = "${var.api_image}"
         tag = "latest"
-        image = "api"
         region = "${local.region}"
         cpu = 256
         memory = 512
