@@ -97,5 +97,5 @@ container/image:
 	@docker tag ${ECR_REPOSITORY_NGINX} ${ECR_REGISTRY_NGINX}/${ECR_REPOSITORY_NGINX}
 
 container/push:
-	@dokcer push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}
-	@docker push ${ECR_REGISTRY_NGINX}/${ECR_REPOSITORY_NGINX}
+	@dokcer push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
+	@docker push ${ECR_REGISTRY_NGINX}/${ECR_REPOSITORY_NGINX}:latest
