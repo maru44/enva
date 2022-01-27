@@ -124,7 +124,6 @@ resource "aws_lb_target_group" "main" {
 
   port = 80
   protocol = "HTTP"
-  target_type = "ip"
 
   health_check {
     port = 80

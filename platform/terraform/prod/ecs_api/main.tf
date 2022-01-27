@@ -1,35 +1,3 @@
-variable "name" {
-  type = string
-}
-
-variable "vpc_id" {
-  type = string
-}
-
-variable "subnet_ids" {
-  type = list(string)
-}
-
-variable "https_listener_arn" {
-  type = string
-}
-
-variable "db_host" {
-  type = string
-}
-
-variable "cluster_name" {
-  type = string
-}
-
-variable "nginx_image" {
-  type = string
-}
-
-variable "api_image" {
-  type = string
-}
-
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
@@ -43,12 +11,12 @@ locals {
 }
 
 resource "aws_lb_target_group" "this" {
-  name = local.name
+  name = "${local.name}"
   vpc_id = var.vpc_id
 
   port = 80
-  target_type = "ip"
   protocol = "HTTP"
+  # target_type = "ip"
 
   health_check {
     port = 80
@@ -63,19 +31,18 @@ resource "aws_ecs_task_definition" "this" {
         image = "${var.nginx_image}"
         esseitila = true
         tag = "latest"
-        cpu = 64
-        memory = 128
+        cpu = 256
+        memory = 512
         network_mode = "awsvpc"
         requires_compatibilities = ["FARGATE"]
 
         task_role_arn = "${aws_iam_role.task_execution.arn}"
         execution_role_arn = "${aws_iam_role.task_execution.arn}"
 
-        portMapping = [
+        portMappings = [
           {
             containerPort = 80
-            hostPort = 8001
-            protocol = "tcp"
+            hostPort = 80
           }
         ]
       },
@@ -91,6 +58,13 @@ resource "aws_ecs_task_definition" "this" {
 
         task_role_arn = "${aws_iam_role.task_execution.arn}"
         execution_role_arn = "${aws_iam_role.task_execution.arn}"
+
+        portMappings = [
+          {
+            containerPort = 8080
+            hostPort = 8080
+          }
+        ]
       }
   ])
 }
@@ -195,21 +169,16 @@ resource "aws_security_group_rule" "this_http" {
   from_port   = 80
   to_port     = 80
   protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = ["10.0.0.0/16"]
 }
 
 resource "aws_ecs_service" "this" {
-  depends_on = [aws_lb_listener_rule.this]
   name = "${local.name}"
+  depends_on = [aws_lb_listener_rule.this]
 
   desired_count = 1
   cluster = "${var.cluster_name}"
   task_definition = "${aws_ecs_task_definition.this.arn}"
-
-  network_configuration {
-    subnets = var.subnet_ids
-    security_groups = ["${aws_security_group.this.id}"]
-  }
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.this.arn}"
