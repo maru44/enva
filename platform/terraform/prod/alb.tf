@@ -131,18 +131,17 @@ resource "aws_lb_target_group" "main" {
   }
 }
 
-resource "aws_lb_listener" "main" {
+resource "aws_lb_listener" "http" {
   port = 80
   protocol = "HTTP"
 
   load_balancer_arn = aws_lb.main.arn
   default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "200"
-      message_body = "ok"
+    type = "redirect"
+    redirect {
+      port = 443
+      protocol = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }
@@ -154,29 +153,14 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.main.arn
   certificate_arn = var.api_cert_arn
   default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.main.id
-  }
-}
+    # type = "forward"
+    # target_group_arn = aws_lb_target_group.main.id
 
-resource "aws_lb_listener_rule" "http_to_https" {
-  listener_arn = aws_lb_listener.main.arn
-  
-  priority = 99
-
-  action {
-    type = "redirect"
-    redirect {
-      port = 443
-      protocol = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-
-  condition {
-    http_header {
-      http_header_name = "X-Forwarded-For"
-      values = ["${var.api_domain}"]
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "200"
+      message_body = "ok"
     }
   }
 }

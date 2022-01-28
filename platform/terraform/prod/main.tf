@@ -221,17 +221,17 @@ resource "aws_acm_certificate_validation" "main" {
   certificate_arn = var.api_cert_arn
 }
 
-module "ecs_api" {
-  source = "./ecs_api"
+# module "ecs_api" {
+#   source = "./ecs_api"
 
-  name = "enva"
-  vpc_id = aws_vpc.main.id
-  subnet_ids = [ "${aws_subnet.public_1a.id}", "${aws_subnet.public_1c.id}" ]
-  https_listener_arn = "${aws_lb_listener.main.arn}"
-  cluster_name = "${aws_ecs_cluster.main.name}"
+#   name = "enva"
+#   vpc_id = aws_vpc.main.id
+#   subnet_ids = [ "${aws_subnet.public_1a.id}", "${aws_subnet.public_1c.id}" ]
+#   https_listener_arn = "${aws_lb_listener.https.arn}"
+#   cluster_name = "${aws_ecs_cluster.main.name}"
 
-  db_host = "${module.rds.endpoint}"
+#   db_host = "${module.rds.endpoint}"
 
-  nginx_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
-  api_image = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
-}
+#   nginx_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
+#   api_image = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
+# }
