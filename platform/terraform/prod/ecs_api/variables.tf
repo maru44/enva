@@ -10,6 +10,10 @@ variable "subnet_ids" {
   type = list(string)
 }
 
+variable "http_listener_arn" {
+  type = string
+}
+
 variable "https_listener_arn" {
   type = string
 }
@@ -27,5 +31,17 @@ variable "nginx_image" {
 }
 
 variable "api_image" {
+  type = string
+}
+
+variable "security_group_id" {
+  type = string
+}
+
+variable "aws_lb_target_group_id" {
+  type = string
+}
+
+variable "aws_lb_target_group_arn" {
   type = string
 }

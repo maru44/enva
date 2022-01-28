@@ -3,74 +3,59 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  name = "${var.name}-api"
-
-  account_id = "${data.aws_caller_identity.current.account_id}"
-
-  region = "${data.aws_region.current.name}"
-}
-
-resource "aws_lb_target_group" "this" {
-  name = "${local.name}"
-  vpc_id = var.vpc_id
-
-  port = 80
-  protocol = "HTTP"
-  # target_type = "ip"
-
-  health_check {
-    port = 80
-  }
+  name       = "${var.name}-api"
+  account_id = data.aws_caller_identity.current.account_id
+  region     = data.aws_region.current.name
 }
 
 resource "aws_ecs_task_definition" "this" {
   family = "api"
   container_definitions = jsonencode([
-      {
-        name = "nginx"
-        image = "${var.nginx_image}"
-        esseitila = true
-        tag = "latest"
-        cpu = 256
-        memory = 512
-        network_mode = "awsvpc"
-        requires_compatibilities = ["FARGATE"]
+    {
+      name                     = "nginx"
+      image                    = "${var.nginx_image}"
+      esseitila                = true
+      tag                      = "latest"
+      cpu                      = 256
+      memory                   = 512
+      network_mode             = "awsvpc"
+      requires_compatibilities = ["FARGATE"]
 
-        task_role_arn = "${aws_iam_role.task_execution.arn}"
-        execution_role_arn = "${aws_iam_role.task_execution.arn}"
+      task_role_arn      = "${aws_iam_role.task_execution.arn}"
+      execution_role_arn = "${aws_iam_role.task_execution.arn}"
 
-        portMappings = [
-          {
-            containerPort = 80
-            hostPort = 80
-          }
-        ]
-      },
-      {
-        name = "${local.name}"
-        image = "${var.api_image}"
-        tag = "latest"
-        region = "${local.region}"
-        cpu = 256
-        memory = 512
-        network_mode = "awsvpc"
-        requires_compatibilities = ["FARGATE"]
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+        }
+      ]
+    },
+    {
+      name                     = "${local.name}"
+      image                    = "${var.api_image}"
+      tag                      = "latest"
+      region                   = "${local.region}"
+      cpu                      = 256
+      memory                   = 512
+      network_mode             = "awsvpc"
+      requires_compatibilities = ["FARGATE"]
 
-        task_role_arn = "${aws_iam_role.task_execution.arn}"
-        execution_role_arn = "${aws_iam_role.task_execution.arn}"
+      task_role_arn      = "${aws_iam_role.task_execution.arn}"
+      execution_role_arn = "${aws_iam_role.task_execution.arn}"
 
-        portMappings = [
-          {
-            containerPort = 8080
-            hostPort = 8080
-          }
-        ]
-      }
+      portMappings = [
+        {
+          containerPort = 8080
+          hostPort      = 8080
+        }
+      ]
+    }
   ])
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name = "/${var.name}/ecs"
+  name              = "/${var.name}/ecs"
   retention_in_days = "7"
 }
 
@@ -95,7 +80,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "task_execution" {
-  role = "${aws_iam_role.task_execution.id}"
+  role = aws_iam_role.task_execution.id
 
   policy = <<EOF
 {
@@ -118,16 +103,16 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "task_execution" {
-  role = "${aws_iam_role.task_execution.name}"
+  role       = aws_iam_role.task_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_lb_listener_rule" "this" {
-  listener_arn = "${var.https_listener_arn}"
+resource "aws_lb_listener_rule" "http" {
+  listener_arn = var.http_listener_arn
 
   action {
     type             = "forward"
-    target_group_arn = "${aws_lb_target_group.this.id}"
+    target_group_arn = var.aws_lb_target_group_id
   }
 
   condition {
@@ -137,52 +122,38 @@ resource "aws_lb_listener_rule" "this" {
   }
 }
 
-resource "aws_security_group" "this" {
-  name = "${local.name}"
-  description = "${local.name}"
+resource "aws_lb_listener_rule" "https" {
+  listener_arn = var.https_listener_arn
 
-  vpc_id = "${var.vpc_id}"
+  action {
+    type             = "forward"
+    target_group_arn = var.aws_lb_target_group_id
+  }
 
-  tags = {
-    Name = "${local.name}"
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
   }
 }
 
-resource "aws_security_group_rule" "egress" {
-  security_group_id = "${aws_security_group.this.id}"
-  type = "egress"
-
-  cidr_blocks = [ "0.0.0.0/0" ]
-  ipv6_cidr_blocks = [ "::/0" ]
-  description = "ecs api egress"
-  prefix_list_ids = []
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
-}
-
-resource "aws_security_group_rule" "this_http" {
-  security_group_id = "${aws_security_group.this.id}"
-
-  type = "ingress"
-
-  from_port   = 80
-  to_port     = 80
-  protocol    = "tcp"
-  cidr_blocks = ["10.0.0.0/16"]
-}
-
 resource "aws_ecs_service" "this" {
-  name = "${local.name}"
-  depends_on = [aws_lb_listener_rule.this]
+  name       = local.name
+  depends_on = [aws_lb_listener_rule.http, aws_lb_listener_rule.https]
 
-  desired_count = 1
-  cluster = "${var.cluster_name}"
-  task_definition = "${aws_ecs_task_definition.this.arn}"
+  desired_count   = 1
+  cluster         = var.cluster_name
+  task_definition = aws_ecs_task_definition.this.arn
+
+  # network_configuration {
+  #   security_groups  = [var.security_group_id]
+  #   subnets          = var.subnet_ids
+  #   assign_public_ip = true
+  # }
 
   load_balancer {
-    target_group_arn = "${aws_lb_target_group.this.arn}"
-    container_name = "nginx"
-    container_port = "80"
+    target_group_arn = var.aws_lb_target_group_arn
+    container_name   = "nginx"
+    container_port   = "80"
   }
 }
