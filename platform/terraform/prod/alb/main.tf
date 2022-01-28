@@ -122,9 +122,9 @@ resource "aws_lb_target_group" "main" {
   name   = "enva"
   vpc_id = var.vpc_id
 
-  port     = 80
-  protocol = "HTTP"
-  # target_type = "ip"
+  port        = 80
+  protocol    = "HTTP"
+  target_type = "ip"
 
   health_check {
     port = 80
@@ -164,14 +164,6 @@ resource "aws_lb_listener" "https" {
       message_body = "ok"
     }
   }
-}
-
-output "aws_lb_target_group_id" {
-  value = aws_lb_target_group.main.id
-}
-
-output "aws_lb_target_group_arn" {
-  value = aws_lb_target_group.main.arn
 }
 
 output "aws_lb_listener_http_arn" {

@@ -9,18 +9,20 @@ locals {
 }
 
 resource "aws_ecs_task_definition" "this" {
-  family = "api"
+  family                   = "api"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 512
+  memory                   = 1024
+  execution_role_arn       = aws_iam_role.task_execution.arn
   container_definitions = jsonencode([
     {
-      name                     = "nginx"
-      image                    = "${var.nginx_image}"
-      esseitila                = true
-      tag                      = "latest"
-      cpu                      = 256
-      memory                   = 512
-      network_mode             = "awsvpc"
-      requires_compatibilities = ["FARGATE"]
-
+      name               = "nginx"
+      image              = "${var.nginx_image}"
+      esseitila          = true
+      tag                = "latest"
+      cpu                = 256
+      memory             = 512
       task_role_arn      = "${aws_iam_role.task_execution.arn}"
       execution_role_arn = "${aws_iam_role.task_execution.arn}"
 
@@ -32,15 +34,12 @@ resource "aws_ecs_task_definition" "this" {
       ]
     },
     {
-      name                     = "${local.name}"
-      image                    = "${var.api_image}"
-      tag                      = "latest"
-      region                   = "${local.region}"
-      cpu                      = 256
-      memory                   = 512
-      network_mode             = "awsvpc"
-      requires_compatibilities = ["FARGATE"]
-
+      name               = "${local.name}"
+      image              = "${var.api_image}"
+      tag                = "latest"
+      region             = "${local.region}"
+      cpu                = 256
+      memory             = 512
       task_role_arn      = "${aws_iam_role.task_execution.arn}"
       execution_role_arn = "${aws_iam_role.task_execution.arn}"
 
@@ -107,12 +106,26 @@ resource "aws_iam_role_policy_attachment" "task_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_lb_target_group" "this" {
+  name = local.name
+
+  vpc_id = var.vpc_id
+
+  port        = 80
+  protocol    = "HTTP"
+  target_type = "ip"
+
+  health_check {
+    port = 80
+  }
+}
+
 resource "aws_lb_listener_rule" "http" {
   listener_arn = var.http_listener_arn
 
   action {
     type             = "forward"
-    target_group_arn = var.aws_lb_target_group_id
+    target_group_arn = aws_lb_target_group.this.arn
   }
 
   condition {
@@ -127,7 +140,7 @@ resource "aws_lb_listener_rule" "https" {
 
   action {
     type             = "forward"
-    target_group_arn = var.aws_lb_target_group_id
+    target_group_arn = aws_lb_target_group.this.arn
   }
 
   condition {
@@ -137,6 +150,36 @@ resource "aws_lb_listener_rule" "https" {
   }
 }
 
+resource "aws_security_group" "this" {
+  name        = local.name
+  description = local.name
+
+  vpc_id = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = local.name
+  }
+}
+
+resource "aws_security_group_rule" "ecs_sec_http" {
+  security_group_id = aws_security_group.this.id
+  type              = "ingress"
+
+  from_port        = 80
+  to_port          = 80
+  protocol         = "tcp"
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = []
+  prefix_list_ids  = []
+}
+
 resource "aws_ecs_service" "this" {
   name       = local.name
   depends_on = [aws_lb_listener_rule.http, aws_lb_listener_rule.https]
@@ -144,15 +187,15 @@ resource "aws_ecs_service" "this" {
   desired_count   = 1
   cluster         = var.cluster_name
   task_definition = aws_ecs_task_definition.this.arn
+  launch_type     = "FARGATE"
 
-  # network_configuration {
-  #   security_groups  = [var.security_group_id]
-  #   subnets          = var.subnet_ids
-  #   assign_public_ip = true
-  # }
+  network_configuration {
+    subnets         = var.subnet_ids
+    security_groups = [aws_security_group.this.id]
+  }
 
   load_balancer {
-    target_group_arn = var.aws_lb_target_group_arn
+    target_group_arn = aws_lb_target_group.this.arn
     container_name   = "nginx"
     container_port   = "80"
   }

@@ -18,10 +18,6 @@ variable "https_listener_arn" {
   type = string
 }
 
-variable "db_host" {
-  type = string
-}
-
 variable "cluster_name" {
   type = string
 }
@@ -34,14 +30,10 @@ variable "api_image" {
   type = string
 }
 
-variable "security_group_id" {
-  type = string
-}
+# variable "aws_lb_target_group_id" {
+#   type = string
+# }
 
-variable "aws_lb_target_group_id" {
-  type = string
-}
-
-variable "aws_lb_target_group_arn" {
-  type = string
-}
+# variable "aws_lb_target_group_arn" {
+#   type = string
+# }

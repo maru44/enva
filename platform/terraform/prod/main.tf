@@ -76,22 +76,16 @@ resource "aws_ecs_cluster" "main" {
   name = "enva"
 }
 
-# module "ecs_api" {
-#   source = "./ecs_api"
+module "ecs_api" {
+  source = "./ecs_api"
 
-#   name               = "enva"
-#   vpc_id             = module.network.vpc_id
-#   security_group_id  = module.alb.aws_security_group_web_id
-#   subnet_ids         = module.network.public_subnet_ids
-#   http_listener_arn  = module.alb.aws_lb_listener_http_arn
-#   https_listener_arn = module.alb.aws_lb_listener_https_arn
-#   cluster_name       = aws_ecs_cluster.main.name
+  name               = "enva"
+  vpc_id             = module.network.vpc_id
+  subnet_ids         = module.network.private_subnet_ids
+  http_listener_arn  = module.alb.aws_lb_listener_http_arn
+  https_listener_arn = module.alb.aws_lb_listener_https_arn
+  cluster_name       = aws_ecs_cluster.main.name
 
-#   aws_lb_target_group_id  = module.alb.aws_lb_target_group_id
-#   aws_lb_target_group_arn = module.alb.aws_lb_target_group_arn
-
-#   db_host = module.rds.endpoint
-
-#   nginx_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
-#   api_image   = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
-# }
+  nginx_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
+  api_image   = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
+}
