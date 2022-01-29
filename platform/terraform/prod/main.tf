@@ -34,15 +34,6 @@ module "alb" {
 **             ecr             **
 ********************************/
 
-resource "aws_ecr_repository" "nginx" {
-  name                 = var.ecr_nginx_repository
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
-
 resource "aws_ecr_repository" "api" {
   name                 = var.ecr_api_repository
   image_tag_mutability = "MUTABLE"
@@ -106,6 +97,5 @@ module "ecs_api" {
   https_listener_arn = module.alb.aws_lb_listener_https_arn
   cluster_name       = aws_ecs_cluster.main.name
 
-  nginx_image = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
-  api_image   = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
+  api_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
 }

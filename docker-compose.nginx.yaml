@@ -10,4 +10,4 @@ services:
     ports:
       - 80:80
     environment:
-      LOCAL_HOST: "nginx"
+      LOCAL_HOST: "127.0.0.1"

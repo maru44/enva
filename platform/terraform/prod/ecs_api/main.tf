@@ -12,27 +12,10 @@ resource "aws_ecs_task_definition" "this" {
   family                   = "api"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = 256
+  memory                   = 512
   execution_role_arn       = aws_iam_role.task_execution.arn
   container_definitions = jsonencode([
-    {
-      name               = "nginx"
-      image              = "${var.nginx_image}"
-      esseitila          = true
-      tag                = "latest"
-      cpu                = 256
-      memory             = 512
-      task_role_arn      = "${aws_iam_role.task_execution.arn}"
-      execution_role_arn = "${aws_iam_role.task_execution.arn}"
-
-      portMappings = [
-        {
-          containerPort = 80
-          hostPort      = 80
-        }
-      ]
-    },
     {
       name               = "${local.name}"
       image              = "${var.api_image}"
@@ -159,24 +142,24 @@ resource "aws_security_group_rule" "ecs_sec_http" {
   type              = "ingress"
 
   from_port        = 80
-  to_port          = 80
+  to_port          = 8080
   protocol         = "tcp"
   cidr_blocks      = ["10.0.0.0/16"]
   ipv6_cidr_blocks = []
   prefix_list_ids  = []
 }
 
-resource "aws_security_group_rule" "ecs_sec_https" {
-  security_group_id = aws_security_group.this.id
-  type              = "ingress"
+# resource "aws_security_group_rule" "ecs_sec_https" {
+#   security_group_id = aws_security_group.this.id
+#   type              = "ingress"
 
-  from_port        = 443
-  to_port          = 443
-  protocol         = "tcp"
-  cidr_blocks      = ["10.0.0.0/16"]
-  ipv6_cidr_blocks = []
-  prefix_list_ids  = []
-}
+#   from_port        = 443
+#   to_port          = 443
+#   protocol         = "tcp"
+#   cidr_blocks      = ["10.0.0.0/16"]
+#   ipv6_cidr_blocks = []
+#   prefix_list_ids  = []
+# }
 
 resource "aws_ecs_service" "this" {
   name       = local.name
@@ -194,7 +177,7 @@ resource "aws_ecs_service" "this" {
 
   load_balancer {
     target_group_arn = var.target_group_arn
-    container_name   = "nginx"
-    container_port   = "80"
+    container_name   = "enva-api"
+    container_port   = 8080
   }
 }

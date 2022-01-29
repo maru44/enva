@@ -30,14 +30,6 @@ variable "database_password" {
   type = string
 }
 
-variable "ecr_nginx_registory" {
-  type = string
-}
-
-variable "ecr_nginx_repository" {
-  type = string
-}
-
 variable "ecr_api_registory" {
   type = string
 }
