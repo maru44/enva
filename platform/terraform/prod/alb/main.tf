@@ -118,6 +118,62 @@ resource "aws_lb" "main" {
   }
 }
 
+resource "aws_lb_listener" "http" {
+  port     = 80
+  protocol = "HTTP"
+
+  load_balancer_arn = aws_lb.main.arn
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "200"
+      message_body = "ok"
+    }
+  }
+}
+
+resource "aws_lb_listener" "https" {
+  port     = 443
+  protocol = "HTTPS"
+
+  load_balancer_arn = aws_lb.main.arn
+  certificate_arn   = var.certificate_arn
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.main.id
+
+    # type = "fixed-response"
+    # fixed_response {
+    #   content_type = "text/plain"
+    #   status_code  = "200"
+    #   message_body = "ok"
+    # }
+  }
+}
+
+resource "aws_lb_listener_rule" "http_to_https" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 99
+
+  action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+
+  condition {
+    host_header {
+      values = [var.domain]
+    }
+  }
+}
+
 resource "aws_lb_target_group" "main" {
   name   = "enva"
   vpc_id = var.vpc_id
@@ -132,38 +188,8 @@ resource "aws_lb_target_group" "main" {
   }
 }
 
-resource "aws_lb_listener" "http" {
-  port     = 80
-  protocol = "HTTP"
-
-  load_balancer_arn = aws_lb.main.arn
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = 443
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
-
-resource "aws_lb_listener" "https" {
-  port     = 443
-  protocol = "HTTPS"
-
-  load_balancer_arn = aws_lb.main.arn
-  certificate_arn   = var.certificate_arn
-  default_action {
-    # type = "forward"
-    # target_group_arn = aws_lb_target_group.main.id
-
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "200"
-      message_body = "ok"
-    }
-  }
+output "target_group_arn" {
+  value = aws_lb_target_group.main.arn
 }
 
 output "aws_lb_listener_http_arn" {

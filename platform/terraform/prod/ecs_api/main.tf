@@ -106,26 +106,12 @@ resource "aws_iam_role_policy_attachment" "task_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_lb_target_group" "this" {
-  name = local.name
-
-  vpc_id = var.vpc_id
-
-  port        = 80
-  protocol    = "HTTP"
-  target_type = "ip"
-
-  health_check {
-    port = 80
-  }
-}
-
 resource "aws_lb_listener_rule" "http" {
   listener_arn = var.http_listener_arn
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = var.target_group_arn
   }
 
   condition {
@@ -140,7 +126,7 @@ resource "aws_lb_listener_rule" "https" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = var.target_group_arn
   }
 
   condition {
@@ -175,7 +161,19 @@ resource "aws_security_group_rule" "ecs_sec_http" {
   from_port        = 80
   to_port          = 80
   protocol         = "tcp"
-  cidr_blocks      = ["0.0.0.0/0"]
+  cidr_blocks      = ["10.0.0.0/16"]
+  ipv6_cidr_blocks = []
+  prefix_list_ids  = []
+}
+
+resource "aws_security_group_rule" "ecs_sec_https" {
+  security_group_id = aws_security_group.this.id
+  type              = "ingress"
+
+  from_port        = 443
+  to_port          = 443
+  protocol         = "tcp"
+  cidr_blocks      = ["10.0.0.0/16"]
   ipv6_cidr_blocks = []
   prefix_list_ids  = []
 }
@@ -195,7 +193,7 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = var.target_group_arn
     container_name   = "nginx"
     container_port   = "80"
   }

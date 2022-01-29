@@ -27,6 +27,7 @@ module "alb" {
   vpc_cidr_block    = module.network.vpc_cidr_block
   public_subnet_ids = module.network.public_subnet_ids
   certificate_arn   = var.api_cert_arn
+  domain            = var.api_domain
 }
 
 /********************************
@@ -100,6 +101,7 @@ module "ecs_api" {
   name               = "enva"
   vpc_id             = module.network.vpc_id
   subnet_ids         = module.network.private_subnet_ids
+  target_group_arn   = module.alb.target_group_arn
   http_listener_arn  = module.alb.aws_lb_listener_http_arn
   https_listener_arn = module.alb.aws_lb_listener_https_arn
   cluster_name       = aws_ecs_cluster.main.name

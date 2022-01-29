@@ -13,3 +13,7 @@ variable "public_subnet_ids" {
 variable "certificate_arn" {
   type = string
 }
+
+variable "domain" {
+  type = string
+}
