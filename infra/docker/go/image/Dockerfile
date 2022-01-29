@@ -42,7 +42,7 @@ ENV SENTRY_DSN ${SENTRY_DSN}
 ENV ROOT /enva
 WORKDIR ${ROOT}
 
-RUN apk update && apk add git && apk add --no-cache ca-certificates && update-ca-certificates
+RUN apk update && apk add git
 COPY go.mod go.sum ./
 RUN go mod tidy
 
@@ -50,7 +50,8 @@ COPY . ${ROOT}/
 RUN CGO_ENABLED=0 GOOS=linux go build -o ${ROOT}/bin/server/main ${ROOT}/service/api/cmd/server/main.go
 
 # prod
-FROM scratch as image
+# FROM scratch as image # if scratch
+FROM alpine:latest as image
 
 ARG ENVIRONMENT
 ARG API_PROTOCOL
@@ -90,10 +91,12 @@ ENV EMAIL_HOST_PASS ${EMAIL_HOST_PASS}
 ENV EMAIL_PORT ${EMAIL_PORT}
 ENV SENTRY_DSN ${SENTRY_DSN}
 
+RUN apk add --no-cache ca-certificates && update-ca-certificates
+
 ENV ROOT /enva
 WORKDIR ${ROOT}
 
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+# COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ # if scratch
 COPY --from=build ${ROOT}/bin/server/main ${ROOT}
 
 EXPOSE 8080
