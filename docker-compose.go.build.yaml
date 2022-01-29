@@ -5,7 +5,9 @@ services:
     container_name: enva-build
     build:
       context: .
-      dockerfile: ./infra/docker/go/build/Dockerfile
+      dockerfile: ./infra/docker/go/image/Dockerfile
+      target: build
+      # dockerfile: ./infra/docker/go/build/Dockerfile
     tty: true
     volumes:
       - .:/enva
