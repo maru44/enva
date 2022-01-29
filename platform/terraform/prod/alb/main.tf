@@ -184,7 +184,7 @@ resource "aws_lb_target_group" "main" {
 
   health_check {
     port = 80
-    path = "/"
+    path = "/health"
   }
 }
 

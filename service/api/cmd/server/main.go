@@ -49,6 +49,7 @@ func main() {
 	// no middlewares
 	sv([]pmf{
 		s("/", anyMethod, base.NotFoundView),
+		s("/health", anyMethod, base.HealthCheck),
 	})
 
 	// get user from ctx
