@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	Env              = os.Getenv("ENV")
-	IsEnvDevelopment = os.Getenv("ENV") == "development"
-	API_PROTOCOL     = os.Getenv("API_PROTCOL")
+	Env              = os.Getenv("ENVIRONMENT")
+	IsEnvDevelopment = os.Getenv("ENVIRONMENT") == "development"
+	API_PROTOCOL     = os.Getenv("API_PROTOCOL")
 	API_HOST         = os.Getenv("API_HOST")
 	API_PORT         = os.Getenv("API_PORT")
 	API_URL          = API_PROTOCOL + API_HOST + API_PORT

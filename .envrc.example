@@ -1,5 +1,5 @@
 export ENV="development"
-export API_PROTCOL="http://"
+export API_PROTOCOL="http://"
 export API_HOST="localhost"
 export API_PORT=":8080"
 export FRONT_PROTOCOL="http://"

@@ -25,11 +25,10 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: ap-northeast-1
-      ENV: ${{ secrets.ENV }}
+      ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
       # api info
-      API_PROTCOL: ${{ secrets.API_PROTCOL }}
-      API_HOST: ${{ secrets.API_PROTCOL }}
+      API_PROTOCOL: ${{ secrets.API_PROTOCOL }}
+      API_HOST: ${{ secrets.API_PROTOCOL }}
       API_PORT:
       # front info
       FRONT_PROTOCOL: ${{ secrets.FRONT_PROTOCOL }}
@@ -51,7 +50,9 @@ jobs:
       EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
       # sentry
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      # not required for golang
       # ecr
+      AWS_REGION: ap-northeast-1
       ECR_REGISTRY_API: ${{ secrets.ECR_REGISTRY_API }}
       ECR_REPOSITORY_API: ${{ secrets.ECR_REPOSITORY_API }}
       ECR_REGISTRY_NGINX: ${{ secrets.ECR_REGISTRY_NGINX }}
