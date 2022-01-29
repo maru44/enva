@@ -1,4 +1,4 @@
-.PHONY: build/cli compression defrost test touch/tar json/version buckup container/build container/image
+.PHONY: build/cli compression defrost test touch/tar json/version buckup container/image
 
 # ADMIN CLI GO FILE
 ADMIN:=./service/admin/internal/main.go
@@ -85,10 +85,6 @@ privacy/json:
 
 backup:
 	@go run ${ADMIN} backup
-
-container/build:
-	@echo build api
-	@docker-compose -f docker-compose.go.build.yaml build
 
 container/image:
 	@docker-compose -f docker-compose.go.image.yaml build
