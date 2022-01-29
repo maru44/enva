@@ -34,7 +34,7 @@ module "alb" {
 ********************************/
 
 resource "aws_ecr_repository" "nginx" {
-  name                 = "enva-nginx"
+  name                 = var.ecr_nginx_repository
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -43,12 +43,30 @@ resource "aws_ecr_repository" "nginx" {
 }
 
 resource "aws_ecr_repository" "api" {
-  name                 = "enva0"
+  name                 = var.ecr_api_repository
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
   }
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  vpc_id              = module.network.vpc_id
+  service_name        = "com.amazonaws.ap-northeast-1.ecr.dkr"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.network.private_subnet_ids
+  security_group_ids  = [module.alb.aws_security_group_internal_id]
+  private_dns_enabled = true
+}
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  vpc_id              = module.network.vpc_id
+  service_name        = "com.amazonaws.ap-northeast-1.ecr.api"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.network.private_subnet_ids
+  security_group_ids  = [module.alb.aws_security_group_internal_id]
+  private_dns_enabled = true
 }
 
 /********************************
@@ -86,6 +104,6 @@ module "ecs_api" {
   https_listener_arn = module.alb.aws_lb_listener_https_arn
   cluster_name       = aws_ecs_cluster.main.name
 
-  nginx_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
-  api_image   = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
+  nginx_image = "${var.ecr_nginx_registory}/${var.ecr_nginx_repository}:latest"
+  api_image   = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
 }

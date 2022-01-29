@@ -169,6 +169,10 @@ resource "aws_route_table_association" "public_1c" {
   route_table_id = aws_route_table.public.id
 }
 
+/********************************
+**           output            **
+********************************/
+
 output "vpc_id" {
   value = aws_vpc.main.id
 }
