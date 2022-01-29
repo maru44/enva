@@ -89,33 +89,17 @@ resource "aws_iam_role_policy_attachment" "task_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_lb_listener_rule" "http" {
-  listener_arn = var.http_listener_arn
+resource "aws_lb_target_group" "this" {
+  name   = "enva"
+  vpc_id = var.vpc_id
 
-  action {
-    type             = "forward"
-    target_group_arn = var.target_group_arn
-  }
+  port        = 8080
+  protocol    = "HTTP"
+  target_type = "ip"
 
-  condition {
-    path_pattern {
-      values = ["*"]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "https" {
-  listener_arn = var.https_listener_arn
-
-  action {
-    type             = "forward"
-    target_group_arn = var.target_group_arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["*"]
-    }
+  health_check {
+    port = 8080
+    path = "/health"
   }
 }
 
@@ -137,7 +121,7 @@ resource "aws_security_group" "this" {
   }
 }
 
-resource "aws_security_group_rule" "ecs_sec_http" {
+resource "aws_security_group_rule" "this" {
   security_group_id = aws_security_group.this.id
   type              = "ingress"
 
@@ -162,8 +146,8 @@ resource "aws_security_group_rule" "ecs_sec_http" {
 # }
 
 resource "aws_ecs_service" "this" {
-  name       = local.name
-  depends_on = [aws_lb_listener_rule.http, aws_lb_listener_rule.https]
+  name = local.name
+  # depends_on = [aws_lb_listener_rule.http, aws_lb_listener_rule.https]
 
   desired_count   = 1
   cluster         = var.cluster_name
@@ -176,8 +160,16 @@ resource "aws_ecs_service" "this" {
   }
 
   load_balancer {
-    target_group_arn = var.target_group_arn
+    target_group_arn = aws_lb_target_group.this.arn
     container_name   = "enva-api"
     container_port   = 8080
   }
+}
+
+output "target_group_arn" {
+  value = aws_lb_target_group.this.arn
+}
+
+output "security_group_id" {
+  value = aws_security_group.this.id
 }

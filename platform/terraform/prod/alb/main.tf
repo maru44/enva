@@ -5,36 +5,11 @@
 resource "aws_security_group" "web" {
   name        = "enva_alb_security_group"
   description = "security group"
-  #   vpc_id      = var.aws_vpc.main.id
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
   tags = {
     Name = "enva_alb_security_group"
   }
-}
-
-resource "aws_security_group_rule" "enva_web_https" {
-  security_group_id = aws_security_group.web.id
-  type              = "ingress"
-
-  cidr_blocks      = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
-  description      = "https"
-  from_port        = 443
-  to_port          = 443
-  protocol         = "tcp"
-}
-
-resource "aws_security_group_rule" "enva_web_http" {
-  security_group_id = aws_security_group.web.id
-  type              = "ingress"
-
-  cidr_blocks      = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
-  description      = "http"
-  from_port        = 80
-  to_port          = 80
-  protocol         = "tcp"
 }
 
 resource "aws_security_group_rule" "egress_web" {
@@ -50,57 +25,28 @@ resource "aws_security_group_rule" "egress_web" {
   protocol         = "-1"
 }
 
-/********************************
-**         private             **
-********************************/
-
-resource "aws_security_group" "internal" {
-  name        = "enva_alb_security_group_internal"
-  description = "security group"
-  vpc_id      = var.vpc_id
-
-  tags = {
-    Name = "enva_alb_security_group_internal"
-  }
-}
-
-resource "aws_security_group_rule" "enva_internal_https" {
-  security_group_id = aws_security_group.internal.id
+resource "aws_security_group_rule" "web_http" {
+  security_group_id = aws_security_group.web.id
   type              = "ingress"
 
-  cidr_blocks      = ["${var.vpc_cidr_block}"]
-  ipv6_cidr_blocks = []
-  prefix_list_ids  = []
-  description      = "https"
-  from_port        = 443
-  to_port          = 443
-  protocol         = "tcp"
-}
-
-resource "aws_security_group_rule" "enva_internal_http" {
-  security_group_id = aws_security_group.internal.id
-  type              = "ingress"
-
-  cidr_blocks      = ["${var.vpc_cidr_block}"]
-  ipv6_cidr_blocks = []
-  prefix_list_ids  = []
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
   description      = "http"
   from_port        = 80
   to_port          = 80
   protocol         = "tcp"
 }
 
-resource "aws_security_group_rule" "egress_internal" {
-  security_group_id = aws_security_group.internal.id
-  type              = "egress"
+resource "aws_security_group_rule" "web_https" {
+  security_group_id = aws_security_group.web.id
+  type              = "ingress"
 
   cidr_blocks      = ["0.0.0.0/0"]
   ipv6_cidr_blocks = ["::/0"]
-  description      = "output internal"
-  prefix_list_ids  = []
-  from_port        = 0
-  to_port          = 0
-  protocol         = "-1"
+  description      = "https"
+  from_port        = 443
+  to_port          = 443
+  protocol         = "tcp"
 }
 
 /********************************
@@ -142,7 +88,7 @@ resource "aws_lb_listener" "https" {
   certificate_arn   = var.certificate_arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.main.id
+    target_group_arn = var.target_group_arn
   }
 }
 
@@ -167,36 +113,17 @@ resource "aws_lb_listener_rule" "http_to_https" {
   }
 }
 
-resource "aws_lb_target_group" "main" {
-  name   = "enva"
-  vpc_id = var.vpc_id
+resource "aws_lb_listener_rule" "http" {
+  listener_arn = aws_lb_listener.http.arn
 
-  port        = 8080
-  protocol    = "HTTP"
-  target_type = "ip"
-
-  health_check {
-    port = 8080
-    path = "/health"
+  action {
+    type             = "forward"
+    target_group_arn = var.target_group_arn
   }
-}
 
-output "target_group_arn" {
-  value = aws_lb_target_group.main.arn
-}
-
-output "aws_lb_listener_http_arn" {
-  value = aws_lb_listener.http.arn
-}
-
-output "aws_lb_listener_https_arn" {
-  value = aws_lb_listener.https.arn
-}
-
-output "aws_security_group_web_id" {
-  value = aws_security_group.web.id
-}
-
-output "aws_security_group_internal_id" {
-  value = aws_security_group.internal.id
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
 }

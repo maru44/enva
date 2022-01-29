@@ -26,6 +26,7 @@ module "alb" {
   vpc_id            = module.network.vpc_id
   vpc_cidr_block    = module.network.vpc_cidr_block
   public_subnet_ids = module.network.public_subnet_ids
+  target_group_arn  = module.ecs_api.target_group_arn
   certificate_arn   = var.api_cert_arn
   domain            = var.api_domain
 }
@@ -48,7 +49,7 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
   service_name        = "com.amazonaws.ap-northeast-1.ecr.dkr"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = module.network.private_subnet_ids
-  security_group_ids  = [module.alb.aws_security_group_internal_id]
+  security_group_ids  = [module.ecs_api.security_group_id]
   private_dns_enabled = true
 }
 
@@ -57,7 +58,7 @@ resource "aws_vpc_endpoint" "ecr_api" {
   service_name        = "com.amazonaws.ap-northeast-1.ecr.api"
   vpc_endpoint_type   = "Interface"
   subnet_ids          = module.network.private_subnet_ids
-  security_group_ids  = [module.alb.aws_security_group_internal_id]
+  security_group_ids  = [module.ecs_api.security_group_id]
   private_dns_enabled = true
 }
 
@@ -89,13 +90,10 @@ resource "aws_ecs_cluster" "main" {
 module "ecs_api" {
   source = "./ecs_api"
 
-  name               = "enva"
-  vpc_id             = module.network.vpc_id
-  subnet_ids         = module.network.private_subnet_ids
-  target_group_arn   = module.alb.target_group_arn
-  http_listener_arn  = module.alb.aws_lb_listener_http_arn
-  https_listener_arn = module.alb.aws_lb_listener_https_arn
-  cluster_name       = aws_ecs_cluster.main.name
+  name         = "enva"
+  vpc_id       = module.network.vpc_id
+  subnet_ids   = module.network.private_subnet_ids
+  cluster_name = aws_ecs_cluster.main.name
 
   api_image = "${var.ecr_api_registory}/${var.ecr_api_repository}:latest"
 }

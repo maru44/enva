@@ -10,18 +10,6 @@ variable "subnet_ids" {
   type = list(string)
 }
 
-variable "target_group_arn" {
-  type = string
-}
-
-variable "http_listener_arn" {
-  type = string
-}
-
-variable "https_listener_arn" {
-  type = string
-}
-
 variable "cluster_name" {
   type = string
 }

@@ -17,3 +17,7 @@ variable "certificate_arn" {
 variable "domain" {
   type = string
 }
+
+variable "target_group_arn" {
+  type = string
+}
