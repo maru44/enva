@@ -42,7 +42,7 @@ ENV SENTRY_DSN ${SENTRY_DSN}
 ENV ROOT /enva
 WORKDIR ${ROOT}
 
-RUN apk update && apk add git
+RUN apk update && apk add git && apk add --no-cache ca-certificates && update-ca-certificates
 COPY go.mod go.sum ./
 RUN go mod tidy
 
@@ -93,7 +93,8 @@ ENV SENTRY_DSN ${SENTRY_DSN}
 ENV ROOT /enva
 WORKDIR ${ROOT}
 
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build ${ROOT}/bin/server/main ${ROOT}
 
 EXPOSE 8080
-ENTRYPOINT ["/enva/main"]
+CMD ["/enva/main"]
