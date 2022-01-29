@@ -52,9 +52,6 @@ func main() {
 		s("/health", anyMethod, base.HealthCheck),
 	})
 
-	// get user from ctx
-	sv([]pmf{s("/test/user", anyMethod, base.UserTestView)}, "user")
-
 	// login required
 	sv(
 		[]pmf{

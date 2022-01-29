@@ -48,13 +48,6 @@ func (con *BaseController) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	response(w, r, nil, map[string]interface{}{"data": "OK"})
 }
 
-func (con *BaseController) UserTestView(w http.ResponseWriter, r *http.Request) {
-	user, ok := r.Context().Value(domain.CtxUserKey).(domain.User)
-	if ok {
-		response(w, r, nil, map[string]interface{}{"user": user})
-	}
-}
-
 /********************************
     Middleware
 ********************************/
