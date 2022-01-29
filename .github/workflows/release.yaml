@@ -9,10 +9,10 @@ env:
   # api info
   API_PROTCOL: ${{ secrets.API_PROTCOL }}
   API_HOST: ${{ secrets.API_PROTCOL }}
-  API_PORT: 
+  API_PORT:
   # front info
   FRONT_PROTOCOL: ${{ secrets.FRONT_PROTOCOL }}
-  FRONT_PORT: 
+  FRONT_PORT:
   # db
   POSTGRES_URL: ${{ secrets.POSTGRES_URL}}
   POSTGRES_MAX_CONNECTIONS: ${{ secrets.POSTGRES_MAX_CONNECTIONS }}
@@ -67,8 +67,8 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1.3.3
-      - name: build-api
-        run: make container/build
+      # - name: build-api
+      #   run: make container/build
       - name: image and push
         id: image-and-push
         run: |
