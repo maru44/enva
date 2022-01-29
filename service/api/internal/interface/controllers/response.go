@@ -17,7 +17,7 @@ import (
 
 func response(w http.ResponseWriter, r *http.Request, err error, body map[string]interface{}) {
 	status := getStatusCode(err, w)
-	ctx := r.Context()
+	// ctx := r.Context()
 
 	if status == http.StatusOK {
 		data, err := json.Marshal(body)
@@ -25,13 +25,13 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 			w.WriteHeader(http.StatusInternalServerError)
 			mess, _ := json.Marshal(map[string]interface{}{"message": err.Error()})
 			if _, err := w.Write(mess); err != nil {
-				sendSentryErr(ctx, err)
+				// sendSentryErr(ctx, err)
 			}
 			return
 		}
 		w.WriteHeader(status)
 		if _, err := w.Write(data); err != nil {
-			sendSentryErr(ctx, err)
+			// sendSentryErr(ctx, err)
 		}
 		return
 	}
@@ -42,15 +42,15 @@ func response(w http.ResponseWriter, r *http.Request, err error, body map[string
 	}
 	if perror, ok := perr.IsPerror(err); ok {
 		mess["error"] = perror.Output().Error()
-		sendSentryPerror(ctx, perror)
+		// sendSentryPerror(ctx, perror)
 	} else {
 		mess["error"] = err.Error()
-		sendSentryErr(ctx, err)
+		// sendSentryErr(ctx, err)
 	}
 
 	data, _ := json.Marshal(mess)
 	if _, err := w.Write(data); err != nil {
-		sendSentryErr(ctx, err)
+		// sendSentryErr(ctx, err)
 	}
 }
 
