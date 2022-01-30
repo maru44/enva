@@ -4,6 +4,11 @@ on:
     branches-ignore:
       - compiled_cli_binary
       - privacy_json
+      - tag_up_api
+      - tag_up_migration
+    paths-ignore:
+      - infra/docker/tag.json
+      - platform/terraform
 env:
   AWS_REGION: ap-northeast-1
 jobs:
@@ -129,3 +134,18 @@ jobs:
         run: |
           make container/migration/image
           make container/migration/push
+      - name: tag up
+        if: success()
+        run: make tag/api
+      - name:
+        if: success()
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_BOT_TOKEN }}
+          base: master
+          branch: tag_up_api
+          delete-branch: true
+          commit-message: api tag up
+          title: api tag up
+          body: |
+            docker api tag is updated

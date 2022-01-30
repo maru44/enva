@@ -13,6 +13,7 @@ import (
 	"github.com/maru44/enva/service/admin/internal/backup"
 	"github.com/maru44/enva/service/admin/internal/migration"
 	"github.com/maru44/enva/service/admin/internal/privacy"
+	"github.com/maru44/enva/service/admin/internal/tag"
 	"github.com/maru44/enva/service/api/pkg/config"
 )
 
@@ -76,18 +77,22 @@ func main() {
 		return
 	}
 
+	if args[0] == "tag" {
+		if args[1] == "api" {
+			tag.SuccessApi()
+			return
+		}
+		if args[1] == "migration" {
+			tag.SuccessMigration()
+			return
+		}
+	}
+
 	if args[0] == "backup" {
 		if err := backup.BackUp(); err != nil {
 			panic(err)
 		}
 		fmt.Println("succeeded to backup db!")
-		return
-	}
-
-	if args[0] == "test" {
-		fmt.Println(config.POSTGRES_URL)
-		fmt.Println(config.Env)
-		fmt.Println(config.IsEnvDevelopment)
 		return
 	}
 
