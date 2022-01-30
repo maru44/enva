@@ -71,6 +71,31 @@ resource "aws_vpc_endpoint" "ecr_api" {
   private_dns_enabled = true
 }
 
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id              = module.network.vpc_id
+  service_name        = "com.amazonaws.ap-northeast-1.s3"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = module.network.private_subnet_ids
+  security_group_ids  = [module.ecs_api.security_group_id]
+  private_dns_enabled = false
+
+  policy = <<EOF
+{
+  "Statement": [
+    {
+      "Sid": "Access-to-specific-bucket-only",
+      "Principal": "*",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Effect": "Allow",
+      "Resource": ["arn:aws:s3:::prod-ap-northeast-1-starport-layer-bucket/*"]
+    }
+  ]
+}
+EOF
+}
+
 /********************************
 **         rds module          **
 ********************************/

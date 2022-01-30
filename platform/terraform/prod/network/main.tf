@@ -60,12 +60,6 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = aws_vpc.main.id
-  service_name      = "com.amazonaws.ap-northeast-1.s3"
-  vpc_endpoint_type = "Gateway"
-}
-
 /********************************
 **              nat             **
 ********************************/
@@ -146,18 +140,6 @@ resource "aws_route_table_association" "private_1c" {
   route_table_id = aws_route_table.private_1c.id
 }
 
-resource "aws_vpc_endpoint_route_table_association" "s3_1a" {
-  count           = 1
-  vpc_endpoint_id = aws_vpc_endpoint.s3.id
-  route_table_id  = aws_route_table.private_1a.id
-}
-
-resource "aws_vpc_endpoint_route_table_association" "s3_1c" {
-  count           = 1
-  vpc_endpoint_id = aws_vpc_endpoint.s3.id
-  route_table_id  = aws_route_table.private_1c.id
-}
-
 /********************************
 **     route for internet      **
 ********************************/
@@ -174,16 +156,6 @@ resource "aws_route" "public" {
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.public.id
   gateway_id             = aws_internet_gateway.main.id
-}
-
-resource "aws_route_table_association" "public_1a" {
-  subnet_id      = aws_subnet.public_1a.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "public_1c" {
-  subnet_id      = aws_subnet.public_1c.id
-  route_table_id = aws_route_table.public.id
 }
 
 /********************************
@@ -203,5 +175,5 @@ output "public_subnet_ids" {
 }
 
 output "private_subnet_ids" {
-  value = [aws_subnet.private_1a.id, aws_subnet.public_1c.id]
+  value = [aws_subnet.private_1a.id, aws_subnet.private_1c.id]
 }
