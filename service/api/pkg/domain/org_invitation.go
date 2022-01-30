@@ -6,7 +6,7 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
-	"github.com/maru44/enva/service/api/internal/config"
+	"github.com/maru44/enva/service/api/pkg/config"
 )
 
 type (

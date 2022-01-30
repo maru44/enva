@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/internal/interface/cache"
+	"github.com/maru44/enva/service/api/pkg/config"
 )
 
 type CacheHandler struct {
