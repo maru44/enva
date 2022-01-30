@@ -47,11 +47,8 @@ func (d *Psql) connect() error {
 	conn.SetMaxIdleConns(config.POSTGRES_MAX_IDLE_CONNECTIONS)
 	conn.SetConnMaxLifetime(maxLifeTime)
 
+	d.conn = conn
 	return nil
-}
-
-func (d *Psql) db() *sql.DB {
-	return d.conn
 }
 
 //go:embed postgres/*.sql

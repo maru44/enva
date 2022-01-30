@@ -107,10 +107,14 @@ func main() {
 				if err := pq.VersionDown(ctx); err != nil {
 					panic(err)
 				}
-				_, isDirty, err = pq.Version(ctx)
+				_, d, err := pq.Version(ctx)
+				if err != nil {
+					panic(err)
+				}
 				if err := pq.VersionDown(ctx); err != nil {
 					panic(err)
 				}
+				isDirty = d
 			}
 			return
 		}
