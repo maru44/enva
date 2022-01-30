@@ -131,7 +131,6 @@ CREATE TABLE kvs (
 
     PRIMARY KEY (id)
 );
--- CREATE INDEX ON kvs (env_key, project_id, is_valid);
 CREATE INDEX ON kvs (project_id, is_valid);
 CREATE UNIQUE INDEX kvs_env_key_project_id_valid ON kvs (env_key, project_id) WHERE (is_valid = true);
 
