@@ -1,10 +1,11 @@
 name: Postgres/migration
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - master
-    # paths:
-    #   - "service/admin/internal/postgres"
+    paths:
+      - "service/admin/internal/postgres"
 env:
   AWS_REGION: ap-northeast-1
 jobs:

@@ -7,8 +7,8 @@
 	backup \
 	container/image \
 	container/push \
-	contaienr/migration/image \
-	contaienr/migration/push \
+	container/migration/image \
+	container/migration/push \
 	migrate \
 	migrate/up \
 	migrate/fix \
@@ -112,7 +112,7 @@ container/migration/image:
 	@docker-compose -f docker-compose.migration.yaml build
 	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
 
-contaienr/migration/push:
+container/migration/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
 
 migrate:
