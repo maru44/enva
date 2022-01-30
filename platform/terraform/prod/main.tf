@@ -132,14 +132,14 @@ module "ecs_api" {
   image_tag    = var.api_image_tag
 }
 
-module "ecs_migration" {
-  source = "./ecs_migration"
+# module "ecs_migration" {
+#   source = "./ecs_migration"
 
-  name                    = "enva"
-  vpc_id                  = module.network.vpc_id
-  subnet_ids              = module.network.private_subnet_ids
-  cluster_arn             = aws_ecs_cluster.main.arn
-  task_execution_role_arn = module.ecs_api.task_execution_role_arn
-  migration_image         = "${var.ecr_api_registory}/${var.ecr_migration_repository}:${var.migration_image_tag}"
-  image_tag               = var.migration_image_tag
-}
+#   name                    = "enva"
+#   vpc_id                  = module.network.vpc_id
+#   subnet_ids              = module.network.private_subnet_ids
+#   cluster_arn             = aws_ecs_cluster.main.arn
+#   task_execution_role_arn = module.ecs_api.task_execution_role_arn
+#   migration_image         = "${var.ecr_api_registory}/${var.ecr_migration_repository}:${var.migration_image_tag}"
+#   image_tag               = var.migration_image_tag
+# }
