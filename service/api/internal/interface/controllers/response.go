@@ -150,6 +150,7 @@ func sendSentryPerror(ctx context.Context, err perr.Perror) {
 		Timestamp: pm.OccurredAt,
 		Data: map[string]interface{}{
 			"treated_as": err.Output().Error(),
+			"traces":     err.Traces(),
 		},
 	})
 
