@@ -37,3 +37,7 @@ variable "ecr_api_registory" {
 variable "ecr_api_repository" {
   type = string
 }
+
+variable "ecr_migration_repository" {
+  type = string
+}
