@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
-	"github.com/maru44/enva/service/api/internal/config"
+	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/perr"
 )
 

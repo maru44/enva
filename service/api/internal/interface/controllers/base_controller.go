@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/internal/interface/myjwt"
 	"github.com/maru44/enva/service/api/internal/usecase"
+	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,7 +11,9 @@ import (
 
 	"github.com/maru44/enva/enva/commands"
 	"github.com/maru44/enva/service/admin/internal/backup"
+	"github.com/maru44/enva/service/admin/internal/migration"
 	"github.com/maru44/enva/service/admin/internal/privacy"
+	"github.com/maru44/enva/service/api/pkg/config"
 )
 
 type (
@@ -37,16 +40,15 @@ const (
 )
 
 func main() {
-	if len(commands.Commands) != len(commands.AllCommands) {
-		panic("commands length not correspond\ncommands.Commands with commands.AllCommands")
-	}
-
 	flag.Parse()
 	args := flag.Args()
 
 	if args[0] == "tar/json" {
 		// if env is local, skip gen tar.json
-		if os.Getenv("CLI_API_URL") == "http://localhost:8080" {
+		if len(commands.Commands) != len(commands.AllCommands) {
+			panic("commands length not correspond\ncommands.Commands with commands.AllCommands")
+		}
+		if config.IsEnvDevelopment {
 			fmt.Println("skip to overwrite tar.json")
 			return
 		}
@@ -60,6 +62,9 @@ func main() {
 	}
 
 	if args[0] == "explain/json" {
+		if len(commands.Commands) != len(commands.AllCommands) {
+			panic("commands length not correspond\ncommands.Commands with commands.AllCommands")
+		}
 		overwriteExplainFile()
 		return
 	}
@@ -77,6 +82,82 @@ func main() {
 		}
 		fmt.Println("succeeded to backup db!")
 		return
+	}
+
+	if args[0] == "migrate" {
+		if len(args) > 2 {
+			panic("invalid arg length")
+		}
+
+		ctx := context.Background()
+		pq, err := migration.NewDB(ctx)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(args) == 1 {
+			if err := pq.Up(ctx); err != nil {
+				fmt.Println(err)
+			}
+			_, isDirty, err := pq.Version(ctx)
+			if err != nil {
+				panic(err)
+			}
+			for isDirty {
+				if err := pq.VersionDown(ctx); err != nil {
+					panic(err)
+				}
+				_, d, err := pq.Version(ctx)
+				if err != nil {
+					panic(err)
+				}
+				if err := pq.VersionDown(ctx); err != nil {
+					panic(err)
+				}
+				isDirty = d
+			}
+			return
+		}
+
+		if args[1] == "down" {
+			if config.IsEnvDevelopment {
+				if err := pq.Down(ctx); err != nil {
+					panic(err)
+				}
+				return
+			}
+			panic("not dev env")
+		}
+		if args[1] == "up" {
+			if err := pq.Up(ctx); err != nil {
+				panic(err)
+			}
+			return
+		}
+		if args[1] == "drop" {
+			if config.IsEnvDevelopment {
+				if err := pq.Drop(ctx); err != nil {
+					panic(err)
+				}
+				return
+			}
+			panic("not dev env")
+		}
+		if args[1] == "version" {
+			v, d, err := pq.Version(ctx)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(*v, d)
+			return
+		}
+		if args[1] == "fix" {
+			if err := pq.VersionDown(ctx); err != nil {
+				panic(err)
+			}
+			return
+		}
+		panic("second arg must be 'fix', 'drop', 'version' 'down' or 'up'")
 	}
 
 	panic("no such commands")

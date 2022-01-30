@@ -56,6 +56,7 @@ jobs:
       API_PORT:
       # front info
       FRONT_PROTOCOL: ${{ secrets.FRONT_PROTOCOL }}
+      FRONT_HOST: ${{ secrets.FRONT_HOST }}
       FRONT_PORT:
       # db
       POSTGRES_URL: ${{ secrets.POSTGRES_URL}}
@@ -79,8 +80,6 @@ jobs:
       AWS_REGION: ap-northeast-1
       ECR_REGISTRY_API: ${{ secrets.ECR_REGISTRY_API }}
       ECR_REPOSITORY_API: ${{ secrets.ECR_REPOSITORY_API }}
-      ECR_REGISTRY_NGINX: ${{ secrets.ECR_REGISTRY_NGINX }}
-      ECR_REPOSITORY_NGINX: ${{ secrets.ECR_REPOSITORY_NGINX }}
     steps:
       - uses: actions/checkout@v2
       - name: aws credentials
@@ -97,3 +96,36 @@ jobs:
         run: |
           make container/image
           make container/push
+  deployMigration:
+    needs:
+      - test
+      - lint
+    if: github.ref == 'refs/heads/master' #@TODO add if migration is changed
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+      # db
+      POSTGRES_URL: ${{ secrets.POSTGRES_URL}}
+      POSTGRES_MAX_CONNECTIONS: ${{ secrets.POSTGRES_MAX_CONNECTIONS }}
+      POSTGRES_MAX_IDLE_CONNECTIONS: ${{ secrets.POSTGRES_MAX_IDLE_CONNECTIONS }}
+      # not required for golang
+      # ecr
+      AWS_REGION: ap-northeast-1
+      ECR_REGISTRY_API: ${{ secrets.ECR_REGISTRY_API }}
+      ECR_REPOSITORY_MIGRATION: ${{ secrets.ECR_REPOSITORY_MIGRATION }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1.3.3
+      - name: image and push
+        id: image-and-push
+        run: |
+          make container/migration/image
+          make container/migration/push

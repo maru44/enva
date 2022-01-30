@@ -7,8 +7,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/maru44/enva/service/api/internal/config"
 	"github.com/maru44/enva/service/api/internal/interface/database"
+	"github.com/maru44/enva/service/api/pkg/config"
 )
 
 type (

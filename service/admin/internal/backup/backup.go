@@ -3,9 +3,10 @@ package backup
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"time"
+
+	"github.com/maru44/enva/service/api/pkg/config"
 )
 
 const buckUpMainDBFile = "./buckup/main_%s.sql"
@@ -13,7 +14,7 @@ const buckUpMainDBFile = "./buckup/main_%s.sql"
 func BackUp() error {
 	cmd := exec.Command(
 		"pg_dump",
-		os.Getenv("POSTGRES_URL"),
+		config.POSTGRES_URL,
 	)
 
 	stdout, err := cmd.StdoutPipe()

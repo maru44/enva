@@ -1,4 +1,19 @@
-.PHONY: build/cli compression defrost test touch/tar json/version buckup container/image
+.PHONY: build/cli \
+	compression \
+	defrost \
+	test \
+	touch/tar \
+	json/version \
+	backup \
+	container/image \
+	container/push \
+	contaienr/migration/image \
+	contaienr/migration/push \
+	migrate \
+	migrate/up \
+	migrate/fix \
+	migrate/drop \
+	migrate/version
 
 # ADMIN CLI GO FILE
 ADMIN:=./service/admin/internal/main.go
@@ -7,7 +22,7 @@ ADMIN:=./service/admin/internal/main.go
 BIN_DIR:=bin/
 BIN_NAME:=enva
 TAR_DIR:=./service/front/public/enva/
-ifeq (${CLI_API_URL}, http://localhost:8080)
+ifeq (${ENVIRONMENT}, development)
   BIN_NAME=enva_dev
   TAR_DIR=${BIN_DIR}enva/
 endif
@@ -92,3 +107,29 @@ container/image:
 
 container/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
+
+container/migration/image:
+	@docker-compose -f docker-compose.migration.yaml build
+	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
+
+contaienr/migration/push:
+	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
+
+migrate:
+	@echo 'migration (safe up)'
+	@go run ${ADMIN} migrate
+
+migrate/up:
+	@echo 'migration (up)'
+	@go run ${ADMIN} migrate up
+
+migrate/fix:
+	@echo 'migration (fix)'
+	@go run ${ADMIN} migrate fix
+
+migrate/drop:
+	@echo 'migration (drop)'
+	@go run ${ADMIN} migrate drop
+
+migrate/version:
+	@go run ${ADMIN} migrate version
