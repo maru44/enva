@@ -37,6 +37,8 @@ func main() {
 	org := controllers.NewOrgController(sql, smtp)
 	user := controllers.NewUserController(sql, pass)
 
+	health := controllers.NewHealthController(sql)
+
 	cliKv := controllers.NewCliKvController(sql)
 	cliProject := controllers.NewCliProjectController(sql)
 	cliU := controllers.NewCliUserController(sql, pass)
@@ -50,6 +52,7 @@ func main() {
 	sv([]pmf{
 		s("/", anyMethod, base.NotFoundView),
 		s("/health", anyMethod, base.HealthCheck),
+		s("/health/pq", anyMethod, health.PostgresCheckView),
 	})
 
 	// login required

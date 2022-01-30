@@ -84,6 +84,14 @@ func main() {
 		return
 	}
 
+	if args[0] == "test" {
+		fmt.Println(config.POSTGRES_URL)
+		fmt.Println(config.Env)
+		fmt.Println(config.IsEnvDevelopment)
+		return
+	}
+
+	// migrate
 	if args[0] == "migrate" {
 		if len(args) > 2 {
 			panic("invalid arg length")

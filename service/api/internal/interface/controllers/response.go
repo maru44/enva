@@ -154,6 +154,7 @@ func sendSentryPerror(ctx context.Context, err perr.Perror) {
 	})
 
 	defer sentry.Flush(3 * time.Second)
+	sentry.CaptureMessage(err.Unwrap().Error())
 }
 
 func sendSentryErr(ctx context.Context, err error) {
@@ -186,4 +187,5 @@ func sendSentryErr(ctx context.Context, err error) {
 	})
 
 	defer sentry.Flush(3 * time.Second)
+	sentry.CaptureMessage(err.Error())
 }

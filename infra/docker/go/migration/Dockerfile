@@ -44,3 +44,27 @@ WORKDIR ${ROOT}
 COPY --from=build ${ROOT}/main ${ROOT}
 
 CMD ["/enva/migration/main", "migrate"]
+
+# prod
+# FROM scratch as image # if scratch
+FROM alpine:latest as test
+
+ARG ENVIRONMENT
+ARG POSTGRES_URL
+ARG POSTGRES_MAX_CONNECTIONS
+ARG POSTGRES_MAX_IDLE_CONNECTIONS
+
+ENV ENVIRONMENT ${ENVIRONMENT}
+ENV POSTGRES_URL ${POSTGRES_URL}
+ENV POSTGRES_MAX_CONNECTIONS ${POSTGRES_MAX_CONNECTIONS}
+ENV POSTGRES_MAX_IDLE_CONNECTIONS ${POSTGRES_MAX_IDLE_CONNECTIONS}
+
+RUN apk add --no-cache ca-certificates && update-ca-certificates
+
+ENV ROOT /enva/migration
+WORKDIR ${ROOT}
+
+# COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ # if scratch
+COPY --from=build ${ROOT}/main ${ROOT}
+
+CMD ["/enva/migration/main", "test"]

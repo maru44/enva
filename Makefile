@@ -9,6 +9,7 @@
 	container/push \
 	container/migration/image \
 	container/migration/push \
+	container/test/image \
 	migrate \
 	migrate/up \
 	migrate/fix \
@@ -115,6 +116,10 @@ container/migration/image:
 container/migration/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
 
+container/test/image:
+	@docker-compose -f docker-compose.test.yaml build
+	@docker run -it mig_image_test
+	
 migrate:
 	@echo 'migration (safe up)'
 	@go run ${ADMIN} migrate
