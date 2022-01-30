@@ -109,6 +109,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: tag up
         run: make tag/api
       - name:
