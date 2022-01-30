@@ -106,7 +106,7 @@ module "rds" {
 
   vpc_id               = module.network.vpc_id
   vpc_main_cidr_blocks = [module.network.vpc_cidr_block]
-  subnet_ids           = module.network.public_subnet_ids
+  subnet_ids           = module.network.private_subnet_ids
 
   database_name   = var.database_name
   master_user     = var.database_user
