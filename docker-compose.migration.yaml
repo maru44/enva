@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  api:
-    container_name: api
-    image: ${ECR_REPOSITORY_API}
+  migration:
+    container_name: migration
+    image: ${ECR_REPOSITORY_MIGRATION}
     build:
       context: .
       dockerfile: ./infra/docker/go/migration/Dockerfile

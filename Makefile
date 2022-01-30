@@ -6,6 +6,9 @@
 	json/version \
 	backup \
 	container/image \
+	container/push \
+	contaienr/migration/image \
+	contaienr/migration/push \
 	migrate \
 	migrate/up \
 	migrate/fix \
@@ -104,6 +107,13 @@ container/image:
 
 container/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
+
+container/migration/image:
+	@docker-compose -f docker-compose.migration.yaml build
+	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
+
+contaienr/migration/push:
+	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:latest
 
 migrate:
 	@echo 'migration (safe up)'
