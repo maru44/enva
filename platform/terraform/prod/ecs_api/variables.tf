@@ -17,3 +17,7 @@ variable "cluster_name" {
 variable "api_image" {
   type = string
 }
+
+variable "image_tag" {
+  type = string
+}

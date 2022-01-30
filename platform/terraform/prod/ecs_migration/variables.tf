@@ -21,3 +21,7 @@ variable "name" {
 variable "task_execution_role_arn" {
   type = string
 }
+
+variable "image_tag" {
+  type = string
+}

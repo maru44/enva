@@ -19,7 +19,7 @@ resource "aws_ecs_task_definition" "this" {
     {
       name               = "${local.name}"
       image              = "${var.api_image}"
-      tag                = "latest"
+      tag                = "${var.image_tag}"
       region             = "${local.region}"
       cpu                = 256
       memory             = 512

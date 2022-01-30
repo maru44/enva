@@ -19,7 +19,7 @@ resource "aws_ecs_task_definition" "migration" {
     {
       name               = local.name
       image              = var.migration_image
-      tag                = "latest"
+      tag                = var.image_tag
       region             = local.region
       cpu                = 256
       memory             = 512
@@ -48,7 +48,7 @@ resource "aws_security_group" "this" {
 
 resource "aws_cloudwatch_event_rule" "migration_schedule" {
   name                = "migration_schedule"
-  schedule_expression = "cron(0 * * * ? *)"
+  schedule_expression = "cron(0 0 * * ? *)"
   is_enabled          = true
 }
 

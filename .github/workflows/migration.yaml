@@ -61,3 +61,28 @@ jobs:
         run: |
           make container/migration/image
           make container/migration/push
+  apiTagUp:
+    needs:
+      - buildAndUpload
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.17
+        id: go
+      - name: tag up
+        run: make tag/migration
+      - name:
+        if: success()
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_BOT_TOKEN }}
+          base: master
+          branch: tag_up_migration
+          delete-branch: true
+          commit-message: migration tag up
+          title: migration tag up
+          body: |
+            docker api migration is updated
