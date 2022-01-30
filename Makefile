@@ -110,14 +110,14 @@ backup:
 
 container/image:
 	@docker-compose -f docker-compose.go.image.yaml build
-	@docker tag ${ECR_REPOSITORY_API} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}
+	@docker tag ${ECR_REPOSITORY_API} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:v$(call plus,${API_TAG},1)
 
 container/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:v$(call plus,${API_TAG},1)
 
 container/migration/image:
 	@docker-compose -f docker-compose.migration.yaml build
-	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}
+	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:v$(call plus,${MIGRATION_TAG},1)
 
 container/migration/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:v$(call plus,${MIGRATION_TAG},1)
