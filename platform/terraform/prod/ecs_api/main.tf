@@ -133,18 +133,6 @@ resource "aws_security_group_rule" "this" {
   prefix_list_ids  = []
 }
 
-# resource "aws_security_group_rule" "ecs_sec_https" {
-#   security_group_id = aws_security_group.this.id
-#   type              = "ingress"
-
-#   from_port        = 443
-#   to_port          = 443
-#   protocol         = "tcp"
-#   cidr_blocks      = ["10.0.0.0/16"]
-#   ipv6_cidr_blocks = []
-#   prefix_list_ids  = []
-# }
-
 resource "aws_ecs_service" "this" {
   name = local.name
   # depends_on = [aws_lb_listener_rule.http, aws_lb_listener_rule.https]
@@ -172,4 +160,8 @@ output "target_group_arn" {
 
 output "security_group_id" {
   value = aws_security_group.this.id
+}
+
+output "task_execution_role_arn" {
+  value = aws_iam_role.task_execution.arn
 }
