@@ -44,6 +44,15 @@ resource "aws_ecr_repository" "api" {
   }
 }
 
+resource "aws_ecr_repository" "migration" {
+  name                 = var.ecr_migration_repository
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
 resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = module.network.vpc_id
   service_name        = "com.amazonaws.ap-northeast-1.ecr.dkr"
