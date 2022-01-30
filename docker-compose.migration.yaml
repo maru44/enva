@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  api:
+    container_name: api
+    image: ${ECR_REPOSITORY_API}
+    build:
+      context: .
+      dockerfile: ./infra/docker/go/migration/Dockerfile
+      target: image
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
+        POSTGRES_URL: ${POSTGRES_URL}
+        POSTGRES_MAX_CONNECTIONS: ${POSTGRES_MAX_CONNECTIONS}
+        POSTGRES_MAX_IDLE_CONNECTIONS: ${POSTGRES_MAX_IDLE_CONNECTIONS}
+    tty: true
+    volumes:
+      - .:/enva/migration

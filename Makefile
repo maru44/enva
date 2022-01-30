@@ -6,6 +6,7 @@
 	json/version \
 	backup \
 	container/image \
+	migrate \
 	migrate/up \
 	migrate/fix \
 	migrate/drop \
@@ -103,6 +104,10 @@ container/image:
 
 container/push:
 	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:latest
+
+migrate:
+	@echo 'migration (safe up)'
+	@go run ${ADMIN} migrate
 
 migrate/up:
 	@echo 'migration (up)'

@@ -85,7 +85,7 @@ func main() {
 	}
 
 	if args[0] == "migrate" {
-		if len(args) != 2 {
+		if len(args) > 2 {
 			panic("invalid arg length")
 		}
 
@@ -94,11 +94,35 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		if args[1] == "down" {
-			if err := pq.Down(ctx); err != nil {
+
+		if len(args) == 1 {
+			if err := pq.Up(ctx); err != nil {
+				fmt.Println(err)
+			}
+			_, isDirty, err := pq.Version(ctx)
+			if err != nil {
 				panic(err)
 			}
+			for isDirty {
+				if err := pq.VersionDown(ctx); err != nil {
+					panic(err)
+				}
+				_, isDirty, err = pq.Version(ctx)
+				if err := pq.VersionDown(ctx); err != nil {
+					panic(err)
+				}
+			}
 			return
+		}
+
+		if args[1] == "down" {
+			if config.IsEnvDevelopment {
+				if err := pq.Down(ctx); err != nil {
+					panic(err)
+				}
+				return
+			}
+			panic("not dev env")
 		}
 		if args[1] == "up" {
 			if err := pq.Up(ctx); err != nil {
@@ -129,7 +153,7 @@ func main() {
 			}
 			return
 		}
-		panic("second arg must be 'down' or 'up'")
+		panic("second arg must be 'fix', 'drop', 'version' 'down' or 'up'")
 	}
 
 	panic("no such commands")
