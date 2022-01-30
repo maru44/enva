@@ -52,6 +52,7 @@ CREATE TABLE subscriptions (
     CONSTRAINT subscription_owner CHECK (user_id IS NOT NULL OR org_id IS NOT NULL)
 );
 
+-- is it required?
 CREATE TABLE ssh_keys (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     name VARCHAR(31) NOT NULL,
