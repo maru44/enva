@@ -2,5 +2,5 @@
 
 locals {
   api_image_tag = "v16"
-  migration_image_tag = "v3"
+  migration_image_tag = "v4"
 }
