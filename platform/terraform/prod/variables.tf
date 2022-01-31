@@ -41,11 +41,3 @@ variable "ecr_api_repository" {
 variable "ecr_migration_repository" {
   type = string
 }
-
-variable "api_image_tag" {
-  type = string
-}
-
-variable "migration_image_tag" {
-  type = string
-}
