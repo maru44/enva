@@ -54,6 +54,8 @@ resource "aws_db_instance" "this" {
   backup_window              = "10:00-10:30" # UTC
   maintenance_window         = "Sun:11:00-Sun:11:30"
 
+  vpc_security_group_ids = [aws_security_group.this.id]
+
   copy_tags_to_snapshot    = true
   db_subnet_group_name     = aws_db_subnet_group.this.name
   delete_automated_backups = true
@@ -83,8 +85,4 @@ resource "aws_db_instance" "this" {
   lifecycle {
     ignore_changes = [password]
   }
-}
-
-output "endpoint" {
-  value = aws_db_instance.this.endpoint
 }
