@@ -18,6 +18,7 @@ const (
 func SuccessApi() {
 	t := read()
 
+	t.MigrationImage--
 	// tf generate
 	if err := tfgen(t); err != nil {
 		panic(err)
@@ -25,6 +26,7 @@ func SuccessApi() {
 
 	// then json update
 	t.ApiImage++
+	t.MigrationImage++
 	j, err := json.Marshal(t)
 	if err != nil {
 		panic(err)
@@ -41,12 +43,14 @@ func SuccessApi() {
 func SuccessMigration() {
 	t := read()
 
+	t.ApiImage--
 	// tf generate
 	if err := tfgen(t); err != nil {
 		panic(err)
 	}
 
 	// then json update
+	t.ApiImage++
 	t.MigrationImage++
 	j, err := json.Marshal(t)
 	if err != nil {
