@@ -8,7 +8,7 @@ on:
       - tag_up_migration
     paths-ignore:
       - infra/docker/tag.json
-      - platform/terraform
+      - platform/terraform/**
 env:
   AWS_REGION: ap-northeast-1
 jobs:

@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - "service/admin/internal/migration/postgres"
+      - service/admin/internal/migration/postgres/**
 env:
   AWS_REGION: ap-northeast-1
 jobs:

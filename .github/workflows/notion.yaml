@@ -1,9 +1,6 @@
 name: Notion
 on:
   workflow_dispatch: {}
-  # push:
-  #   branches:
-  #     - master
 jobs:
   enva:
     runs-on: ubuntu-latest

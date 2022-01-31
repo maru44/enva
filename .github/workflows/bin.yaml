@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - "enva/commands/version.json"
+      - enva/commands/version.json
 jobs:
   enva:
     runs-on: ubuntu-latest
