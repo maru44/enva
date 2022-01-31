@@ -17,8 +17,14 @@ const (
 
 func SuccessApi() {
 	t := read()
-	t.ApiImage++
 
+	// tf generate
+	if err := tfgen(t); err != nil {
+		panic(err)
+	}
+
+	// then json update
+	t.ApiImage++
 	j, err := json.Marshal(t)
 	if err != nil {
 		panic(err)
@@ -28,18 +34,20 @@ func SuccessApi() {
 	defer file.Close()
 
 	if _, err := file.WriteAt(j, 0); err != nil {
-		panic(err)
-	}
-
-	if err := tfgen(t); err != nil {
 		panic(err)
 	}
 }
 
 func SuccessMigration() {
 	t := read()
-	t.MigrationImage++
 
+	// tf generate
+	if err := tfgen(t); err != nil {
+		panic(err)
+	}
+
+	// then json update
+	t.MigrationImage++
 	j, err := json.Marshal(t)
 	if err != nil {
 		panic(err)
@@ -49,10 +57,6 @@ func SuccessMigration() {
 	defer file.Close()
 
 	if _, err := file.WriteAt(j, 0); err != nil {
-		panic(err)
-	}
-
-	if err := tfgen(t); err != nil {
 		panic(err)
 	}
 }

@@ -42,8 +42,6 @@ GOARCH_AMD:=amd64
 GOARCH_386:=386
 
 VERSION:=$(shell jq .version ./enva/commands/version.json)
-
-plus = $(word $2,$(wordlist $1,100,2 3 4 5 6 7 8 9 10 11 12 13 14 15))
 API_TAG:=$(shell jq .apiImageTag ./infra/docker/tag.json)
 MIGRATION_TAG:=$(shell jq .migrationImageTag ./infra/docker/tag.json)
 
@@ -110,17 +108,17 @@ backup:
 
 container/image:
 	@docker-compose -f docker-compose.go.image.yaml build
-	@docker tag ${ECR_REPOSITORY_API} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:v$(call plus,${API_TAG},1)
+	@docker tag ${ECR_REPOSITORY_API} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:v${API_TAG}
 
 container/push:
-	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:v$(call plus,${API_TAG},1)
+	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_API}:v${API_TAG}
 
 container/migration/image:
 	@docker-compose -f docker-compose.migration.yaml build
-	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:v$(call plus,${MIGRATION_TAG},1)
+	@docker tag ${ECR_REPOSITORY_MIGRATION} ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:v${MIGRATION_TAG}
 
 container/migration/push:
-	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:v$(call plus,${MIGRATION_TAG},1)
+	@docker push ${ECR_REGISTRY_API}/${ECR_REPOSITORY_MIGRATION}:v${MIGRATION_TAG}
 
 container/test/image:
 	@docker-compose -f docker-compose.test.yaml build
