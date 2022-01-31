@@ -127,8 +127,8 @@ module "ecs_api" {
   vpc_id       = module.network.vpc_id
   subnet_ids   = module.network.private_subnet_ids
   cluster_name = aws_ecs_cluster.main.name
-  api_image    = "${var.ecr_api_registory}/${var.ecr_api_repository}:${var.api_image_tag}"
-  image_tag    = var.api_image_tag
+  api_image    = "${var.ecr_api_registory}/${var.ecr_api_repository}:${local.api_image_tag}"
+  image_tag    = local.api_image_tag
 }
 
 module "ecs_migration" {
@@ -139,6 +139,6 @@ module "ecs_migration" {
   subnet_ids              = module.network.private_subnet_ids
   cluster_arn             = aws_ecs_cluster.main.arn
   task_execution_role_arn = module.ecs_api.task_execution_role_arn
-  migration_image         = "${var.ecr_api_registory}/${var.ecr_migration_repository}:${var.migration_image_tag}"
-  image_tag               = var.migration_image_tag
+  migration_image         = "${var.ecr_api_registory}/${var.ecr_migration_repository}:${local.migration_image_tag}"
+  image_tag               = local.migration_image_tag
 }

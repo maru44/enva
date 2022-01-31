@@ -30,6 +30,10 @@ func SuccessApi() {
 	if _, err := file.WriteAt(j, 0); err != nil {
 		panic(err)
 	}
+
+	if err := tfgen(t); err != nil {
+		panic(err)
+	}
 }
 
 func SuccessMigration() {
@@ -45,6 +49,10 @@ func SuccessMigration() {
 	defer file.Close()
 
 	if _, err := file.WriteAt(j, 0); err != nil {
+		panic(err)
+	}
+
+	if err := tfgen(t); err != nil {
 		panic(err)
 	}
 }
