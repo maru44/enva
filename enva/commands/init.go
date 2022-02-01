@@ -20,6 +20,10 @@ func init() {
 	}
 }
 
+var (
+	frontUrl = ""
+)
+
 func (c *initialize) Run(ctx context.Context, opts ...string) error {
 	kvs, err := fileReadAndCreateKvs()
 	if err != nil {
@@ -76,11 +80,7 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 				path = "project/" + *s.OrgSlug + "/" + s.ProjectSlug
 			}
 			color.Green("Project created!\nURL: ")
-			color.Blue(
-				"%s%s%s/%s",
-				os.Getenv("FRONT_PROTOCOL"), os.Getenv("FRONT_HOST"), os.Getenv("FRONT_PORT"),
-				path,
-			)
+			color.Blue("%s/%s", frontUrl, path)
 			return nil
 		}
 		return err
