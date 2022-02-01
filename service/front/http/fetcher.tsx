@@ -1,6 +1,6 @@
 import { NextPageContext } from 'next'
 import { parseCookies } from 'nookies'
-import { ApiUrl, IsDevelopment, ThisUrl } from '../config/env'
+import { IsDevelopment } from '../config/env'
 
 export enum GetPath {
   PROJECT_LIST = '/project',
@@ -56,16 +56,16 @@ export const fetchBaseApi = async (
     },
     body: body && JSON.stringify(body),
   }
-  const res = await fetch(`${ApiUrl}${path}`, opt)
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, opt)
 
   switch (res.status) {
     case 401:
-      await fetch(`${ThisUrl}/api/auth/refresh`, {
+      await fetch(`${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/refresh`, {
         method: 'GET',
         credentials: 'include',
       })
 
-      const res2 = await fetch(`${ApiUrl}${path}`, opt)
+      const res2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, opt)
       return res2
     default:
       return res
@@ -93,10 +93,13 @@ export async function fetcherSSR<
     case 200:
       return res
     case 401:
-      const resUser = await fetch(`${ThisUrl}/api/auth/server/refresh`, {
-        method: 'GET',
-        credentials: 'include',
-      })
+      const resUser = await fetch(
+        `${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/server/refresh`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      )
       // setCookie
       if (resUser.status === 200) {
         // destroyCookie(ctx, 'accessToken');

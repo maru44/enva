@@ -1,7 +1,6 @@
 import { Box, Container, Grid } from '@mui/material'
 import Head from 'next/head'
 import { ReactNode } from 'react'
-import { ThisUrl } from '../../config/env'
 import { Footer } from './Footer'
 import { Header } from './Header'
 
@@ -28,15 +27,14 @@ export const BaseLayout: React.FC<props> = ({ main }) => {
           property="description"
           content="Envassador serves you an efficient system to share Environment variable. Envassador helps your local development."
         />
-        <meta property="og:url" content={ThisUrl} />
-        {/* @TODO: add image */}
+        <meta property="og:url" content={process.env.NEXT_PUBLIC_FRONT_URL} />
         <meta property="og:image" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
           content="Envassador | Acceralate Local Development!"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/enva.png" />
       </Head>
       <Box
         display="flex"

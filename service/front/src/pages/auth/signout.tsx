@@ -3,7 +3,6 @@ import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import { useRecoilState } from 'recoil'
-import { ThisUrl } from '../../../config/env'
 import { currentUserState } from '../../../hooks/useCurrentUser'
 import { PageProps } from '../../../types/page'
 
@@ -15,7 +14,9 @@ const SignOut: NextPage<PageProps> = (props) => {
   if (router.isReady) {
     ;(async () => {
       try {
-        const res = await fetch(`${ThisUrl}/api/auth/signout`)
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/signout`
+        )
         switch (res.status) {
           case 200:
             setCurrentUser(null)

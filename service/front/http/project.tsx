@@ -1,9 +1,8 @@
-import { ApiUrl } from '../config/env'
 import { Project, ProjectInput } from '../types/project'
 import { fetchBaseApi, GetPath } from './fetcher'
 
 export const fetchProjectListByUser = async () => {
-  return await fetch(`${ApiUrl}/project/list/user`, {
+  return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/project/list/user`, {
     method: 'GET',
     mode: 'cors',
     credentials: 'include',

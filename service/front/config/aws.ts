@@ -1,4 +1,3 @@
-import { IsDevelopment, ThisUrl } from './env'
 import { randomSlug } from '../utils/random'
 
 export const awsConfig = {
@@ -8,11 +7,9 @@ export const awsConfig = {
   userPoolWebClientId: process.env.NEXT_PUBLIC_COGNITO_WEBCLIENTID,
 }
 
-export const cognitoUrl = `https://${process.env.NEXT_PUBLIC_COGNITO_DOMAINNAME}.auth.${process.env.NEXT_PUBLIC_COGNITO_REGION}.amazoncognito.com/`
+const cognitoUrl = `https://${process.env.NEXT_PUBLIC_COGNITO_DOMAINNAME}.auth.${process.env.NEXT_PUBLIC_COGNITO_REGION}.amazoncognito.com/`
 
-export const callbackUrl = IsDevelopment
-  ? 'http://localhost:3000/api/auth/callback/cognito'
-  : ''
+export const callbackUrl = `${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/callback/cognito`
 
 export const loginUrl = `${cognitoUrl}login?response_type=${
   process.env.NEXT_PUBLIC_COGNITO_RESPONSE_TYPE
@@ -22,4 +19,4 @@ export const loginUrl = `${cognitoUrl}login?response_type=${
   12
 )}&scope=openid%20email%20profile&redirect_uri=${encodeURI(callbackUrl)}`
 
-export const logoutUrl = `${cognitoUrl}logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_USERPOOLWEBCLIENTID}&logout_uri=${ThisUrl}/auth/signout`
+export const logoutUrl = `${cognitoUrl}logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_USERPOOLWEBCLIENTID}&logout_uri=${process.env.NEXT_PUBLIC_FRONT_URL}/auth/signout`
