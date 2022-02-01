@@ -41,4 +41,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
-replace github.com/joho/godotenv v1.4.0 => github.com/maru44/godotenv v1.0.3
+replace github.com/joho/godotenv v1.4.0 => github.com/maru44/godotenv v1.0.4
