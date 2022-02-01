@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"errors"
-	"os"
 
 	"github.com/fatih/color"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -16,7 +15,7 @@ type (
 var (
 	Commands = map[string]createCommandHandler{}
 
-	ApiUrl = os.Getenv("CLI_API_URL")
+	apiUrl = ""
 )
 
 // if added commands add the name to AllCommands

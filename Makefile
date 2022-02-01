@@ -54,17 +54,17 @@ TEST_INFRA:=./service/api/internal/infra
 
 build/cli:
 	@echo 'Start ${GOOS_DARWIN}'
-	@GOOS=${GOOS_DARWIN} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_DARWIN}/${GOARCH_AMD}/${BIN_NAME} ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_DARWIN} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_DARWIN}/${GOARCH_AMD}/${BIN_NAME} -ldflags '-X github.com/maru44/enva/enva/commands.apiUrl=${CLI_API_URL}' ${ENVA_MAIN_FILE}
 	@echo 'Finish ${GOOS_DARWIN}!!'
 
 	@echo 'Start ${GOOS_LINUX}'
-	@GOOS=${GOOS_LINUX} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_AMD}/${BIN_NAME} ${ENVA_MAIN_FILE}
-	@GOOS=${GOOS_LINUX} GOARCH=${GOARCH_386} go build -o ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_386}/${BIN_NAME} ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_LINUX} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_AMD}/${BIN_NAME} -ldflags '-X github.com/maru44/enva/enva/commands.apiUrl=${CLI_API_URL}' ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_LINUX} GOARCH=${GOARCH_386} go build -o ${BIN_DIR}enva/${GOOS_LINUX}/${GOARCH_386}/${BIN_NAME} -ldflags '-X github.com/maru44/enva/enva/commands.apiUrl=${CLI_API_URL}' ${ENVA_MAIN_FILE}
 	@echo 'Finish ${GOOS_LINUX}!!'
 
 	@echo 'Start ${GOOS_WINDOWS}'
-	@GOOS=${GOOS_WINDOWS} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/${BIN_NAME} ${ENVA_MAIN_FILE}
-	@GOOS=${GOOS_WINDOWS} GOARCH=${GOARCH_386} go build -o ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/${BIN_NAME} ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_WINDOWS} GOARCH=${GOARCH_AMD} go build -o ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/${BIN_NAME} -ldflags '-X github.com/maru44/enva/enva/commands.apiUrl=${CLI_API_URL}' ${ENVA_MAIN_FILE}
+	@GOOS=${GOOS_WINDOWS} GOARCH=${GOARCH_386} go build -o ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/${BIN_NAME} -ldflags '-X github.com/maru44/enva/enva/commands.apiUrl=${CLI_API_URL}' ${ENVA_MAIN_FILE}
 	@echo 'Finish ${GOOS_WINDOWS}!!'
 
 touch/tar:

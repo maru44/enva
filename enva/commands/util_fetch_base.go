@@ -8,7 +8,7 @@ import (
 )
 
 func request(path string, method string, jsonInput []byte, email, password string) (*http.Request, error) {
-	req, err := http.NewRequest(method, ApiUrl+path, bytes.NewBuffer(jsonInput))
+	req, err := http.NewRequest(method, apiUrl+path, bytes.NewBuffer(jsonInput))
 	if err != nil {
 		return nil, err
 	}
