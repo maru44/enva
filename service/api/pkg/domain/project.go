@@ -67,15 +67,15 @@ type (
 
 func (p *ProjectInput) Validate() error {
 	return validation.ValidateStruct(p,
-		validation.Field(&p.Slug, validation.Required, validation.Length(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
-		validation.Field(&p.Name, validation.Required, validation.Length(1, 64)),
+		validation.Field(&p.Slug, validation.Required, validation.RuneLength(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
+		validation.Field(&p.Name, validation.Required, validation.RuneLength(1, 64)),
 	)
 }
 
 func (p *CliProjectInput) Validate() error {
 	return validation.ValidateStruct(p,
-		validation.Field(&p.Slug, validation.Required, validation.Length(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
-		validation.Field(&p.Name, validation.Required, validation.Length(1, 64)),
+		validation.Field(&p.Slug, validation.Required, validation.RuneLength(1, 64), validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`))),
+		validation.Field(&p.Name, validation.Required, validation.RuneLength(1, 64)),
 	)
 }
 

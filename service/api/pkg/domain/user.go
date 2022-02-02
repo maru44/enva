@@ -65,8 +65,8 @@ func (u *UserID) String() string {
 func (u *UserInput) Validate() error {
 	if err := validation.ValidateStruct(u,
 		validation.Field(&u.ID, validation.Required, is.UUID),
-		validation.Field(&u.Email, validation.Required, is.Email, validation.Length(1, 255)),
-		validation.Field(&u.Username, validation.Required, validation.Length(1, 255)),
+		validation.Field(&u.Email, validation.Required, is.Email, validation.RuneLength(1, 255)),
+		validation.Field(&u.Username, validation.Required, validation.RuneLength(1, 255)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -76,7 +76,7 @@ func (u *UserInput) Validate() error {
 func (u *UserCliPasswordInput) Validate() error {
 	if err := validation.ValidateStruct(u,
 		validation.Field(&u.ID, validation.Required, is.UUID),
-		validation.Field(&u.CliPassword, validation.Required, validation.Length(31, 511)),
+		validation.Field(&u.CliPassword, validation.Required, validation.RuneLength(31, 511)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
@@ -85,8 +85,8 @@ func (u *UserCliPasswordInput) Validate() error {
 
 func (u *UserCliValidationInput) Validate() error {
 	if err := validation.ValidateStruct(u,
-		validation.Field(&u.CliPassword, validation.Required, validation.Length(31, 255)),
-		validation.Field(&u.EmailOrUsername, validation.Required, validation.Length(1, 255)),
+		validation.Field(&u.CliPassword, validation.Required, validation.RuneLength(31, 255)),
+		validation.Field(&u.EmailOrUsername, validation.Required, validation.RuneLength(1, 255)),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}

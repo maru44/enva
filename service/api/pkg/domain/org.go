@@ -63,8 +63,8 @@ type (
 
 func (o *OrgInput) Validate() error {
 	return validation.ValidateStruct(o,
-		validation.Field(&o.Slug, validation.Required, validation.Length(1, 64)),
-		validation.Field(&o.Name, validation.Required, validation.Length(1, 64)),
+		validation.Field(&o.Slug, validation.Required, validation.RuneLength(1, 64)),
+		validation.Field(&o.Name, validation.Required, validation.RuneLength(1, 64)),
 	)
 }
 

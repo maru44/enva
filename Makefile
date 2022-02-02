@@ -46,7 +46,6 @@ API_TAG:=$(shell jq .apiImageTag ./infra/docker/tag.json)
 MIGRATION_TAG:=$(shell jq .migrationImageTag ./infra/docker/tag.json)
 
 # test dirs
-# test dirs
 TEST_USECASE:=./service/api/internal/usecase
 TEST_REPOSITORY:=./service/api/internal/interface/database
 TEST_CONTROLLER:=./service/api/internal/interface/controllers
