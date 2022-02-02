@@ -12,6 +12,8 @@ var (
 	fileWriteMap = map[string]func(kv domain.KvValid) string{
 		".envrc":  writeDirenv,
 		".tfvars": writeTfval,
+		".yaml":   writeYaml,
+		".yml":    writeYaml,
 	}
 )
 
@@ -28,6 +30,11 @@ func writeDirenv(kv domain.KvValid) string {
 func writeTfval(kv domain.KvValid) string {
 	value := escapeDoubleQuotes(kv.Value.String())
 	return fmt.Sprintf("%s=\"%s\"\n", kv.Key, value)
+}
+
+func writeYaml(kv domain.KvValid) string {
+	value := soroundedQuotes(kv.Value.String())
+	return fmt.Sprintf("%s: %s\n", kv.Key, value)
 }
 
 /* utils */

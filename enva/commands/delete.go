@@ -9,16 +9,16 @@ import (
 )
 
 type (
-	delete struct{}
+	deleteS struct{}
 )
 
 func init() {
 	Commands["delete"] = func() domain.ICommandInteractor {
-		return &delete{}
+		return &deleteS{}
 	}
 }
 
-func (c *delete) Run(ctx context.Context, opts ...string) error {
+func (c *deleteS) Run(ctx context.Context, opts ...string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -42,7 +42,7 @@ func (c *delete) Run(ctx context.Context, opts ...string) error {
 	return nil
 }
 
-func (c *delete) Explain() string {
+func (c *deleteS) Explain() string {
 	return `	Removing remote and local key-value set. An arg is needed.
 	ex) enva delete [key]
 `

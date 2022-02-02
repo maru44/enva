@@ -25,18 +25,24 @@ var (
 )
 
 func (c *initialize) Run(ctx context.Context, opts ...string) error {
-	kvs, err := fileReadAndCreateKvs()
+	kvs, err := kvsFromEnvFile()
 	if err != nil {
 		return err
 	}
 
 	inputs := make([]domain.KvInput, len(kvs))
-	for i, kv := range kvs {
+	count := 0
+	for k, v := range kvs {
+		kv := domain.KvValid{
+			Key:   k,
+			Value: v,
+		}
 		input := kv.ToInput()
 		if err := input.Validate(); err != nil {
 			return err
 		}
-		inputs[i] = *input
+		inputs[count] = *input
+		count++
 	}
 
 	email, password, err := inputEmailPassword()
