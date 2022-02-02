@@ -35,7 +35,8 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 
 	remoteData := domain.MapFromKv(body.Data)
 
-	localData, err := kvsFromEnvFile()
+	localDataRaw, err := kvsFromEnvFile()
+	localData := domain.MapFromKv(localDataRaw)
 	if err != nil {
 		return err
 	}
@@ -46,16 +47,19 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 	)
 
 	for k, v := range remoteData {
+		// remote only
 		lv, ok := localData[k]
 		if !ok {
 			listOnlyRemote = append(listOnlyRemote, domain.KvValid{Key: k, Value: v})
 			continue
 		}
 
+		// match
 		if lv == v {
 			continue
 		}
 
+		// diffs
 		diffs = append(diffs, diffKvValid{
 			Key:         k,
 			RemoteValue: v,
@@ -63,6 +67,7 @@ func (c *diff) Run(ctx context.Context, opts ...string) error {
 		})
 	}
 
+	// local only
 	for k, v := range localData {
 		if _, ok := remoteData[k]; !ok {
 			listOnlyLocal = append(listOnlyLocal, domain.KvValid{Key: k, Value: v})

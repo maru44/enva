@@ -32,11 +32,7 @@ func (c *initialize) Run(ctx context.Context, opts ...string) error {
 
 	inputs := make([]domain.KvInput, len(kvs))
 	count := 0
-	for k, v := range kvs {
-		kv := domain.KvValid{
-			Key:   k,
-			Value: v,
-		}
+	for _, kv := range kvs {
 		input := kv.ToInput()
 		if err := input.Validate(); err != nil {
 			return err
