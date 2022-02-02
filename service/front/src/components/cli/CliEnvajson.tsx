@@ -21,8 +21,8 @@ export const CliEnvajson: React.FC = () => {
                 enva.json
               </Typography>
               {attrs.map((a, i) => (
-                <Box mb={2}>
-                  <Typography mb={1} variant="h6" key={i}>
+                <Box mb={2} key={i}>
+                  <Typography mb={1} variant="h6">
                     <b>{a.attr}</b> {a.required && '(required)'}
                   </Typography>
                   <Typography>
