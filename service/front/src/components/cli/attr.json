@@ -12,7 +12,7 @@
     {
         "attr": "org",
         "required": false,
-        "exp": "The slug of org. If it is not null, We reference the project that matches org slug and project slug. Or if it is null, we reference your own project matches project slug."
+        "exp": "The slug of org. If it is not null, we reference the project that matches org slug and project slug. Or if it is null, we reference your own project matches project slug."
     },
     {
         "attr": "pre",

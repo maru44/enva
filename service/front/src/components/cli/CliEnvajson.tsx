@@ -29,8 +29,8 @@ export const CliEnvajson: React.FC = () => {
                     {a.exp}
                     {a.attr === 'file' && (
                       <Typography>
-                        We support <b>.envrc</b>, <b>.yaml</b> (<b>.yml</b>) and{' '}
-                        <b>.tfvars</b> extensions.
+                        We support <b>.envrc</b>, <b>.yaml</b> (<b>.yml</b>),{' '}
+                        <b>.json</b> and <b>.tfvars</b> extensions.
                         <br />
                         If you indicate extension other than those, it will be
                         written <b>key=value</b> format like <b>.env</b>.
