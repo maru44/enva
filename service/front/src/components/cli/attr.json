@@ -1,0 +1,27 @@
+[
+    {
+        "attr": "file",
+        "required": true,
+        "exp": "The path of your env file."
+    },
+    {
+        "attr": "project",
+        "required": true,
+        "exp": "The slug of project."
+    },
+    {
+        "attr": "org",
+        "required": false,
+        "exp": "The slug of org. If it is not null, We reference the project that matches org slug and project slug. Or if it is null, we reference your own project matches project slug."
+    },
+    {
+        "attr": "pre",
+        "required": false,
+        "exp": "The sentence inserted above key-value sets."
+    },
+    {
+        "attr": "suf",
+        "required": false,
+        "exp": "The sentence inserted below key-value sets."
+    }
+]

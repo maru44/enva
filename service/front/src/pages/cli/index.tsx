@@ -6,8 +6,9 @@ import styles from '../../styles/cli.module.css'
 import { useRouter } from 'next/router'
 import { CliInstallations } from '../../components/cli/CliInstallations'
 import { CliCommands } from '../../components/cli/CliCommands'
+import { CliEnvajson } from '../../components/cli/CliEnvajson'
 
-type tab = 'installations' | 'commands'
+type tab = 'installations' | 'commands' | 'enva.json'
 
 const CliIndex: NextPage<PageProps> = (props) => {
   const router = useRouter()
@@ -34,9 +35,11 @@ const CliIndex: NextPage<PageProps> = (props) => {
             label="Installations"
           />
           <Tab key="commands" value="commands" label="Commands" />
+          <Tab key="enva.json" value="enva.json" label="enva.json" />
         </Tabs>
         {tab === 'installations' && <CliInstallations />}
         {tab === 'commands' && <CliCommands />}
+        {tab === 'enva.json' && <CliEnvajson />}
       </Box>
     </Box>
   )
