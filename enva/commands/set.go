@@ -53,17 +53,18 @@ func (c *set) Explain() string {
 
 func (c *set) inputSettingsInfo() (*string, error) {
 	fmt.Println("start creating enva.json ...")
+
+	fileName, err := c.input("file path", true)
+	if err != nil {
+		return nil, err
+	}
+
 	projectSlug, err := c.input("project slug", true)
 	if err != nil {
 		return nil, err
 	}
 
 	orgSlug, err := c.input("org slug", false)
-	if err != nil {
-		return nil, err
-	}
-
-	fileName, err := c.input("filepath", true)
 	if err != nil {
 		return nil, err
 	}
