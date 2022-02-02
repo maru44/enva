@@ -1,4 +1,5 @@
 import { Box, Grid, Typography } from '@mui/material'
+import Link from 'next/link'
 import { useState } from 'react'
 import { TermsOfUse } from './static/rule/TermsOfUse'
 
@@ -19,12 +20,16 @@ export const Footer: React.FC = () => {
         <Box>
           <Typography>&copy; 2022 maru</Typography>
         </Box>
-        <Box>
+        <Box display="flex" alignItems="center">
+          <Link passHref href="https://forms.gle/oVf98yrmcnhwc1SLA">
+            <a target="_new">Inquiry</a>
+          </Link>
           <Typography
             onClick={() => {
               setIsTermsOpen(true)
             }}
             className="likeLink"
+            ml={2}
           >
             terms of use
           </Typography>
