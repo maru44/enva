@@ -12,10 +12,27 @@ export const CliCommands: React.FC = () => {
 
   return (
     <Box>
+      <Box mt={6}>
+        <Grid container>
+          <Grid item xs={1} />
+          <Grid item xs={10}>
+            <Box pl={1} pr={1}>
+              <Typography variant="h5">enva.json</Typography>
+              <Typography variant="subtitle1" mt={4}>
+                We support <b>.envrc</b>, <b>.yaml</b> (<b>.yml</b>) and{' '}
+                <b>.tfvars</b> extensions.
+                <br />
+                If you indicate extension other than those, it will be written{' '}
+                <b>key=value</b> format like <b>.env</b>.
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
       <Grid container>
         <Grid item xs={1} />
         <Grid item xs={10}>
-          <Box mt={6} pl={1} pr={1}>
+          <Box mt={8} pl={1} pr={1}>
             <Typography variant="h5">List of CLI Commands</Typography>
           </Box>
           <Box mt={4} pl={1} pr={1}>

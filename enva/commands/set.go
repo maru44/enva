@@ -79,18 +79,18 @@ func (c *set) inputSettingsInfo() (*string, error) {
 	}
 
 	input := []string{
-		fmt.Sprintf(`	"env_file_name": "%s"`, fileName),
-		fmt.Sprintf(`	"project_slug": "%s"`, projectSlug),
+		fmt.Sprintf(`	"file": "%s"`, fileName),
+		fmt.Sprintf(`	"project": "%s"`, projectSlug),
 	}
 
 	if orgSlug != "" {
-		input = append(input, fmt.Sprintf(`	"org_slug": "%s"`, orgSlug))
+		input = append(input, fmt.Sprintf(`	"org": "%s"`, orgSlug))
 	}
 	if pre != "" {
-		input = append(input, fmt.Sprintf(`	"pre_sentence": "%s"`, pre))
+		input = append(input, fmt.Sprintf(`	"pre": "%s"`, pre))
 	}
 	if suf != "" {
-		input = append(input, fmt.Sprintf(`	"suf_sentence": "%s"`, suf))
+		input = append(input, fmt.Sprintf(`	"suf": "%s"`, suf))
 	}
 
 	jsonContent := strings.Join(input, ",\n")

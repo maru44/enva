@@ -37,15 +37,15 @@ const ProjectDetail: NextPage<PageProps> = (props) => {
   if (data?.error) return <ErrorComponent errBody={data} />
 
   const sampleJson = `{
-  "env_file_name": ".envrc",
-  "projectSlug": "${data?.data.slug}",${
+  "file": ".envrc",
+  "project": "${data?.data.slug}",${
     data?.data.org
       ? `
-  "org_slug": "${data?.data.org.slug}",`
+  "org": "${data?.data.org.slug}",`
       : ''
   }
-  "pre_sentence": "# this is optional value\\n# you can write any thing",
-  "suf_sentence": "# this is optional value\\n# Have a nice day!"
+  "pre": "# this is optional value\\n# you can write any thing",
+  "suf": "# this is optional value\\n# Have a nice day!"
 }`
 
   return (
