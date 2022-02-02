@@ -37,6 +37,14 @@ func writeYaml(kv domain.KvValid) string {
 	return fmt.Sprintf("%s: %s\n", kv.Key, value)
 }
 
+func writeJson(kv domain.KvValid, isLast bool) string {
+	value := escapeDoubleQuotes(kv.Value.String())
+	if isLast {
+		return fmt.Sprintf("\t\"%s\": \"%s\"\n", kv.Key, value)
+	}
+	return fmt.Sprintf("\t\"%s\": \"%s\",\n", kv.Key, value)
+}
+
 /* utils */
 
 func escapeDoubleQuotes(str string) string {

@@ -59,6 +59,7 @@ func writeKvsToFile(kvs []domain.KvValid) error {
 	fileName := s.EnvFileName
 	// to read
 	ext := filepath.Ext(s.EnvFileName)
+
 	/* write file by created kvs */
 	fw, ok := fileWriteMap[ext]
 	if !ok {
@@ -71,21 +72,41 @@ func writeKvsToFile(kvs []domain.KvValid) error {
 	}
 	defer file.Close()
 
+	if ext == ".json" {
+		if _, err := file.WriteString("{" + "\n"); err != nil {
+			return err
+		}
+		length := len(kvs)
+		for i, kv := range kvs {
+			if _, err := file.WriteString(writeJson(kv, length == i+1)); err != nil {
+				return err
+			}
+		}
+		if _, err := file.WriteString("}" + "\n"); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// pre
 	if s.PreSentence != nil {
 		if _, err := file.WriteString(*s.PreSentence + "\n"); err != nil {
 			return err
 		}
 	}
+	// kvs
 	for _, kv := range kvs {
 		if _, err := file.WriteString(fw(kv)); err != nil {
 			return err
 		}
 	}
+	// suf
 	if s.SufSentence != nil {
 		if _, err := file.WriteString(*s.SufSentence + "\n"); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -97,6 +118,17 @@ func kvsFromEnvFile() ([]domain.KvValid, error) {
 
 	fileName := s.EnvFileName
 
+	ext := filepath.Ext(fileName)
+	// json
+	if ext == ".json" {
+		kvs, err := kvsFromJsonFile(fileName)
+		if err != nil {
+			return nil, err
+		}
+		return kvs, nil
+	}
+
+	// others
 	ms, err := godotenv.Read(fileName)
 	if err != nil {
 		return nil, err
