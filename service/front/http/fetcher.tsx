@@ -34,6 +34,7 @@ export const GetPath = {
 
   USER: '/user',
   USER_CREATE: '/user/create',
+  USER_WITHDRAW: '/user/withdraw',
 
   CLI_USER: '/cli/user',
   CLI_USER_UPDATE: '/cli/user/update',

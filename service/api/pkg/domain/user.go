@@ -92,7 +92,6 @@ func (u *UserCliPasswordInput) Validate() error {
 func (u *UserUpdateIsValidInput) Validate() error {
 	if err := validation.ValidateStruct(u,
 		validation.Field(&u.ID, validation.Required, is.UUID),
-		validation.Field(&u.IsValid, validation.Required),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
