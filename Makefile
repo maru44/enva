@@ -93,7 +93,7 @@ compress:
 	@echo 'Compression ${GOOS_WINDOWS}'
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_AMD}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_AMD}.tar.gz ${BIN_NAME}
 	@tar -C ${BIN_DIR}enva/${GOOS_WINDOWS}/${GOARCH_386}/ -cvzf ${TAR_DIR}enva_${VERSION}_${GOOS_WINDOWS}_${GOARCH_386}.tar.gz ${BIN_NAME}
-	@go run ${ADMIN} ${VERSION} ${GOOS_WINDOWS} ${GOARCH_AMD}
+	@go run ${ADMIN} tar/json ${VERSION} ${GOOS_WINDOWS} ${GOARCH_AMD}
 	@go run ${ADMIN} tar/json ${VERSION} ${GOOS_WINDOWS} ${GOARCH_386}
 
 defrost:
