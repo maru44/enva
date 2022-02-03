@@ -9,7 +9,7 @@ on:
       - .github/workflows/**
       - service/front/**
       - service/admin/**
-      - ./Makefile
+      - Makefile
 env:
   AWS_REGION: ap-northeast-1
 jobs:
