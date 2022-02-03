@@ -261,6 +261,7 @@ func updateFrontVersionFile(inputVersion, inputOs, inputArch string) {
 			// if arch not ex
 			vs[idxVersion].Oss[idxOs].Archs = append(vs[idxVersion].Oss[idxOs].Archs, inputArch)
 		}
+		vs[idxVersion].UpdatedAt = time.Now().Format("Jan 2, 2006")
 	}
 
 	j, err := json.Marshal(vs)
