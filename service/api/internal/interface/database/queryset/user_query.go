@@ -10,6 +10,10 @@ const (
 		"SET cli_password = $1, updated_at = now() " +
 		"WHERE id = $2"
 
+	UserUpdateValidQuery = "UPDATE users " +
+		"SET is_valid = $1, updated_at = now() " +
+		"WHERE id = $2"
+
 	UserGetByIDQuery = "SELECT " +
 		"u.id, u.email, u.username, u.image_url, u.cli_password, u.is_valid, u.is_email_verified, u.created_at, u.updated_at, " +
 		"s.id, s.stripe_subscription_id, s.stripe_customer_id, " +
@@ -27,7 +31,7 @@ const (
 		"WHERE u.email = $1"
 
 	UserExistsQuery = "SELECT " +
-		"id " +
+		"id, is_valid " +
 		"FROM users " +
 		"WHERE id = $1"
 

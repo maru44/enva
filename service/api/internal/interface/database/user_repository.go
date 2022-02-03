@@ -86,7 +86,7 @@ func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*doma
 	return u, nil
 }
 
-func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
+func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.Forbidden)
@@ -101,14 +101,23 @@ func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 		return nil, err
 	}
 
-	var id *string
+	var (
+		id      *string
+		isValid bool
+	)
 	row := repo.QueryRowContext(ctx, queryset.UserExistsQuery, input.ID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
-	err = row.Scan(&id)
+
+	err = row.Scan(&id, &isValid)
+	// if ex
 	if err == nil {
-		return nil, perr.New("The user already exists", perr.BadRequest, "The user already exists")
+		// if not valid return 403
+		if !isValid {
+			return nil, perr.New("user is not valid", perr.Forbidden, "user is not valid")
+		}
+		return id, nil
 	}
 	if err != sql.ErrNoRows {
 		return nil, perr.Wrap(err, perr.InternalServerError)
@@ -125,6 +134,27 @@ func (repo *UserRepository) Create(ctx context.Context) (*string, error) {
 	return id, nil
 }
 
+func (repo *UserRepository) UpdateValid(ctx context.Context, input domain.UserUpdateIsValidInput) error {
+	if err := input.Validate(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	exe, err := repo.ExecContext(ctx,
+		queryset.UserUpdateValidQuery,
+		input.IsValid, input.ID,
+	)
+	if err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+
+	if affected, err := exe.RowsAffected(); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	} else if affected == 0 {
+		return perr.New("There is no affected row", perr.BadRequest)
+	}
+	return nil
+}
+
 func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
@@ -139,7 +169,7 @@ func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, err
 	}
 
 	input := &domain.UserCliPasswordInput{
-		ID:          user.ID.String(),
+		ID:          user.ID,
 		CliPassword: hashed,
 	}
 	if err := input.Validate(); err != nil {

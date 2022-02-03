@@ -82,6 +82,7 @@ func main() {
 			/* user */
 			s("/user", http.MethodGet, user.GetUserView),
 			s("/user/create", http.MethodGet, user.CreateView),
+			s("/user/withdraw", http.MethodGet, user.UpdateToInvalidView),
 
 			/* cli_users */
 			s("/cli/user", http.MethodGet, user.ExistsCliPasswordView),

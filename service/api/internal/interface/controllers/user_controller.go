@@ -70,11 +70,35 @@ func (con *UserController) UpdateCliPasswordView(w http.ResponseWriter, r *http.
 }
 
 func (con *UserController) CreateView(w http.ResponseWriter, r *http.Request) {
-	id, err := con.in.Create(r.Context())
+	id, err := con.in.CreateOrDoNothing(r.Context())
 	if err != nil {
+		// destroy cookie
+		destroyCookie(w, domain.JwtCookieKeyAccessToken)
+		destroyCookie(w, domain.JwtCookieKeyIdToken)
+		destroyCookie(w, domain.JwtCookieKeyRefreshToken)
+
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}
 
 	response(w, r, nil, map[string]interface{}{"data": id})
+}
+
+func (con *UserController) UpdateToInvalidView(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	user, err := domain.UserFromCtx(ctx)
+	if err != nil {
+		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		return
+	}
+
+	input := domain.UserUpdateIsValidInput{
+		ID:      user.ID,
+		IsValid: false,
+	}
+	if err := con.in.UpdateValid(ctx, input); err != nil {
+		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		return
+	}
+	response(w, r, nil, map[string]interface{}{"data": user.ID})
 }

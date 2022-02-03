@@ -39,8 +39,13 @@ type (
 	}
 
 	UserCliPasswordInput struct {
-		ID          string `json:"id"`
+		ID          UserID `json:"id"`
 		CliPassword string `json:"password"`
+	}
+
+	UserUpdateIsValidInput struct {
+		ID      UserID
+		IsValid bool
 	}
 
 	UserCliValidationInput struct {
@@ -51,7 +56,8 @@ type (
 	IUserInteractor interface {
 		GetByID(context.Context, UserID) (*User, error)
 		GetByEmail(context.Context, string) (*User, error)
-		Create(context.Context) (*string, error)
+		CreateOrDoNothing(context.Context) (*string, error)
+		UpdateValid(context.Context, UserUpdateIsValidInput) error
 
 		UpdateCliPassword(context.Context) (*string, error)
 		GetUserCli(context.Context, *UserCliValidationInput) (*User, error)
@@ -77,6 +83,16 @@ func (u *UserCliPasswordInput) Validate() error {
 	if err := validation.ValidateStruct(u,
 		validation.Field(&u.ID, validation.Required, is.UUID),
 		validation.Field(&u.CliPassword, validation.Required, validation.RuneLength(31, 511)),
+	); err != nil {
+		return perr.Wrap(err, perr.BadRequest)
+	}
+	return nil
+}
+
+func (u *UserUpdateIsValidInput) Validate() error {
+	if err := validation.ValidateStruct(u,
+		validation.Field(&u.ID, validation.Required, is.UUID),
+		validation.Field(&u.IsValid, validation.Required),
 	); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
 	}
