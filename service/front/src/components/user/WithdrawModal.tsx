@@ -2,7 +2,7 @@ import { Box, Button, Dialog, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useSnackbar } from 'notistack'
 import { logoutUrl } from '../../../config/aws'
-import { userCRUDResponseBody } from '../../../http/body/user'
+import { userResponseBody } from '../../../http/body/user'
 import { fetchWithdraw } from '../../../http/user'
 
 type props = {
@@ -16,7 +16,7 @@ export const WithdrawModal: React.FC<props> = ({ onClose, isOpen }) => {
 
   const withdraw = async () => {
     const res = await fetchWithdraw()
-    const ret: userCRUDResponseBody = await res.json()
+    const ret: userResponseBody = await res.json()
     if (res.status === 200) {
       snack.enqueueSnackbar('Thank you. See you soon!', { variant: 'success' })
       router.push(logoutUrl)
