@@ -1,5 +1,6 @@
 .PHONY: build/cli \
 	compression \
+	explain/json \
 	defrost \
 	test \
 	touch/tar \
