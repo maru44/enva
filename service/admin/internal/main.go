@@ -252,15 +252,19 @@ func updateFrontVersionFile(inputVersion, inputOs, inputArch string) {
 		if idxOs == -1 {
 			vs[idxVersion].Oss = append(vs[idxVersion].Oss, versionOs{Name: inputOs, Archs: []string{inputArch}})
 		} else {
+			exArch := false
 			// if input os ex
 			for _, a := range vs[idxVersion].Oss[idxOs].Archs {
 				// if input arch ex
 				if a == inputArch {
-					return
+					exArch = true
+					break
 				}
 			}
 			// if arch not ex
-			vs[idxVersion].Oss[idxOs].Archs = append(vs[idxVersion].Oss[idxOs].Archs, inputArch)
+			if !exArch {
+				vs[idxVersion].Oss[idxOs].Archs = append(vs[idxVersion].Oss[idxOs].Archs, inputArch)
+			}
 		}
 	}
 
