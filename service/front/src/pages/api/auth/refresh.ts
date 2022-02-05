@@ -24,7 +24,8 @@ export default async function handler(
       case 200:
         // set cookie
         if (!ret.id_token) {
-          throw new Error('Access Token is blank')
+          res.status(400).json({ message: 'id token is blank' })
+          return
         }
         res.setHeader('Set-Cookie', [
           serialize(

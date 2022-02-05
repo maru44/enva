@@ -63,10 +63,16 @@ export const fetchBaseApi = async (
   switch (res.status) {
     case 401:
       // refresh
-      await fetch(`${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/refresh`, {
-        method: 'GET',
-        credentials: 'include',
-      })
+      const resRefresh = await fetch(
+        `${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/refresh`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      )
+      if (resRefresh.status !== 200) {
+        return res
+      }
 
       // re fetch
       const res2 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, opt)
