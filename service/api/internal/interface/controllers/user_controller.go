@@ -69,7 +69,7 @@ func (con *UserController) UpdateCliPasswordView(w http.ResponseWriter, r *http.
 	response(w, r, nil, map[string]interface{}{"data": pass})
 }
 
-func (con *UserController) CreateView(w http.ResponseWriter, r *http.Request) {
+func (con *UserController) UpsertView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_, err := con.in.UpsertIfNotInvalid(ctx)
 	if err != nil {
