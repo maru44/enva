@@ -43,7 +43,7 @@ export default async function handler(
             getCookieOption(3600 * 24 * 7 * 3)
           ),
         ])
-        res.status(200).json({ message: ret.id_token })
+        res.status(200).json({ message: 'succeeded to refresh token' })
         return
       default:
         res.status(400).json(ret)
