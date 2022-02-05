@@ -45,7 +45,6 @@ export default async function handler(
         ])
 
         res.redirect('/auth/create')
-
         return
       default:
         res.status(400).json(ret)
