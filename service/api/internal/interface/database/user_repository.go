@@ -96,6 +96,7 @@ func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, err
 		Email:           user.Email,
 		Username:        user.Username,
 		IsEmailVerified: user.IsEmailVerified,
+		ImageURL:        user.ImageURL,
 	}
 	if err := input.Validate(); err != nil {
 		return nil, err
@@ -117,6 +118,7 @@ func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, err
 		if !isValid {
 			return nil, perr.New("user is not valid", perr.Forbidden, "user is not valid")
 		}
+		// @TODO update isEmailVerified and imageURL if it changed
 		return id, nil
 	}
 	if err != sql.ErrNoRows {
@@ -126,7 +128,7 @@ func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, err
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.UserInsertQuery,
-		input.ID, input.Email, input.Username, input.IsEmailVerified,
+		input.ID, input.Email, input.Username, input.IsEmailVerified, input.ImageURL,
 	).Scan(&id); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}

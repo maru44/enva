@@ -32,10 +32,11 @@ type (
 	}
 
 	UserInput struct {
-		ID              string `json:"id"`
-		Email           string `json:"email"`
-		Username        string `json:"username"`
-		IsEmailVerified bool   `json:"is_email_verified"`
+		ID              string
+		Email           string
+		Username        string
+		ImageURL        *string
+		IsEmailVerified bool
 	}
 
 	UserCliPasswordInput struct {

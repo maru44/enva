@@ -2,8 +2,8 @@ package queryset
 
 const (
 	UserInsertQuery = "INSERT INTO " +
-		"users(id, email, username, is_email_verified) " +
-		"VALUES($1, $2, $3, $4) " +
+		"users(id, email, username, is_email_verified, image_url) " +
+		"VALUES($1, $2, $3, $4, $5) " +
 		"RETURNING id"
 
 	UserUpdateCliPasswordQuery = "UPDATE users " +
