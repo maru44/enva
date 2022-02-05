@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import {
   Box,
   Card,
+  CardMedia,
   Icon,
   List,
   ListItem,
@@ -24,10 +25,10 @@ import {
   Sync,
   Timer,
   Update,
-  YouTube,
 } from '@material-ui/icons'
 import { ReactNode } from 'react'
 import Link from 'next/link'
+import ReactPlayer from 'react-player'
 
 const Home: NextPage = () => {
   return (
@@ -114,6 +115,16 @@ const Home: NextPage = () => {
       <Box mt={12}>
         <Box>
           <Typography variant="h4" textAlign="center">
+            <b>Demo Video</b>
+          </Typography>
+        </Box>
+        <Box display="flex" justifyContent="center" mt={4}>
+          <ReactPlayer url="https://youtu.be/WGM3ncb0xIY" />
+        </Box>
+      </Box>
+      <Box mt={12}>
+        <Box>
+          <Typography variant="h4" textAlign="center">
             <b>Payments</b>
           </Typography>
         </Box>
@@ -180,13 +191,7 @@ const Home: NextPage = () => {
               <ListItemIcon>
                 <Update />
               </ListItemIcon>
-              <ListItemText>Improving sign in(up) UI.</ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <YouTube />
-              </ListItemIcon>
-              <ListItemText>Demonstration video for introduction.</ListItemText>
+              <ListItemText>Improving UI and modifying functions.</ListItemText>
             </ListItem>
             <ListItem>
               <ListItemIcon>
