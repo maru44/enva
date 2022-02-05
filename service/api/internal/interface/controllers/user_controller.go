@@ -73,11 +73,6 @@ func (con *UserController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_, err := con.in.CreateOrDoNothing(ctx)
 	if err != nil {
-		// destroy cookie
-		destroyCookie(w, domain.JwtCookieKeyAccessToken)
-		destroyCookie(w, domain.JwtCookieKeyIdToken)
-		destroyCookie(w, domain.JwtCookieKeyRefreshToken)
-
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return
 	}
