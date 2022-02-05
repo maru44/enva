@@ -86,7 +86,7 @@ func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*doma
 	return u, nil
 }
 
-func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, error) {
+func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.Forbidden)
@@ -96,26 +96,55 @@ func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, err
 		Email:           user.Email,
 		Username:        user.Username,
 		IsEmailVerified: user.IsEmailVerified,
+		ImageURL:        user.ImageURL,
 	}
 	if err := input.Validate(); err != nil {
 		return nil, err
 	}
 
 	var (
-		id      *string
-		isValid bool
+		id, imageURL             *string
+		isValid, isEmailVerified bool
 	)
 	row := repo.QueryRowContext(ctx, queryset.UserExistsQuery, input.ID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
 
-	err = row.Scan(&id, &isValid)
+	err = row.Scan(&id, &isValid, &isEmailVerified, &imageURL)
 	// if ex
 	if err == nil {
 		// if not valid return 403
 		if !isValid {
 			return nil, perr.New("user is not valid", perr.Forbidden, "user is not valid")
+		}
+
+		// update isEmailVerified and imageURL if it changed
+		isNeedToUpdate := false
+		switch {
+		case input.ImageURL == nil && imageURL == nil:
+		case input.IsEmailVerified != isEmailVerified,
+			input.ImageURL == nil && imageURL != nil,
+			input.ImageURL != nil && imageURL == nil,
+			*input.ImageURL != *imageURL:
+			isNeedToUpdate = true
+		}
+		if isNeedToUpdate {
+			exe, err := repo.ExecContext(ctx,
+				queryset.UserUpdateImageOrIsEmailVerifiedQuery,
+				input.IsEmailVerified, input.ImageURL, input.ID,
+			)
+			if err != nil {
+				return nil, perr.Wrap(err, perr.BadRequest)
+			}
+
+			affected, err := exe.RowsAffected()
+			if err != nil {
+				return nil, perr.Wrap(err, perr.BadRequest)
+			}
+			if affected == 0 {
+				return nil, perr.New("There is no affected row", perr.BadRequest)
+			}
 		}
 		return id, nil
 	}
@@ -123,10 +152,11 @@ func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, err
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
 
+	// if not ex
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.UserInsertQuery,
-		input.ID, input.Email, input.Username, input.IsEmailVerified,
+		input.ID, input.Email, input.Username, input.IsEmailVerified, input.ImageURL,
 	).Scan(&id); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}

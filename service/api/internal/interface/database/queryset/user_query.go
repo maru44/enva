@@ -2,9 +2,13 @@ package queryset
 
 const (
 	UserInsertQuery = "INSERT INTO " +
-		"users(id, email, username, is_email_verified) " +
-		"VALUES($1, $2, $3, $4) " +
+		"users(id, email, username, is_email_verified, image_url) " +
+		"VALUES($1, $2, $3, $4, $5) " +
 		"RETURNING id"
+
+	UserUpdateImageOrIsEmailVerifiedQuery = "UPDATE users " +
+		"SET is_email_verified = $1, image_url = $2, updated_at = now() " +
+		"WHERE id = $3"
 
 	UserUpdateCliPasswordQuery = "UPDATE users " +
 		"SET cli_password = $1, updated_at = now() " +
@@ -31,7 +35,7 @@ const (
 		"WHERE u.email = $1"
 
 	UserExistsQuery = "SELECT " +
-		"id, is_valid " +
+		"id, is_valid, is_email_verified, image_url " +
 		"FROM users " +
 		"WHERE id = $1"
 
@@ -39,8 +43,4 @@ const (
 		"id, email, username, image_url, cli_password, created_at, updated_at " +
 		"FROM users " +
 		"WHERE (email = $1 OR username = $1) AND is_valid = true AND is_email_verified"
-
-	// UserGetPasswordByEmailOrPassword = "SELECT passsword " +
-	// 	"FROM users " +
-	// 	"WHERE (email = $1 OR username = $1) AND is_valid = true"
 )
