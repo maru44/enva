@@ -23,6 +23,9 @@ export default async function handler(
     switch (response.status) {
       case 200:
         // set cookie
+        if (!ret.id_token) {
+          throw new Error('Access Token is blank')
+        }
         res.setHeader('Set-Cookie', [
           serialize(
             CookieKeyIdToken,
