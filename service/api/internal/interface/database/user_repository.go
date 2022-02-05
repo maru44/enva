@@ -152,6 +152,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
 
+	// if not ex
 	if err := repo.QueryRowContext(
 		ctx,
 		queryset.UserInsertQuery,
