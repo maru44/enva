@@ -1,5 +1,6 @@
 import { Kv } from '../types/kv'
 
+// sort by key
 export const sortKvs = (original: Kv[]): Kv[] => {
   return original.sort((kv1, kv2) => {
     if (kv1.kv_key > kv2.kv_key) {
@@ -13,3 +14,5 @@ export const sortKvs = (original: Kv[]): Kv[] => {
     return 0
   })
 }
+
+// @TODO sort by many pattern

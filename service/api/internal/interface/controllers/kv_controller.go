@@ -52,7 +52,7 @@ func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 		response(w, r, perr.Wrap(err, perr.NotFound), nil)
 		return
 	}
-	sort.Slice(kvs, func(i, j int) bool { return kvs[i].Key.String() > kvs[j].Key.String() })
+	sort.Slice(kvs, func(i, j int) bool { return kvs[i].Key.String() < kvs[j].Key.String() })
 	response(w, r, nil, map[string]interface{}{"data": kvs})
 }
 

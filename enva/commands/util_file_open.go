@@ -73,7 +73,7 @@ func writeKvsToFile(kvs []domain.KvValid) error {
 	}
 	defer file.Close()
 
-	sort.Slice(kvs, func(i, j int) bool { return kvs[i].Key.String() > kvs[j].Key.String() })
+	sort.Slice(kvs, func(i, j int) bool { return kvs[i].Key.String() < kvs[j].Key.String() })
 	if ext == ".json" {
 		if _, err := file.WriteString("{" + "\n"); err != nil {
 			return err
