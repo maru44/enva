@@ -28,7 +28,7 @@ const UserCreate: NextPage<PageProps> = (props) => {
         router.push('/')
       }
     })()
-  }, [router])
+  }, [router, snack, setCurrentUser])
 
   return <div></div>
 }
