@@ -46,9 +46,7 @@ export default async function handler(
         ])
 
         // i don't know why but cookie does not set without this.
-        console.log(ret.id_token)
-
-        res.status(200).json({ message: 'succeeded to refresh token' })
+        res.status(200).json({ message: ret.access_token })
         return
       default:
         res.status(400).json(ret)
