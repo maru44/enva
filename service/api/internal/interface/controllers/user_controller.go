@@ -71,7 +71,7 @@ func (con *UserController) UpdateCliPasswordView(w http.ResponseWriter, r *http.
 
 func (con *UserController) CreateView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	_, err := con.in.CreateOrDoNothing(ctx)
+	_, err := con.in.UpsertIfNotInvalid(ctx)
 	if err != nil {
 		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
 		return

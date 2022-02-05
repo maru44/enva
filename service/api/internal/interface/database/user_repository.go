@@ -86,7 +86,7 @@ func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*doma
 	return u, nil
 }
 
-func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, error) {
+func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.Forbidden)
@@ -103,22 +103,49 @@ func (repo *UserRepository) CreateOrDoNothing(ctx context.Context) (*string, err
 	}
 
 	var (
-		id      *string
-		isValid bool
+		id, imageURL             *string
+		isValid, isEmailVerified bool
 	)
 	row := repo.QueryRowContext(ctx, queryset.UserExistsQuery, input.ID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
 
-	err = row.Scan(&id, &isValid)
+	err = row.Scan(&id, &isValid, &isEmailVerified, &imageURL)
 	// if ex
 	if err == nil {
 		// if not valid return 403
 		if !isValid {
 			return nil, perr.New("user is not valid", perr.Forbidden, "user is not valid")
 		}
-		// @TODO update isEmailVerified and imageURL if it changed
+
+		// update isEmailVerified and imageURL if it changed
+		isNeedToUpdate := false
+		switch {
+		case input.ImageURL == nil && imageURL == nil:
+		case input.IsEmailVerified != isEmailVerified,
+			input.ImageURL == nil && imageURL != nil,
+			input.ImageURL != nil && imageURL == nil,
+			*input.ImageURL != *imageURL:
+			isNeedToUpdate = true
+		}
+		if isNeedToUpdate {
+			exe, err := repo.ExecContext(ctx,
+				queryset.UserUpdateImageOrIsEmailVerifiedQuery,
+				input.IsEmailVerified, input.ImageURL, input.ID,
+			)
+			if err != nil {
+				return nil, perr.Wrap(err, perr.BadRequest)
+			}
+
+			affected, err := exe.RowsAffected()
+			if err != nil {
+				return nil, perr.Wrap(err, perr.BadRequest)
+			}
+			if affected == 0 {
+				return nil, perr.New("There is no affected row", perr.BadRequest)
+			}
+		}
 		return id, nil
 	}
 	if err != sql.ErrNoRows {

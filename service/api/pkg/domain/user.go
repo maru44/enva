@@ -57,7 +57,7 @@ type (
 	IUserInteractor interface {
 		GetByID(context.Context, UserID) (*User, error)
 		GetByEmail(context.Context, string) (*User, error)
-		CreateOrDoNothing(context.Context) (*string, error)
+		UpsertIfNotInvalid(context.Context) (*string, error)
 		UpdateValid(context.Context, UserUpdateIsValidInput) error
 
 		UpdateCliPassword(context.Context) (*string, error)
