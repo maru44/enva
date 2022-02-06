@@ -15,8 +15,8 @@ CREATE TABLE users (
 
     PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX ON users (email);
-CREATE UNIQUE INDEX ON users (username);
+CREATE UNIQUE INDEX users_email_valid_idx ON users (email) WHERE (is_valid = true);
+CREATE UNIQUE INDEX users_username_valid_idx ON users (username) WHERE (is_valid = true);
 
 -- organization
 CREATE TABLE orgs (
