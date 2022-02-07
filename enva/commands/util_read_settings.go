@@ -9,13 +9,15 @@ import (
 	"github.com/maru44/enva/service/api/pkg/domain"
 )
 
+var envaSettingsFile = ""
+
 func readSettings() (*domain.Settings, error) {
 	path, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := ioutil.ReadFile(fmt.Sprintf("%s/enva.json", path))
+	data, err := ioutil.ReadFile(fmt.Sprintf("%s/%s", path, envaSettingsFile))
 	if err != nil {
 		return nil, err
 	}

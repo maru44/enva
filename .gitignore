@@ -1,7 +1,6 @@
 .envrc
 .vscode/
 /tmp
-**/enva.json
 .env
 .env.prod
 
