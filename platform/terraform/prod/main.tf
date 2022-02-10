@@ -118,6 +118,7 @@ module "rds" {
 
   kms_arn = module.kms.pg_arn
 
+  rds_id          = var.rds_id
   master_user     = var.database_user
   master_password = var.database_password
 }

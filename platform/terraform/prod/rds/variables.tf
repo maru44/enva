@@ -25,3 +25,7 @@ variable "vpc_main_cidr_blocks" {
 variable "kms_arn" {
   type = string
 }
+
+variable "rds_id" {
+  type = string
+}
