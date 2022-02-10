@@ -21,3 +21,7 @@ variable "master_password" {
 variable "vpc_main_cidr_blocks" {
   type = list(string)
 }
+
+variable "kms_arn" {
+  type = string
+}
