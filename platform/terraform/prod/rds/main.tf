@@ -44,7 +44,7 @@ resource "aws_db_subnet_group" "this" {
 }
 
 resource "aws_db_instance" "this" {
-  name              = "enva0"
+  name              = var.rds_id
   allocated_storage = 20
   storage_type      = "gp2"
 
@@ -67,7 +67,7 @@ resource "aws_db_instance" "this" {
   skip_final_snapshot             = true
 
   iam_database_authentication_enabled = true # managed by IAM
-  identifier                          = "enva0"
+  identifier                          = var.rds_id
   max_allocated_storage               = 0
 
   instance_class = "db.t4g.micro"
@@ -80,7 +80,8 @@ resource "aws_db_instance" "this" {
 
   port                = 5432
   publicly_accessible = false
-  storage_encrypted   = false
+  storage_encrypted   = true
+  kms_key_id          = var.kms_arn
 
   lifecycle {
     ignore_changes = [password]

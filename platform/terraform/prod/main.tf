@@ -100,6 +100,14 @@ EOF
 **         rds module          **
 ********************************/
 
+module "kms" {
+  source = "./kms"
+}
+
+/********************************
+**         rds module          **
+********************************/
+
 module "rds" {
   source = "./rds"
   name   = var.rds_name
@@ -108,6 +116,9 @@ module "rds" {
   vpc_main_cidr_blocks = [module.network.vpc_cidr_block]
   subnet_ids           = module.network.private_subnet_ids
 
+  kms_arn = module.kms.pg_arn
+
+  rds_id          = var.rds_id
   master_user     = var.database_user
   master_password = var.database_password
 }

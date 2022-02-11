@@ -120,6 +120,7 @@ func sendSentryPerror(ctx context.Context, err perr.Perror) {
 	}); err != nil {
 		panic(err)
 	}
+	defer sentry.Flush(3 * time.Second)
 
 	var (
 		sLevel = sentry.LevelWarning
@@ -132,7 +133,7 @@ func sendSentryPerror(ctx context.Context, err perr.Perror) {
 	case perr.ErrLevelInternal:
 		sLevel = sentry.LevelError
 	case perr.ErrLevelExternal:
-		sLevel = sentry.LevelInfo
+		return
 	default:
 		panic("must not reach here")
 	}
@@ -154,7 +155,6 @@ func sendSentryPerror(ctx context.Context, err perr.Perror) {
 		},
 	})
 
-	defer sentry.Flush(3 * time.Second)
 	sentry.CaptureMessage(err.Unwrap().Error())
 }
 

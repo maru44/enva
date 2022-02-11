@@ -14,10 +14,6 @@ variable "api_cert_arn" {
   type = string
 }
 
-variable "rds_name" {
-  type = string
-}
-
 variable "database_name" {
   type = string
 }
@@ -39,5 +35,13 @@ variable "ecr_api_repository" {
 }
 
 variable "ecr_migration_repository" {
+  type = string
+}
+
+variable "rds_id" {
+  type = string
+}
+
+variable "rds_name" {
   type = string
 }
