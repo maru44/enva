@@ -3,12 +3,11 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/maru44/enva/service/api/internal/usecase"
 	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -18,40 +17,60 @@ import (
 type (
 	jwtInteractorForTest struct {
 		usecase.JwtInteractor
+		cookieIdToken cookieIdToken
 	}
 
 	testContextViewBody struct {
 		Access domain.CtxAccess `json:"access"`
+		User   *domain.User     `json:"user"`
 	}
+
+	cookieIdToken string
 )
 
-func newBaseControllerForTest(t *testing.T) *BaseController {
+const (
+	cookieIdTokenBlank   = cookieIdToken("blank")
+	cookieIdTokenInvalid = cookieIdToken("invalid")
+	cookieIdTokenValid   = cookieIdToken("valid")
+)
+
+var testUser = domain.User{
+	ID:              "id",
+	Username:        "username",
+	Email:           "aaa@example.com",
+	IsValid:         true,
+	IsEmailVerified: true,
+}
+
+func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *BaseController {
 	return &BaseController{
-		ji: &jwtInteractorForTest{},
+		ji: &jwtInteractorForTest{
+			cookieIdToken: cookieIdToken,
+		},
 	}
 }
 
 func (in *jwtInteractorForTest) GetUserByJwt(context.Context, string) (*domain.User, error) {
-	return &domain.User{
-		ID:              "id",
-		Username:        "username",
-		Email:           "aaa@example.com",
-		IsValid:         true,
-		IsEmailVerified: true,
-	}, nil
+	switch in.cookieIdToken {
+	case cookieIdTokenBlank:
+		return nil, nil
+	case cookieIdTokenInvalid:
+		return nil, errors.New("invalid cookie")
+	case cookieIdTokenValid:
+		return &testUser, nil
+	default:
+		panic("must not reach here")
+	}
 }
 
 func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		fmt.Println(err)
 	}
-	keySet, _ := ctx.Value(domain.CtxCognitoKeySetKey).(jwk.Set)
 	access, _ := ctx.Value(domain.CtxAccessKey).(domain.CtxAccess)
 	response(w, r, nil, map[string]interface{}{
 		"user":   user,
-		"key":    keySet,
 		"access": access,
 	})
 }
@@ -59,8 +78,9 @@ func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Reques
 /**************************
 **************************/
 
+// @TODO change to use client
 func Test_BaseMiddlewareCors(t *testing.T) {
-	con := newBaseControllerForTest(t)
+	con := newBaseControllerForTest(t, cookieIdTokenBlank)
 	baseUrl := "http://example.com/"
 
 	tests := []struct {
@@ -115,6 +135,131 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 
 			assert.Equal(t, tt.wantStatus, got.Result().StatusCode)
 			assert.Equal(t, tt.wantAccess, access.Access)
+			got.Result().Body.Close()
+		})
+	}
+}
+
+func Test_GiveUserMiddleware(t *testing.T) {
+	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank)
+	conAuth := newBaseControllerForTest(t, cookieIdTokenValid)
+	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid)
+	baseUrl := "http://example.com/user-test"
+
+	tests := []struct {
+		name       string
+		method     string
+		con        *BaseController
+		wantStatus int
+		wantUser   *domain.User
+	}{
+		{
+			name:       "success anonymous",
+			method:     http.MethodPost,
+			con:        conAnonymous,
+			wantStatus: http.StatusOK,
+			wantUser:   nil,
+		},
+		{
+			name:       "success annonymous invalid cookie",
+			method:     http.MethodGet,
+			con:        conInvalid,
+			wantStatus: http.StatusOK,
+			wantUser:   nil,
+		},
+		{
+			name:       "success authenticated",
+			method:     http.MethodDelete,
+			con:        conAuth,
+			wantStatus: http.StatusOK,
+			wantUser:   &testUser,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := httptest.NewRequest(tt.method, baseUrl, nil)
+			defer r.Body.Close()
+			con := tt.con
+			if con == conAuth || con == conInvalid {
+				r.Header.Add("Cookie", domain.JwtCookieKeyIdToken+"=a")
+			}
+
+			got := httptest.NewRecorder()
+			mid := con.BaseMiddleware(con.GiveUserMiddleware(http.HandlerFunc(con.testContextView)))
+			mid.ServeHTTP(got, r)
+
+			var bod testContextViewBody
+			if err := json.NewDecoder(got.Result().Body).Decode(&bod); err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, tt.wantStatus, got.Code)
+			assert.Equal(t, tt.wantUser, bod.User)
+			got.Result().Body.Close()
+		})
+	}
+}
+
+func Test_LoginRequiredMiddleware(t *testing.T) {
+	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank)
+	conAuth := newBaseControllerForTest(t, cookieIdTokenValid)
+	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid)
+	baseUrl := "http://example.com/user-test"
+
+	tests := []struct {
+		name       string
+		method     string
+		con        *BaseController
+		wantStatus int
+		wantUser   *domain.User
+	}{
+		{
+			name:       "failed anonymous",
+			method:     http.MethodPost,
+			con:        conAnonymous,
+			wantStatus: http.StatusUnauthorized,
+			wantUser:   nil,
+		},
+		{
+			name:       "failed annonymous invalid cookie",
+			method:     http.MethodPost,
+			con:        conInvalid,
+			wantStatus: http.StatusForbidden,
+			wantUser:   nil,
+		},
+		{
+			name:       "success authenticated",
+			method:     http.MethodDelete,
+			con:        conAuth,
+			wantStatus: http.StatusOK,
+			wantUser:   &testUser,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := httptest.NewRequest(tt.method, baseUrl, nil)
+			defer r.Body.Close()
+			con := tt.con
+			if con == conAuth || con == conInvalid {
+				r.Header.Add("Cookie", domain.JwtCookieKeyIdToken+"=a")
+			}
+
+			got := httptest.NewRecorder()
+			mid := con.BaseMiddleware(con.LoginRequiredMiddleware(http.HandlerFunc(con.testContextView)))
+			mid.ServeHTTP(got, r)
+
+			assert.Equal(t, tt.wantStatus, got.Code)
+
+			if tt.wantStatus == 200 {
+				var bod testContextViewBody
+				if err := json.NewDecoder(got.Result().Body).Decode(&bod); err != nil {
+					t.Fatal(err)
+				}
+				assert.Equal(t, tt.wantUser, bod.User)
+			}
+			got.Result().Body.Close()
 		})
 	}
 }

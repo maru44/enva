@@ -156,6 +156,7 @@ func (con *BaseController) GiveUserMiddleware(next http.Handler) http.Handler {
 			user, err := con.ji.GetUserByJwt(r.Context(), cookie.Value)
 			if err != nil {
 				next.ServeHTTP(w, r)
+				return
 			}
 
 			// set user to context
