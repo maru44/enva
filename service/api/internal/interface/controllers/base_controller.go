@@ -84,58 +84,35 @@ func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request
 }
 
 func (con *BaseController) PostOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
-			response(w, r, nil, nil)
-			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
-		}
-	})
+	return con.methodsOnlyMiddleware(next, []string{http.MethodPost})
 }
 
 func (con *BaseController) PutOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPut {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
-			response(w, r, nil, nil)
-			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
-		}
-	})
+	return con.methodsOnlyMiddleware(next, []string{http.MethodPut})
 }
 
 func (con *BaseController) DeleteOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodDelete {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
-			response(w, r, nil, nil)
-			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
-		}
-	})
+	return con.methodsOnlyMiddleware(next, []string{http.MethodDelete})
 }
 
 func (con *BaseController) GetOnlyMiddleware(next http.Handler) http.Handler {
+	return con.methodsOnlyMiddleware(next, []string{http.MethodGet})
+}
+
+func (con *BaseController) methodsOnlyMiddleware(next http.Handler, methods []string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
+		if r.Method == http.MethodOptions {
 			response(w, r, nil, nil)
 			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
 		}
+		for _, m := range methods {
+			if r.Method == m {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
+		return
 	})
 }
 
