@@ -19,7 +19,7 @@ type UserRepository struct {
 func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*domain.User, error) {
 	row := repo.QueryRowContext(ctx, qs.UserGetByIDQuery, id)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	u := &domain.User{}
@@ -30,7 +30,7 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 		&sID, &sSubScriptionID, &sCustomerID,
 		&sProductID, &sSubscriptionStatus,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	if u.CliPassword != nil {
@@ -54,7 +54,7 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 	row := repo.QueryRowContext(ctx, qs.UserGetByEmailQuery, email)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	u := &domain.User{}
@@ -65,7 +65,7 @@ func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*doma
 		&sID, &sSubScriptionID, &sCustomerID,
 		&sProductID, &sSubscriptionStatus,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	if u.CliPassword != nil {
@@ -89,7 +89,7 @@ func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*doma
 func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 	input := &domain.UserInput{
 		ID:              user.ID.String(),
@@ -108,7 +108,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 	)
 	row := repo.QueryRowContext(ctx, qs.UserExistsQuery, input.ID)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.InternalServerError)
+		return nil, perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	err = row.Scan(&id, &isValid, &isEmailVerified, &imageURL)
@@ -116,7 +116,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 	if err == nil {
 		// if not valid return 403
 		if !isValid {
-			return nil, perr.New("user is not valid", perr.Forbidden, "user is not valid")
+			return nil, perr.New("user is not valid", perr.ErrForbidden, "user is not valid")
 		}
 
 		// update isEmailVerified and imageURL if it changed
@@ -135,21 +135,21 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 				input.IsEmailVerified, input.ImageURL, input.ID,
 			)
 			if err != nil {
-				return nil, perr.Wrap(err, perr.BadRequest)
+				return nil, perr.Wrap(err, perr.ErrBadRequest)
 			}
 
 			affected, err := exe.RowsAffected()
 			if err != nil {
-				return nil, perr.Wrap(err, perr.BadRequest)
+				return nil, perr.Wrap(err, perr.ErrBadRequest)
 			}
 			if affected == 0 {
-				return nil, perr.New("There is no affected row", perr.BadRequest)
+				return nil, perr.New("There is no affected row", perr.ErrBadRequest)
 			}
 		}
 		return id, nil
 	}
 	if err != sql.ErrNoRows {
-		return nil, perr.Wrap(err, perr.InternalServerError)
+		return nil, perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	// if not ex
@@ -158,7 +158,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 		qs.UserInsertQuery,
 		input.ID, input.Email, input.Username, input.IsEmailVerified, input.ImageURL,
 	).Scan(&id); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return id, nil
@@ -166,7 +166,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 
 func (repo *UserRepository) UpdateValid(ctx context.Context, input domain.UserUpdateIsValidInput) error {
 	if err := input.Validate(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	exe, err := repo.ExecContext(ctx,
@@ -174,13 +174,13 @@ func (repo *UserRepository) UpdateValid(ctx context.Context, input domain.UserUp
 		input.IsValid, input.ID,
 	)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	if affected, err := exe.RowsAffected(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	} else if affected == 0 {
-		return perr.New("There is no affected row", perr.BadRequest)
+		return perr.New("There is no affected row", perr.ErrBadRequest)
 	}
 	return nil
 }
@@ -188,14 +188,14 @@ func (repo *UserRepository) UpdateValid(ctx context.Context, input domain.UserUp
 func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	// generate new password and its hash
 	rawPass := tools.GenRandSlug(48)
 	hashed, err := repo.Generate(rawPass)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	input := &domain.UserCliPasswordInput{
@@ -203,7 +203,7 @@ func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, err
 		CliPassword: hashed,
 	}
 	if err := input.Validate(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	exe, err := repo.ExecContext(ctx,
@@ -211,13 +211,13 @@ func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, err
 		input.CliPassword, input.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	if affected, err := exe.RowsAffected(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	} else if affected == 0 {
-		return nil, perr.New("There is no affected row", perr.BadRequest)
+		return nil, perr.New("There is no affected row", perr.ErrBadRequest)
 	}
 
 	return &rawPass, nil
@@ -229,7 +229,7 @@ func (repo *UserRepository) GetUserCli(ctx context.Context, input *domain.UserCl
 		input.EmailOrUsername,
 	)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	u := &domain.User{}
@@ -237,11 +237,11 @@ func (repo *UserRepository) GetUserCli(ctx context.Context, input *domain.UserCl
 		&u.ID, &u.Email, &u.Username, &u.ImageURL,
 		&u.CliPassword, &u.CreatedAt, &u.UpdatedAt,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	if err := repo.Check(*u.CliPassword, input.CliPassword); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return u, nil

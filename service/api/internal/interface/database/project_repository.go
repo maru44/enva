@@ -19,7 +19,7 @@ type ProjectReposotory struct {
 func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	orgRows, err := repo.QueryContext(ctx,
@@ -27,10 +27,10 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 		user.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if err := orgRows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	var orgs []domain.Org
@@ -43,7 +43,7 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 			&o.ID, &o.Slug, &o.Name, &o.Description,
 			&o.CreatedAt, &o.UpdatedAt, &userType,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.BadRequest)
+			return nil, perr.Wrap(err, perr.ErrBadRequest)
 		}
 		orgs = append(orgs, o)
 	}
@@ -52,7 +52,7 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 	for i, o := range orgs {
 		ps, err := repo.ListByOrg(ctx, o.ID)
 		if err != nil {
-			return nil, perr.Wrap(err, perr.BadRequest)
+			return nil, perr.Wrap(err, perr.ErrBadRequest)
 		}
 		// set org
 		for _, p := range ps {
@@ -64,7 +64,7 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 
 	ps, err := repo.ListByUser(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	projects = append(projects, ps...)
 
@@ -76,15 +76,15 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx, qs.ProjectValidListByUserQuery, user.ID)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var ps []domain.Project
@@ -98,7 +98,7 @@ func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project
 			&userID, &orgID,
 			&p.CreatedAt, &p.UpdatedAt,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 
 		// set user
@@ -122,7 +122,7 @@ func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project
 func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID) ([]domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx,
@@ -130,10 +130,10 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 		orgID, user.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var ps []domain.Project
@@ -148,7 +148,7 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 			&userID, &orgID,
 			&p.CreatedAt, &p.UpdatedAt,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 
 		// set org
@@ -173,15 +173,15 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx, qs.ProjectValidSlugListByUserQuery, user.ID)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var slugs []string
@@ -192,7 +192,7 @@ func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, er
 		if err := rows.Scan(
 			&slug,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 
 		slugs = append(slugs, slug)
@@ -204,12 +204,12 @@ func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, er
 func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailBySlugQuery, slug, user.ID)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var (
@@ -223,13 +223,13 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 		&p.IsValid, &p.DeletedAt,
 		&p.CreatedAt, &p.UpdatedAt,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	// set user
 	if userID != "" {
 		if userID != user.ID {
-			return nil, perr.New(perr.NotFound.Error(), perr.NotFound)
+			return nil, perr.New(perr.ErrNotFound.Error(), perr.ErrNotFound)
 		}
 		p.OwnerUser = user
 	}
@@ -248,12 +248,12 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug string, orgID domain.OrgID) (*domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailBySlugAndOrgIdQuery, user.ID, orgID, slug)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var (
@@ -268,7 +268,7 @@ func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug strin
 		&p.CreatedAt, &p.UpdatedAt,
 		&o.Slug, &o.Name,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	// set user
@@ -284,12 +284,12 @@ func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug strin
 func (repo *ProjectReposotory) GetBySlugAndOrgSlug(ctx context.Context, slug, orgSlug string) (*domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailBySlugAndOrgSlugQuery, user.ID, orgSlug, slug)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var (
@@ -304,7 +304,7 @@ func (repo *ProjectReposotory) GetBySlugAndOrgSlug(ctx context.Context, slug, or
 		&p.CreatedAt, &p.UpdatedAt,
 		&o.ID, &o.Name,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	// set user
@@ -320,12 +320,12 @@ func (repo *ProjectReposotory) GetBySlugAndOrgSlug(ctx context.Context, slug, or
 func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID) (*domain.Project, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailByIDQuery, id)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var (
@@ -338,7 +338,7 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 		&p.IsValid, &p.DeletedAt,
 		&p.CreatedAt, &p.UpdatedAt,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	// set user
@@ -359,7 +359,7 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 
 func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectInput) (*string, error) {
 	if err := input.Validate(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	var inputU, slug *string
@@ -369,23 +369,23 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 		// validate by project capacity
 		count, sub, err := repo.CountValidByOrgID(ctx, *input.OrgID)
 		if err != nil {
-			return nil, perr.Wrap(err, perr.BadRequest)
+			return nil, perr.Wrap(err, perr.ErrBadRequest)
 		}
 		if err := domain.CanCreateProject(sub, *count, ownerType); err != nil {
-			return nil, perr.Wrap(err, perr.BadRequest, err.Error())
+			return nil, perr.Wrap(err, perr.ErrBadRequest, err.Error())
 		}
 	} else {
 		cu, err := domain.UserFromCtx(ctx)
 		if err != nil {
-			return nil, perr.Wrap(err, perr.Forbidden)
+			return nil, perr.Wrap(err, perr.ErrForbidden)
 		}
 		// validate by project capacity
 		count, sub, err := repo.CountValidByUser(ctx, cu.ID)
 		if err != nil {
-			return nil, perr.Wrap(err, perr.BadRequest)
+			return nil, perr.Wrap(err, perr.ErrBadRequest)
 		}
 		if err := domain.CanCreateProject(sub, *count, ownerType); err != nil {
-			return nil, perr.Wrap(err, perr.BadRequest, err.Error())
+			return nil, perr.Wrap(err, perr.ErrBadRequest, err.Error())
 		}
 
 		inputU = tools.StringPtr(cu.ID.String())
@@ -396,7 +396,7 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 		qs.ProjectCreateQuery,
 		input.Name, input.Slug, input.Description, ownerType, inputU, input.OrgID,
 	).Scan(&slug); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return slug, nil
@@ -405,12 +405,12 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 func (repo *ProjectReposotory) Delete(ctx context.Context, projectID domain.ProjectID) (int, error) {
 	exe, err := repo.ExecContext(ctx, qs.ProjectDeleteQuery, projectID)
 	if err != nil {
-		return 0, perr.Wrap(err, perr.BadRequest)
+		return 0, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	affected, err := exe.RowsAffected()
 	if err != nil {
-		return 0, perr.Wrap(err, perr.BadRequest)
+		return 0, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return affected, nil
@@ -419,7 +419,7 @@ func (repo *ProjectReposotory) Delete(ctx context.Context, projectID domain.Proj
 func (repo *ProjectReposotory) CountValidByOrgID(ctx context.Context, orgID domain.OrgID) (*int, *domain.Subscription, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, nil, perr.Wrap(err, perr.Forbidden)
+		return nil, nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	row := repo.QueryRowContext(ctx,
@@ -432,7 +432,7 @@ func (repo *ProjectReposotory) CountValidByOrgID(ctx context.Context, orgID doma
 func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, nil, perr.Wrap(err, perr.Forbidden)
+		return nil, nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 	row := repo.QueryRowContext(ctx,
 		qs.ProjectValidCountByOrgSlug,
@@ -451,7 +451,7 @@ func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID doma
 
 func countValidByRow(row IRow) (*int, *domain.Subscription, error) {
 	if err := row.Err(); err != nil {
-		return nil, nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var (
@@ -472,7 +472,7 @@ func countValidByRow(row IRow) (*int, *domain.Subscription, error) {
 		if err == sql.ErrNoRows {
 			return tools.IntPtrAbleZero(0), nil, nil
 		}
-		return nil, nil, perr.Wrap(err, perr.BadRequest)
+		return nil, nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	if sID != nil {

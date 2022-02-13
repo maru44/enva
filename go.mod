@@ -12,7 +12,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/lestrrat-go/jwx v1.2.12
 	github.com/lib/pq v1.10.4
-	github.com/maru44/perr v1.1.7
+	github.com/maru44/perr v1.1.8
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211

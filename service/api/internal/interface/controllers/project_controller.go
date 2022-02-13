@@ -33,7 +33,7 @@ func NewProjectController(sql database.ISqlHandler) *ProjectController {
 func (con *ProjectController) ListAllView(w http.ResponseWriter, r *http.Request) {
 	ps, err := con.in.ListAll(r.Context())
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (con *ProjectController) ListAllView(w http.ResponseWriter, r *http.Request
 func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Request) {
 	ps, err := con.in.ListByUser(r.Context())
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 		return
 	}
 
@@ -55,13 +55,13 @@ func (con *ProjectController) ListByUserView(w http.ResponseWriter, r *http.Requ
 func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Request) {
 	orgID := r.URL.Query().Get(QueryParamsID)
 	if orgID == "" {
-		response(w, r, perr.New(ErrorNoOrgIdParams.Error(), perr.BadRequest), nil)
+		response(w, r, perr.New(ErrorNoOrgIdParams.Error(), perr.ErrBadRequest), nil)
 		return
 	}
 
 	ps, err := con.in.ListByOrg(r.Context(), domain.OrgID(orgID))
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (con *ProjectController) ListByOrgView(w http.ResponseWriter, r *http.Reque
 func (con *ProjectController) SlugListByUserView(w http.ResponseWriter, r *http.Request) {
 	slugs, err := con.in.SlugListByUser(r.Context())
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 
 	slug := r.URL.Query().Get(QueryParamsSlug)
 	if slug == "" {
-		response(w, r, perr.New("No slug was given", perr.BadRequest), nil)
+		response(w, r, perr.New("No slug was given", perr.ErrBadRequest), nil)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 	if orgID != "" {
 		p, err := con.in.GetBySlugAndOrgID(ctx, slug, domain.OrgID(orgID))
 		if err != nil {
-			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 			return
 		}
 
@@ -107,7 +107,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 	if orgSlug != "" {
 		p, err := con.in.GetBySlugAndOrgSlug(ctx, slug, orgSlug)
 		if err != nil {
-			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 			return
 		}
 
@@ -117,7 +117,7 @@ func (con *ProjectController) ProjectDetailView(w http.ResponseWriter, r *http.R
 
 	p, err := con.in.GetBySlug(ctx, slug)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 		return
 	}
 
@@ -130,25 +130,25 @@ func (con *ProjectController) CreateView(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	var input domain.ProjectInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 
 	if input.OrgID != nil {
 		ut, err := con.oIn.MemberGetCurrentUserType(ctx, *input.OrgID)
 		if err != nil {
-			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 			return
 		}
 		if err := ut.IsAdmin(); err != nil {
-			response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+			response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
 			return
 		}
 	}
 
 	id, err := con.in.Create(ctx, input)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 
@@ -161,35 +161,35 @@ func (con *ProjectController) DeleteView(w http.ResponseWriter, r *http.Request)
 
 	p, err := con.in.GetByID(ctx, domain.ProjectID(projectID))
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 
 	// validate user access
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
 	}
 	if p.OwnerType == "user" {
 		if p.OwnerUser.ID != user.ID {
-			response(w, r, perr.New("user is not owner of this project", perr.Forbidden), nil)
+			response(w, r, perr.New("user is not owner of this project", perr.ErrForbidden), nil)
 			return
 		}
 	} else {
 		ut, err := con.oIn.MemberGetCurrentUserType(ctx, p.OwnerOrg.ID)
 		if err != nil {
-			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 			return
 		}
 		if err := ut.IsAdmin(); err != nil {
-			response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+			response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
 			return
 		}
 	}
 
 	affected, err := con.in.Delete(ctx, domain.ProjectID(projectID))
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 

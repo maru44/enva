@@ -29,13 +29,13 @@ func (con *UserController) GetUserView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	ctxUser, _ := domain.UserFromCtx(ctx)
 	if ctxUser == nil {
-		response(w, r, perr.New("no user in context", perr.BadRequest), nil)
+		response(w, r, perr.New("no user in context", perr.ErrBadRequest), nil)
 		return
 	}
 
 	user, err := con.in.GetByID(ctx, ctxUser.ID)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 	response(w, r, nil, map[string]interface{}{"data": user})
@@ -47,7 +47,7 @@ func (con *UserController) ExistsCliPasswordView(w http.ResponseWriter, r *http.
 
 	user, err := con.in.GetByID(ctx, cU.ID)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.NotFound), nil)
+		response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 		return
 	}
 
@@ -56,13 +56,13 @@ func (con *UserController) ExistsCliPasswordView(w http.ResponseWriter, r *http.
 		return
 	}
 
-	response(w, r, perr.New("Cli password not found", perr.BadRequest, "Cli password not found"), nil)
+	response(w, r, perr.New("Cli password not found", perr.ErrBadRequest, "Cli password not found"), nil)
 }
 
 func (con *UserController) UpdateCliPasswordView(w http.ResponseWriter, r *http.Request) {
 	pass, err := con.in.UpdateCliPassword(r.Context())
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 
@@ -73,12 +73,12 @@ func (con *UserController) UpsertView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	_, err := con.in.UpsertIfNotInvalid(ctx)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (con *UserController) UpdateToInvalidView(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+		response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (con *UserController) UpdateToInvalidView(w http.ResponseWriter, r *http.Re
 		IsValid: false,
 	}
 	if err := con.in.UpdateValid(ctx, input); err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 	response(w, r, nil, map[string]interface{}{"data": nil})

@@ -15,18 +15,18 @@ type CliKvRepository struct {
 func (repo *CliKvRepository) BulkInsert(ctx context.Context, projectID domain.ProjectID, inputs []domain.KvInput) error {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	for _, in := range inputs {
 		if err := in.Validate(); err != nil {
 			tx.Rollback()
-			return perr.Wrap(err, perr.BadRequest)
+			return perr.Wrap(err, perr.ErrBadRequest)
 		}
 
 		var id string
@@ -36,12 +36,12 @@ func (repo *CliKvRepository) BulkInsert(ctx context.Context, projectID domain.Pr
 			in.Key, in.Value, projectID, user.ID,
 		).Scan(&id); err != nil {
 			tx.Rollback()
-			return perr.Wrap(err, perr.BadRequest)
+			return perr.Wrap(err, perr.ErrBadRequest)
 		}
 	}
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	return nil

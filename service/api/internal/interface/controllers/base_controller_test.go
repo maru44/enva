@@ -104,20 +104,20 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 				URL:    "/abc/efg",
 			},
 		},
-		// {
-		// 	name:   "fail for origin",
-		// 	method: http.MethodOptions,
-		// 	path:   "/xyz",
-		// 	headers: map[string]string{
-		// 		"Origin":     "https://front.example.com",
-		// 		"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
-		// 	},
-		// 	wantStatus: 419,
-		// 	wantAccess: domain.CtxAccess{
-		// 		Method: http.MethodOptions,
-		// 		URL:    "/xyz",
-		// 	},
-		// },
+		{
+			name:   "fail for origin",
+			method: http.MethodOptions,
+			path:   "/xyz",
+			headers: map[string]string{
+				"Origin":     "https://front.example.com",
+				"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+			},
+			wantStatus: 419,
+			wantAccess: domain.CtxAccess{
+				Method: http.MethodOptions,
+				URL:    "/xyz",
+			},
+		},
 	}
 
 	for _, tt := range tests {

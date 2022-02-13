@@ -75,7 +75,7 @@ func (in *KvInput) Validate() error {
 		validation.RuneLength(1, 1024),
 		validation.Match(regexp.MustCompile(`^[a-zA-Z0-9-_]+$`)),
 	); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	return nil
 }

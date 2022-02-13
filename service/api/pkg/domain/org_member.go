@@ -34,14 +34,14 @@ func (u *UserType) IsAdmin() error {
 	if *u == UserTypeOwner || *u == UserTypeAdmin {
 		return nil
 	}
-	return perr.New("user is not admin or owner", perr.Forbidden, "you are not admin or owner of this org")
+	return perr.New("user is not admin or owner", perr.ErrForbidden, "you are not admin or owner of this org")
 }
 
 func (u *UserType) IsUser() error {
 	if *u != UserTypeGuest {
 		return nil
 	}
-	return perr.New("user is guest", perr.Forbidden, "you are guest of this org")
+	return perr.New("user is guest", perr.ErrForbidden, "you are guest of this org")
 }
 
 func (o *OrgInvitation) ToMemberInput() *OrgMemberInput {
@@ -56,10 +56,10 @@ func (o *OrgInvitation) ToMemberInput() *OrgMemberInput {
 func (o *OrgMemberInput) Validate(ctx context.Context) error {
 	user, err := UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 	if user.ID != o.UserID {
-		return perr.New("user not match: invited user and current user", perr.Forbidden)
+		return perr.New("user not match: invited user and current user", perr.ErrForbidden)
 	}
 
 	return validation.ValidateStruct(o,

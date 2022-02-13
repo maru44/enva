@@ -17,17 +17,17 @@ type OrgRepository struct {
 func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx,
 		qs.OrgValidListQuery, user.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var orgs []domain.Org
@@ -40,7 +40,7 @@ func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
 			&o.ID, &o.Slug, &o.Name, &o.Description,
 			&o.CreatedAt, &o.UpdatedAt, &userType,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 
 		orgs = append(orgs, o)
@@ -51,17 +51,17 @@ func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
 func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx,
 		qs.OrgValidListQuery, user.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var orgs []domain.Org
@@ -74,7 +74,7 @@ func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, er
 			&o.ID, &o.Slug, &o.Name, &o.Description,
 			&o.CreatedAt, &o.UpdatedAt, &userType,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 
 		if userType == domain.UserTypeOwner || userType == domain.UserTypeAdmin {
@@ -87,7 +87,7 @@ func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, er
 func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*domain.Org, *domain.UserType, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	row := repo.QueryRowContext(
 		ctx,
@@ -95,7 +95,7 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 		user.ID, slug,
 	)
 	if err := row.Err(); err != nil {
-		return nil, nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	var (
 		o                                                                  *domain.Org = &domain.Org{}
@@ -109,7 +109,7 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 		&ut,
 		&sID, &sSubscriptionID, &sCustomerID, &sProductID, &sSubscriptionStatus,
 	); err != nil {
-		return nil, nil, perr.Wrap(err, perr.NotFound)
+		return nil, nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	if sID != nil {
@@ -128,25 +128,25 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 
 func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*string, error) {
 	if err := input.Validate(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	// validate count org
 	count, sub, err := repo.OrgValidCount(ctx, cu.ID)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if err := domain.CanCreateOrg(sub, *count); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest, err.Error())
+		return nil, perr.Wrap(err, perr.ErrBadRequest, err.Error())
 	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.InternalServerError)
+		return nil, perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	var id, slug *string
@@ -155,7 +155,7 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 		input.Slug, input.Name, input.Description, cu.ID,
 	).Scan(&id, &slug); err != nil {
 		tx.Rollback()
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	var memberID *string
@@ -164,12 +164,12 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 		id, cu.ID, domain.UserTypeOwner, nil,
 	).Scan(&memberID); err != nil {
 		tx.Rollback()
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return nil, perr.Wrap(err, perr.InternalServerError)
+		return nil, perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	return slug, nil
@@ -191,17 +191,17 @@ invitation
 func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitation, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	rows, err := repo.QueryContext(ctx,
 		qs.OrgInvitationListFromOrgQuery,
 		orgID, cu.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var invs []domain.OrgInvitation
@@ -217,7 +217,7 @@ func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID doma
 			&id, &username, &email, &imageUrl,
 			&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 		u = domain.User{Email: *email}
 		if id != nil {
@@ -240,7 +240,7 @@ func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID doma
 func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvitation, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	rows, err := repo.QueryContext(ctx,
@@ -248,10 +248,10 @@ func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvi
 		cu.ID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var orgs []domain.OrgInvitation
@@ -266,7 +266,7 @@ func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvi
 			&o.ID, &o.UserType, &o.CreatedAt,
 			&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 		o.Org = org
 		o.User = *cu
@@ -280,7 +280,7 @@ func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvi
 func (repo *OrgRepository) InvitationDetail(ctx context.Context, invID domain.OrgInvitationID) (*domain.OrgInvitation, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	row := repo.QueryRowContext(ctx,
@@ -288,7 +288,7 @@ func (repo *OrgRepository) InvitationDetail(ctx context.Context, invID domain.Or
 		invID, cu.Email,
 	)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var (
@@ -301,7 +301,7 @@ func (repo *OrgRepository) InvitationDetail(ctx context.Context, invID domain.Or
 		&org.ID, &org.Slug, &org.Name, &org.Description,
 		&inv.ID, &inv.Username, &inv.Email, &inv.ImageURL,
 	); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	o.Org = org
 	o.Invitor = inv
@@ -312,26 +312,26 @@ func (repo *OrgRepository) InvitationDetail(ctx context.Context, invID domain.Or
 
 func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitationInput) error {
 	if err := input.Validate(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	// if user have input's email exists already
 	if _, err := repo.memberGetUserTypeByEmail(ctx, input.OrgID, input.Eamil); err == nil {
 		errStr := "user already belongs to " + input.OrgName
-		return perr.New(errStr, perr.BadRequest, errStr)
+		return perr.New(errStr, perr.ErrBadRequest, errStr)
 	}
 
 	count, sub, err := repo.MemberValidCount(ctx, input.OrgID)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if err := domain.CanCreateOrgMember(sub, *count); err != nil {
-		return perr.Wrap(err, perr.BadRequest, err.Error())
+		return perr.Wrap(err, perr.ErrBadRequest, err.Error())
 	}
 
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	var uId *domain.UserID
@@ -344,13 +344,13 @@ func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitatio
 		qs.OrgInvitationCraeteQuery,
 		input.OrgID, uId, input.Eamil, input.UserType, cu.ID,
 	).Scan(&id); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	// send invitation mail
 	mailInput := input.CreateMail(domain.OrgInvitationID(*id), *cu)
 	if err := repo.Send(mailInput); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return nil
@@ -359,7 +359,7 @@ func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitatio
 func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.OrgID) ([]domain.OrgInvitationID, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx,
@@ -367,10 +367,10 @@ func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.
 		orgID, cu.Email,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var ids []domain.OrgInvitationID
@@ -379,7 +379,7 @@ func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.
 		if err := rows.Scan(
 			&id,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 		ids = append(ids, id)
 	}
@@ -389,7 +389,7 @@ func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.
 func (repo *OrgRepository) InvitationUpdateStatus(ctx context.Context, invID domain.OrgInvitationID, status domain.OrgInvitationStatus) error {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	res, err := repo.ExecContext(ctx,
@@ -397,15 +397,15 @@ func (repo *OrgRepository) InvitationUpdateStatus(ctx context.Context, invID dom
 		status, invID, cu.Email,
 	)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if affected == 0 {
-		return perr.New("no rows affected", perr.BadRequest)
+		return perr.New("no rows affected", perr.ErrBadRequest)
 	}
 
 	return nil
@@ -414,20 +414,20 @@ func (repo *OrgRepository) InvitationUpdateStatus(ctx context.Context, invID dom
 func (repo *OrgRepository) InvitationDeny(ctx context.Context, invID domain.OrgInvitationID) error {
 	inv, err := repo.InvitationDetail(ctx, invID)
 	if err != nil {
-		return perr.Wrap(err, perr.NotFound)
+		return perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := repo.InvitationUpdateStatus(ctx, invID, domain.OrgInvitationStatusDenied); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	ids, err := repo.InvitationPastList(ctx, inv.Org.ID)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	for _, id := range ids {
 		if err := repo.InvitationUpdateStatus(ctx, id, domain.OrgInvitationStatusClosed); err != nil {
-			return perr.Wrap(err, perr.BadRequest)
+			return perr.Wrap(err, perr.ErrBadRequest)
 		}
 	}
 
@@ -442,26 +442,26 @@ member
 
 func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMemberInput) error {
 	if err := input.Validate(ctx); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	count, sub, err := repo.MemberValidCount(ctx, input.OrgID)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if err := domain.CanCreateOrgMember(sub, *count); err != nil {
-		return perr.Wrap(err, perr.BadRequest, err.Error())
+		return perr.Wrap(err, perr.ErrBadRequest, err.Error())
 	}
 
 	// current user
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.NotFound)
+		return perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	tx, err := repo.BeginTx(ctx, nil)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	// create member
@@ -471,7 +471,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 		input.OrgID, input.UserID, input.UserType, input.OrgInvitationID,
 	).Scan(&id); err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	// update invitation status
@@ -482,16 +482,16 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 	)
 	if err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	affected, err := res.RowsAffected()
 	if err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if affected == 0 {
 		tx.Rollback()
-		return perr.New("no rows affected", perr.BadRequest)
+		return perr.New("no rows affected", perr.ErrBadRequest)
 	}
 
 	// past invitation ids
@@ -501,11 +501,11 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 	)
 	if err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.NotFound)
+		return perr.Wrap(err, perr.ErrNotFound)
 	}
 	if err := rows.Err(); err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.NotFound)
+		return perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	var pastIDs []domain.OrgInvitationID
@@ -515,7 +515,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 			&id,
 		); err != nil {
 			tx.Rollback()
-			return perr.Wrap(err, perr.NotFound)
+			return perr.Wrap(err, perr.ErrNotFound)
 		}
 		pastIDs = append(pastIDs, id)
 	}
@@ -528,23 +528,23 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 		)
 		if err != nil {
 			tx.Rollback()
-			return perr.Wrap(err, perr.BadRequest)
+			return perr.Wrap(err, perr.ErrBadRequest)
 		}
 
 		affected, err := res.RowsAffected()
 		if err != nil {
 			tx.Rollback()
-			return perr.Wrap(err, perr.BadRequest)
+			return perr.Wrap(err, perr.ErrBadRequest)
 		}
 		if affected == 0 {
 			tx.Rollback()
-			return perr.New("no rows affected", perr.BadRequest)
+			return perr.New("no rows affected", perr.ErrBadRequest)
 		}
 	}
 
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	return nil
@@ -553,7 +553,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (map[domain.UserType][]domain.User, error) {
 	// confirm access
 	if _, err := repo.MemberGetCurrentUserType(ctx, orgID); err != nil {
-		return nil, perr.Wrap(err, perr.Forbidden)
+		return nil, perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	rows, err := repo.QueryContext(ctx,
@@ -561,10 +561,10 @@ func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (
 		orgID,
 	)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	users := map[domain.UserType][]domain.User{}
@@ -576,7 +576,7 @@ func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (
 		if err := rows.Scan(
 			&u.ID, &u.Username, &u.Email, &u.ImageURL, &ut,
 		); err != nil {
-			return nil, perr.Wrap(err, perr.NotFound)
+			return nil, perr.Wrap(err, perr.ErrNotFound)
 		}
 
 		users[ut] = append(users[ut], u)
@@ -588,7 +588,7 @@ func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (
 func (repo *OrgRepository) MemberGetCurrentUserType(ctx context.Context, orgID domain.OrgID) (*domain.UserType, error) {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return repo.MemberGetUserType(ctx, user.ID, orgID)
@@ -597,11 +597,11 @@ func (repo *OrgRepository) MemberGetCurrentUserType(ctx context.Context, orgID d
 func (repo *OrgRepository) MemberGetUserType(ctx context.Context, userID domain.UserID, orgID domain.OrgID) (*domain.UserType, error) {
 	row := repo.QueryRowContext(ctx, qs.OrgUserTypeQuery, orgID, userID)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	var ut *domain.UserType
 	if err := row.Scan(&ut); err != nil {
-		return nil, perr.Wrap(err, perr.BadRequest)
+		return nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return ut, nil
@@ -610,31 +610,31 @@ func (repo *OrgRepository) MemberGetUserType(ctx context.Context, userID domain.
 func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domain.OrgMemberUpdateInput) error {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	currentUt, err := repo.MemberGetCurrentUserType(ctx, input.OrgID)
 	if err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 	if err := currentUt.IsAdmin(); err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	if err := input.Validate(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if user.ID == input.UserID {
-		return perr.New("cannot change own user type", perr.Forbidden, "cannot change your user type by yourself")
+		return perr.New("cannot change own user type", perr.ErrForbidden, "cannot change your user type by yourself")
 	}
 	updatedUserUt, err := repo.MemberGetUserType(ctx, input.UserID, input.OrgID)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	// if target or new value is owner, current user must be owner
 	if *updatedUserUt == domain.UserTypeOwner || *input.UserType == domain.UserTypeOwner {
 		if *currentUt != domain.UserTypeOwner {
-			return perr.New("User is not owner", perr.Forbidden, "you are not owner")
+			return perr.New("User is not owner", perr.ErrForbidden, "you are not owner")
 		}
 	}
 
@@ -643,15 +643,15 @@ func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domai
 		input.UserType, input.OrgID, input.UserID,
 	)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if affected == 0 {
-		return perr.New("no rows affected", perr.BadRequest)
+		return perr.New("no rows affected", perr.ErrBadRequest)
 	}
 
 	return nil
@@ -660,27 +660,27 @@ func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domai
 func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserID, orgID domain.OrgID) error {
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if user.ID == userID {
-		return perr.New("cannot delete own", perr.Forbidden, "cannot delete yourself")
+		return perr.New("cannot delete own", perr.ErrForbidden, "cannot delete yourself")
 	}
 
 	currentUt, err := repo.MemberGetCurrentUserType(ctx, orgID)
 	if err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 	if err := currentUt.IsAdmin(); err != nil {
-		return perr.Wrap(err, perr.Forbidden)
+		return perr.Wrap(err, perr.ErrForbidden)
 	}
 
 	updatedUserUt, err := repo.MemberGetUserType(ctx, userID, orgID)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	// only owner user can delete owner
 	if *updatedUserUt == domain.UserTypeOwner && *currentUt != domain.UserTypeOwner {
-		return perr.New("User is not owner", perr.Forbidden, "you are not owner")
+		return perr.New("User is not owner", perr.ErrForbidden, "you are not owner")
 	}
 
 	res, err := repo.ExecContext(ctx,
@@ -688,15 +688,15 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 		orgID, userID,
 	)
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	affected, err := res.RowsAffected()
 	if err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	if affected == 0 {
-		return perr.New("no rows affected", perr.BadRequest)
+		return perr.New("no rows affected", perr.ErrBadRequest)
 	}
 
 	return nil
@@ -705,7 +705,7 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 func (repo *OrgRepository) MemberValidCount(ctx context.Context, orgID domain.OrgID) (*int, *domain.Subscription, error) {
 	cu, err := domain.UserFromCtx(ctx)
 	if err != nil {
-		return nil, nil, perr.Wrap(err, perr.BadRequest)
+		return nil, nil, perr.Wrap(err, perr.ErrBadRequest)
 	}
 	row := repo.QueryRowContext(ctx,
 		qs.OrgMemberCountByOrgID,
@@ -726,11 +726,11 @@ func (repo *OrgRepository) memberGetUserTypeByEmail(ctx context.Context, orgID d
 		orgID, email,
 	)
 	if err := row.Err(); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 	var ut *domain.UserType
 	if err := row.Scan(&ut); err != nil {
-		return nil, perr.Wrap(err, perr.NotFound)
+		return nil, perr.Wrap(err, perr.ErrNotFound)
 	}
 
 	return ut, nil

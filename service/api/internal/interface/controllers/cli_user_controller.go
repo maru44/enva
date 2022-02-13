@@ -52,7 +52,7 @@ func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Ha
 		iPass := r.Header.Get("Authorization")
 		iPassArr := strings.SplitN(iPass, domain.CLI_HEADER_SEP, 2)
 		if len(iPassArr) != 2 {
-			response(w, r, perr.New(perr.Forbidden.Error(), perr.Forbidden), nil)
+			response(w, r, perr.New(perr.ErrForbidden.Error(), perr.ErrForbidden), nil)
 			return
 		}
 
@@ -63,7 +63,7 @@ func (con *CliUserController) LoginRequiredMiddleware(next http.Handler) http.Ha
 
 		user, err := con.in.GetUserCli(r.Context(), input)
 		if err != nil {
-			response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+			response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
 			return
 		}
 

@@ -32,7 +32,7 @@ func NewDB(ctx context.Context) (*Psql, error) {
 		url: config.POSTGRES_URL,
 	}
 	if err := d.connect(); err != nil {
-		return nil, perr.Wrap(err, perr.InternalServerError)
+		return nil, perr.Wrap(err, perr.ErrInternalServerError)
 	}
 	return d, nil
 }
@@ -40,7 +40,7 @@ func NewDB(ctx context.Context) (*Psql, error) {
 func (d *Psql) connect() error {
 	conn, err := sql.Open("postgres", d.url)
 	if err != nil {
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	conn.SetMaxOpenConns(config.POSTGRES_MAX_CONNECTIONS)
@@ -118,25 +118,25 @@ func (d *Psql) VersionDown(ctx context.Context) error {
 func (d *Psql) useMigrator(ctx context.Context, f func(*migrate.Migrate) error) (err error) {
 	drv, err := iofs.New(migrationFileFS, "postgres")
 	if err != nil {
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 	m, err := migrate.NewWithSourceInstance("iofs", drv, d.url)
 	if err != nil {
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 	m.Log = newLogger(ctx)
 
 	defer func() {
 		srcErr, dbErr := m.Close()
 		if srcErr != nil {
-			err = perr.Wrap(srcErr, perr.InternalServerError)
+			err = perr.Wrap(srcErr, perr.ErrInternalServerError)
 		}
 		if dbErr != nil {
-			err = perr.Wrap(dbErr, perr.InternalServerError)
+			err = perr.Wrap(dbErr, perr.ErrInternalServerError)
 		}
 		connectErr := d.connect()
 		if connectErr != nil {
-			err = perr.Wrap(connectErr, perr.InternalServerError)
+			err = perr.Wrap(connectErr, perr.ErrInternalServerError)
 		}
 	}()
 

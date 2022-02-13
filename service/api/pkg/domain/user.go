@@ -75,7 +75,7 @@ func (u *UserInput) Validate() error {
 		validation.Field(&u.Email, validation.Required, is.Email, validation.RuneLength(1, 255)),
 		validation.Field(&u.Username, validation.Required, validation.RuneLength(1, 255)),
 	); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	return nil
 }
@@ -85,7 +85,7 @@ func (u *UserCliPasswordInput) Validate() error {
 		validation.Field(&u.ID, validation.Required, is.UUID),
 		validation.Field(&u.CliPassword, validation.Required, validation.RuneLength(31, 511)),
 	); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func (u *UserUpdateIsValidInput) Validate() error {
 	if err := validation.ValidateStruct(u,
 		validation.Field(&u.ID, validation.Required, is.UUID),
 	); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (u *UserCliValidationInput) Validate() error {
 		validation.Field(&u.CliPassword, validation.Required, validation.RuneLength(31, 255)),
 		validation.Field(&u.EmailOrUsername, validation.Required, validation.RuneLength(1, 255)),
 	); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	return nil

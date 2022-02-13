@@ -61,51 +61,33 @@ func getStatusCode(err error, w http.ResponseWriter) int {
 
 	if perror, ok := perr.IsPerror(err); ok {
 		switch {
-		case perror.IsOutput(perr.InternalServerError), perror.IsOutput(perr.InternalServerErrorWithUrgency):
+		case perror.IsOutput(perr.ErrInternalServerError), perror.IsOutput(perr.ErrInternalServerErrorWithUrgency):
 			return http.StatusInternalServerError
-		case perror.IsOutput(perr.NotFound):
+		case perror.IsOutput(perr.ErrNotFound):
 			return http.StatusNotFound
-		case perror.IsOutput(perr.Forbidden):
+		case perror.IsOutput(perr.ErrForbidden):
 			return http.StatusForbidden
-		case perror.IsOutput(perr.Unauthorized), perror.IsOutput(perr.Expired), perror.IsOutput(perr.InvalidToken):
+		case perror.IsOutput(perr.ErrUnauthorized), perror.IsOutput(perr.ErrExpired), perror.IsOutput(perr.ErrInvalidToken):
 			return http.StatusUnauthorized
-		case perror.IsOutput(perr.BadRequest):
+		case perror.IsOutput(perr.ErrBadRequest):
 			return http.StatusBadRequest
-		case perror.IsOutput(perr.Created):
+		case perror.IsOutput(perr.SuccessCreated):
 			return http.StatusCreated
-		case perror.IsOutput(perr.UnsupportedMediaType):
+		case perror.IsOutput(perr.ErrUnsupportedMediaType):
 			return http.StatusUnsupportedMediaType
-		case perror.IsOutput(perr.MethodNotAllowed):
+		case perror.IsOutput(perr.ErrMethodNotAllowed):
 			return http.StatusMethodNotAllowed
-		case perror.IsOutput(perr.UnsupportedMediaType):
+		case perror.IsOutput(perr.ErrUnsupportedMediaType):
 			return http.StatusUnsupportedMediaType
+		case perror.IsOutput(perr.ErrCorsError):
+			return 419
 		default:
 			return http.StatusInternalServerError
 		}
 	}
 
-	switch err {
-	case perr.InternalServerError, perr.InternalServerErrorWithUrgency:
-		return http.StatusInternalServerError
-	case perr.NotFound:
-		return http.StatusNotFound
-	case perr.Forbidden:
-		return http.StatusForbidden
-	case perr.Unauthorized, perr.Expired, perr.InvalidToken:
-		return http.StatusUnauthorized
-	case perr.BadRequest:
-		return http.StatusBadRequest
-	case perr.Created:
-		return http.StatusCreated
-	case perr.UnsupportedMediaType:
-		return http.StatusUnsupportedMediaType
-	case perr.MethodNotAllowed:
-		return http.StatusMethodNotAllowed
-	case perr.UnsupportedMediaType:
-		return http.StatusUnsupportedMediaType
-	default:
-		return http.StatusInternalServerError
-	}
+	return http.StatusInternalServerError
+
 }
 
 func sendSentryPerror(ctx context.Context, err perr.Perror) {

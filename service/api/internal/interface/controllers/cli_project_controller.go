@@ -36,11 +36,11 @@ func (con *CliProjectController) CreateView(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 	var cliInput domain.CliProjectInput
 	if err := json.NewDecoder(r.Body).Decode(&cliInput); err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 	if err := cliInput.Validate(); err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 
@@ -48,12 +48,12 @@ func (con *CliProjectController) CreateView(w http.ResponseWriter, r *http.Reque
 	if cliInput.OrgSlug != nil {
 		org, ut, err := con.oIn.DetailBySlug(ctx, *cliInput.OrgSlug)
 		if err != nil {
-			response(w, r, perr.Wrap(err, perr.NotFound), nil)
+			response(w, r, perr.Wrap(err, perr.ErrNotFound), nil)
 			return
 		}
 
 		if err := ut.IsAdmin(); err != nil {
-			response(w, r, perr.Wrap(err, perr.Forbidden), nil)
+			response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
 			return
 		}
 		input.OrgID = &org.ID
@@ -61,7 +61,7 @@ func (con *CliProjectController) CreateView(w http.ResponseWriter, r *http.Reque
 
 	id, err := con.in.Create(ctx, input)
 	if err != nil {
-		response(w, r, perr.Wrap(err, perr.BadRequest), nil)
+		response(w, r, perr.Wrap(err, perr.ErrBadRequest), nil)
 		return
 	}
 

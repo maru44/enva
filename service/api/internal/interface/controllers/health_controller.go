@@ -20,12 +20,12 @@ func NewHealthController(sql database.ISqlHandler) *HealthController {
 func (con *HealthController) PostgresCheckView(w http.ResponseWriter, r *http.Request) {
 	row := con.sql.QueryRowContext(r.Context(), "SELECT '1'")
 	if err := row.Err(); err != nil {
-		response(w, r, perr.Wrap(err, perr.InternalServerErrorWithUrgency), nil)
+		response(w, r, perr.Wrap(err, perr.ErrInternalServerErrorWithUrgency), nil)
 		return
 	}
 	var one string
 	if err := row.Scan(&one); err != nil {
-		response(w, r, perr.Wrap(err, perr.InternalServerErrorWithUrgency), nil)
+		response(w, r, perr.Wrap(err, perr.ErrInternalServerErrorWithUrgency), nil)
 		return
 	}
 	response(w, r, nil, map[string]interface{}{"data": one})

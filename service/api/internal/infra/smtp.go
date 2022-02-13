@@ -13,7 +13,7 @@ type Smtp struct{}
 
 func (s *Smtp) Send(input domain.SmtpInput) error {
 	if err := input.Validate(); err != nil {
-		return perr.Wrap(err, perr.BadRequest)
+		return perr.Wrap(err, perr.ErrBadRequest)
 	}
 
 	smtpAuth := smtp.PlainAuth(
@@ -38,7 +38,7 @@ Content-Type: text/plain; charset="utf-8"
 `, input.Subject, input.Subject, config.EMAIL_HOST_USER, input.Message,
 		)),
 	); err != nil {
-		return perr.Wrap(err, perr.InternalServerError)
+		return perr.Wrap(err, perr.ErrInternalServerError)
 	}
 
 	return nil
