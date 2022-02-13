@@ -74,7 +74,7 @@ func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 
 func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Origin") != config.FRONT_URL && r.Header.Get("Origin") != "" {
-		response(w, r, perr.New("cors error", perr.ErrBadRequest), nil)
+		response(w, r, perr.New("cors error", perr.ErrCorsError), nil)
 		return
 	}
 	w.Header().Set("Access-Control-Allow-Origin", config.FRONT_URL)
