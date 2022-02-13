@@ -81,7 +81,7 @@ func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Reques
 // @TODO change to use client
 func Test_BaseMiddlewareCors(t *testing.T) {
 	con := newBaseControllerForTest(t, cookieIdTokenBlank)
-	baseUrl := "http://example.com/"
+	// baseUrl := "https://example.com/"
 
 	tests := []struct {
 		name       string
@@ -94,7 +94,7 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 		{
 			name:   "success",
 			method: http.MethodGet,
-			path:   "abc/efg",
+			path:   "/abc/efg",
 			headers: map[string]string{
 				"Origin": config.FRONT_URL,
 			},
@@ -106,36 +106,47 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 		},
 		// {
 		// 	name:   "fail for origin",
-		// 	method: http.MethodPut,
-		// 	path:   "xyz",
+		// 	method: http.MethodOptions,
+		// 	path:   "/xyz",
 		// 	headers: map[string]string{
 		// 		"Origin":     "https://front.example.com",
 		// 		"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
 		// 	},
 		// 	wantStatus: 419,
+		// 	wantAccess: domain.CtxAccess{
+		// 		Method: http.MethodOptions,
+		// 		URL:    "/xyz",
+		// 	},
 		// },
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest(tt.method, baseUrl+tt.path, nil)
+			h := http.Handler(con.BaseMiddleware(http.HandlerFunc(con.testContextView)))
+			ts := httptest.NewServer(h)
+			defer ts.Close()
+
+			r := httptest.NewRequest(tt.method, ts.URL+tt.path, nil)
+			defer r.Body.Close()
 			for k, v := range tt.headers {
 				r.Header.Add(k, v)
 			}
-			defer r.Body.Close()
-
-			got := httptest.NewRecorder()
-			mid := con.BaseMiddleware(http.HandlerFunc(con.testContextView))
-			mid.ServeHTTP(got, r)
+			r.RequestURI = ""
+			cli := &http.Client{}
+			got, err := cli.Do(r)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer got.Body.Close()
 
 			var access testContextViewBody
-			if err := json.NewDecoder(got.Result().Body).Decode(&access); err != nil {
+			if err := json.NewDecoder(got.Body).Decode(&access); err != nil {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, tt.wantStatus, got.Result().StatusCode)
+			assert.Equal(t, tt.wantStatus, got.StatusCode)
 			assert.Equal(t, tt.wantAccess, access.Access)
-			got.Result().Body.Close()
+			got.Body.Close()
 		})
 	}
 }
