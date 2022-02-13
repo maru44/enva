@@ -78,7 +78,6 @@ func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Reques
 /**************************
 **************************/
 
-// @TODO change to use client
 func Test_BaseMiddlewareCors(t *testing.T) {
 	con := newBaseControllerForTest(t, cookieIdTokenBlank)
 	// baseUrl := "https://example.com/"
@@ -113,10 +112,6 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 				"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
 			},
 			wantStatus: 419,
-			wantAccess: domain.CtxAccess{
-				Method: http.MethodOptions,
-				URL:    "/xyz",
-			},
 		},
 	}
 
