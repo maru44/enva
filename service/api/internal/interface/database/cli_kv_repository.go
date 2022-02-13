@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 
-	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/database/qs"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
@@ -32,7 +32,7 @@ func (repo *CliKvRepository) BulkInsert(ctx context.Context, projectID domain.Pr
 		var id string
 		if err := tx.QueryRowContext(
 			ctx,
-			queryset.KvInsertQuery,
+			qs.KvInsertQuery,
 			in.Key, in.Value, projectID, user.ID,
 		).Scan(&id); err != nil {
 			tx.Rollback()

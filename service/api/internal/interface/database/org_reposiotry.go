@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 
-	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/database/qs"
 	"github.com/maru44/enva/service/api/internal/interface/mysmtp"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
@@ -21,7 +21,7 @@ func (repo *OrgRepository) List(ctx context.Context) ([]domain.Org, error) {
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgValidListQuery, user.ID,
+		qs.OrgValidListQuery, user.ID,
 	)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
@@ -55,7 +55,7 @@ func (repo *OrgRepository) ListOwnerAdmin(ctx context.Context) ([]domain.Org, er
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgValidListQuery, user.ID,
+		qs.OrgValidListQuery, user.ID,
 	)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
@@ -91,7 +91,7 @@ func (repo *OrgRepository) DetailBySlug(ctx context.Context, slug string) (*doma
 	}
 	row := repo.QueryRowContext(
 		ctx,
-		queryset.OrgValidDetailBySlugQuery,
+		qs.OrgValidDetailBySlugQuery,
 		user.ID, slug,
 	)
 	if err := row.Err(); err != nil {
@@ -151,7 +151,7 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 
 	var id, slug *string
 	if err := tx.QueryRowContext(ctx,
-		queryset.OrgCreateQuery,
+		qs.OrgCreateQuery,
 		input.Slug, input.Name, input.Description, cu.ID,
 	).Scan(&id, &slug); err != nil {
 		tx.Rollback()
@@ -160,7 +160,7 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 
 	var memberID *string
 	if err := tx.QueryRowContext(ctx,
-		queryset.RelOrgMembersInsertQuery,
+		qs.RelOrgMembersInsertQuery,
 		id, cu.ID, domain.UserTypeOwner, nil,
 	).Scan(&memberID); err != nil {
 		tx.Rollback()
@@ -177,7 +177,7 @@ func (repo *OrgRepository) Create(ctx context.Context, input domain.OrgInput) (*
 
 func (repo *OrgRepository) OrgValidCount(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
 	row := repo.QueryRowContext(ctx,
-		queryset.OrgValidCountByOwner, userID,
+		qs.OrgValidCountByOwner, userID,
 	)
 	return countValidByRow(row)
 }
@@ -194,7 +194,7 @@ func (repo *OrgRepository) InvitationListFromOrg(ctx context.Context, orgID doma
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgInvitationListFromOrgQuery,
+		qs.OrgInvitationListFromOrgQuery,
 		orgID, cu.ID,
 	)
 	if err != nil {
@@ -244,7 +244,7 @@ func (repo *OrgRepository) InvitationList(ctx context.Context) ([]domain.OrgInvi
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgInvitationListQuery,
+		qs.OrgInvitationListQuery,
 		cu.ID,
 	)
 	if err != nil {
@@ -284,7 +284,7 @@ func (repo *OrgRepository) InvitationDetail(ctx context.Context, invID domain.Or
 	}
 
 	row := repo.QueryRowContext(ctx,
-		queryset.OrgInvitationDetailQuery,
+		qs.OrgInvitationDetailQuery,
 		invID, cu.Email,
 	)
 	if err := row.Err(); err != nil {
@@ -341,7 +341,7 @@ func (repo *OrgRepository) Invite(ctx context.Context, input domain.OrgInvitatio
 
 	var id *string
 	if err := repo.QueryRowContext(ctx,
-		queryset.OrgInvitationCraeteQuery,
+		qs.OrgInvitationCraeteQuery,
 		input.OrgID, uId, input.Eamil, input.UserType, cu.ID,
 	).Scan(&id); err != nil {
 		return perr.Wrap(err, perr.BadRequest)
@@ -363,7 +363,7 @@ func (repo *OrgRepository) InvitationPastList(ctx context.Context, orgID domain.
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.NewOrgInvitationListQuery,
+		qs.NewOrgInvitationListQuery,
 		orgID, cu.Email,
 	)
 	if err != nil {
@@ -393,7 +393,7 @@ func (repo *OrgRepository) InvitationUpdateStatus(ctx context.Context, invID dom
 	}
 
 	res, err := repo.ExecContext(ctx,
-		queryset.OrgInvitationUpdateStatusQuery,
+		qs.OrgInvitationUpdateStatusQuery,
 		status, invID, cu.Email,
 	)
 	if err != nil {
@@ -467,7 +467,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 	// create member
 	var id *string
 	if err := tx.QueryRowContext(ctx,
-		queryset.RelOrgMembersInsertQuery,
+		qs.RelOrgMembersInsertQuery,
 		input.OrgID, input.UserID, input.UserType, input.OrgInvitationID,
 	).Scan(&id); err != nil {
 		tx.Rollback()
@@ -476,7 +476,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 
 	// update invitation status
 	res, err := tx.ExecContext(ctx,
-		queryset.OrgInvitationUpdateStatusQuery,
+		qs.OrgInvitationUpdateStatusQuery,
 		domain.OrgInvitationStatusAccepted,
 		input.OrgInvitationID, cu.Email,
 	)
@@ -496,7 +496,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 
 	// past invitation ids
 	rows, err := tx.QueryContext(ctx,
-		queryset.NewOrgInvitationListQuery,
+		qs.NewOrgInvitationListQuery,
 		input.OrgID, cu.Email,
 	)
 	if err != nil {
@@ -523,7 +523,7 @@ func (repo *OrgRepository) MemberCreate(ctx context.Context, input domain.OrgMem
 	// update past invitations' status >> closed
 	for _, invID := range pastIDs {
 		res, err := tx.ExecContext(ctx,
-			queryset.OrgInvitationUpdateStatusQuery,
+			qs.OrgInvitationUpdateStatusQuery,
 			domain.OrgInvitationStatusClosed, invID, cu.Email,
 		)
 		if err != nil {
@@ -557,7 +557,7 @@ func (repo *OrgRepository) MemberList(ctx context.Context, orgID domain.OrgID) (
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.OrgUsersQuery,
+		qs.OrgUsersQuery,
 		orgID,
 	)
 	if err != nil {
@@ -595,7 +595,7 @@ func (repo *OrgRepository) MemberGetCurrentUserType(ctx context.Context, orgID d
 }
 
 func (repo *OrgRepository) MemberGetUserType(ctx context.Context, userID domain.UserID, orgID domain.OrgID) (*domain.UserType, error) {
-	row := repo.QueryRowContext(ctx, queryset.OrgUserTypeQuery, orgID, userID)
+	row := repo.QueryRowContext(ctx, qs.OrgUserTypeQuery, orgID, userID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
 	}
@@ -639,7 +639,7 @@ func (repo *OrgRepository) MemberUpdateUserType(ctx context.Context, input domai
 	}
 
 	res, err := repo.ExecContext(ctx,
-		queryset.OrgMemberUserTypeUpdateQuery,
+		qs.OrgMemberUserTypeUpdateQuery,
 		input.UserType, input.OrgID, input.UserID,
 	)
 	if err != nil {
@@ -684,7 +684,7 @@ func (repo *OrgRepository) MemberDelete(ctx context.Context, userID domain.UserI
 	}
 
 	res, err := repo.ExecContext(ctx,
-		queryset.OrgEliminateMemberQuery,
+		qs.OrgEliminateMemberQuery,
 		orgID, userID,
 	)
 	if err != nil {
@@ -708,7 +708,7 @@ func (repo *OrgRepository) MemberValidCount(ctx context.Context, orgID domain.Or
 		return nil, nil, perr.Wrap(err, perr.BadRequest)
 	}
 	row := repo.QueryRowContext(ctx,
-		queryset.OrgMemberCountByOrgID,
+		qs.OrgMemberCountByOrgID,
 		orgID, cu.ID,
 	)
 	return countValidByRow(row)
@@ -722,7 +722,7 @@ util
 
 func (repo *OrgRepository) memberGetUserTypeByEmail(ctx context.Context, orgID domain.OrgID, email string) (*domain.UserType, error) {
 	row := repo.QueryRowContext(ctx,
-		queryset.OrgUserTypeByEmailQuery,
+		qs.OrgUserTypeByEmailQuery,
 		orgID, email,
 	)
 	if err := row.Err(); err != nil {

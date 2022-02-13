@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/database/qs"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/perr"
 )
@@ -14,7 +14,7 @@ type KvRepository struct {
 }
 
 func (repo *KvRepository) ListValid(ctx context.Context, projectID domain.ProjectID) (kvs []domain.Kv, err error) {
-	rows, err := repo.QueryContext(ctx, queryset.ValidKvListOfProject, projectID)
+	rows, err := repo.QueryContext(ctx, qs.ValidKvListOfProject, projectID)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -40,7 +40,7 @@ func (repo *KvRepository) ListValid(ctx context.Context, projectID domain.Projec
 }
 
 func (repo *KvRepository) DetailValid(ctx context.Context, key domain.KvKey, projectID domain.ProjectID) (*domain.Kv, error) {
-	row := repo.QueryRowContext(ctx, queryset.ValidKvDetail, key, projectID)
+	row := repo.QueryRowContext(ctx, qs.ValidKvDetail, key, projectID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -68,7 +68,7 @@ func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, proj
 
 	// if key exists >> return error
 	var preId string
-	row := repo.QueryRowContext(ctx, queryset.ValidKvDetailID, input.Key, projectID)
+	row := repo.QueryRowContext(ctx, qs.ValidKvDetailID, input.Key, projectID)
 	if err := row.Scan(&preId); err == nil {
 		return nil, perr.New(fmt.Sprintf("the key is already exists: %s", input.Key), perr.BadRequest)
 	}
@@ -76,7 +76,7 @@ func (repo *KvRepository) Create(ctx context.Context, input domain.KvInput, proj
 	var id string
 	if err := repo.QueryRowContext(
 		ctx,
-		queryset.KvInsertQuery,
+		qs.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,
 	).Scan(&id); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -104,7 +104,7 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 	// deactivate existing kv
 	exe, err := tx.ExecContext(
 		ctx,
-		queryset.KvDeactivateQuery,
+		qs.KvDeactivateQuery,
 		user.ID, projectID, input.Key,
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (repo *KvRepository) Update(ctx context.Context, input domain.KvInput, proj
 	var id string
 	if err := tx.QueryRowContext(
 		ctx,
-		queryset.KvInsertQuery,
+		qs.KvInsertQuery,
 		input.Key, input.Value, projectID, user.ID,
 	).Scan(&id); err != nil {
 		tx.Rollback()
@@ -149,7 +149,7 @@ func (repo *KvRepository) Delete(ctx context.Context, kvID domain.KvID, projectI
 	// deactivate existing kv
 	exe, err := repo.ExecContext(
 		ctx,
-		queryset.KvDeactivateByIdQuery,
+		qs.KvDeactivateByIdQuery,
 		user.ID, projectID, kvID,
 	)
 	if err != nil {
@@ -174,7 +174,7 @@ func (repo *KvRepository) DeleteByKey(ctx context.Context, key domain.KvKey, pro
 	// deactivate existing kv
 	exe, err := repo.ExecContext(
 		ctx,
-		queryset.KvDeactivateQuery,
+		qs.KvDeactivateQuery,
 		user.ID, projectID, key,
 	)
 	if err != nil {

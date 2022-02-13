@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/database/qs"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/enva/service/api/pkg/tools"
 	"github.com/maru44/perr"
@@ -23,7 +23,7 @@ func (repo *ProjectReposotory) ListAll(ctx context.Context) ([]domain.Project, e
 	}
 
 	orgRows, err := repo.QueryContext(ctx,
-		queryset.OrgValidListQuery,
+		qs.OrgValidListQuery,
 		user.ID,
 	)
 	if err != nil {
@@ -79,7 +79,7 @@ func (repo *ProjectReposotory) ListByUser(ctx context.Context) ([]domain.Project
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	rows, err := repo.QueryContext(ctx, queryset.ProjectValidListByUserQuery, user.ID)
+	rows, err := repo.QueryContext(ctx, qs.ProjectValidListByUserQuery, user.ID)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -126,7 +126,7 @@ func (repo *ProjectReposotory) ListByOrg(ctx context.Context, orgID domain.OrgID
 	}
 
 	rows, err := repo.QueryContext(ctx,
-		queryset.ProjectListValidByOrgQuery,
+		qs.ProjectListValidByOrgQuery,
 		orgID, user.ID,
 	)
 	if err != nil {
@@ -176,7 +176,7 @@ func (repo *ProjectReposotory) SlugListByUser(ctx context.Context) ([]string, er
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	rows, err := repo.QueryContext(ctx, queryset.ProjectValidSlugListByUserQuery, user.ID)
+	rows, err := repo.QueryContext(ctx, qs.ProjectValidSlugListByUserQuery, user.ID)
 	if err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -207,7 +207,7 @@ func (repo *ProjectReposotory) GetBySlug(ctx context.Context, slug string) (*dom
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	row := repo.QueryRowContext(ctx, queryset.ProjectValidDetailBySlugQuery, slug, user.ID)
+	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailBySlugQuery, slug, user.ID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -251,7 +251,7 @@ func (repo *ProjectReposotory) GetBySlugAndOrgID(ctx context.Context, slug strin
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	row := repo.QueryRowContext(ctx, queryset.ProjectValidDetailBySlugAndOrgIdQuery, user.ID, orgID, slug)
+	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailBySlugAndOrgIdQuery, user.ID, orgID, slug)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -287,7 +287,7 @@ func (repo *ProjectReposotory) GetBySlugAndOrgSlug(ctx context.Context, slug, or
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	row := repo.QueryRowContext(ctx, queryset.ProjectValidDetailBySlugAndOrgSlugQuery, user.ID, orgSlug, slug)
+	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailBySlugAndOrgSlugQuery, user.ID, orgSlug, slug)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -323,7 +323,7 @@ func (repo *ProjectReposotory) GetByID(ctx context.Context, id domain.ProjectID)
 		return nil, perr.Wrap(err, perr.Forbidden)
 	}
 
-	row := repo.QueryRowContext(ctx, queryset.ProjectValidDetailByIDQuery, id)
+	row := repo.QueryRowContext(ctx, qs.ProjectValidDetailByIDQuery, id)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -393,7 +393,7 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 
 	if err := repo.QueryRowContext(
 		ctx,
-		queryset.ProjectCreateQuery,
+		qs.ProjectCreateQuery,
 		input.Name, input.Slug, input.Description, ownerType, inputU, input.OrgID,
 	).Scan(&slug); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -403,7 +403,7 @@ func (repo *ProjectReposotory) Create(ctx context.Context, input domain.ProjectI
 }
 
 func (repo *ProjectReposotory) Delete(ctx context.Context, projectID domain.ProjectID) (int, error) {
-	exe, err := repo.ExecContext(ctx, queryset.ProjectDeleteQuery, projectID)
+	exe, err := repo.ExecContext(ctx, qs.ProjectDeleteQuery, projectID)
 	if err != nil {
 		return 0, perr.Wrap(err, perr.BadRequest)
 	}
@@ -423,7 +423,7 @@ func (repo *ProjectReposotory) CountValidByOrgID(ctx context.Context, orgID doma
 	}
 
 	row := repo.QueryRowContext(ctx,
-		queryset.ProjectValidCountByOrgID,
+		qs.ProjectValidCountByOrgID,
 		orgID, cu.ID,
 	)
 	return countValidByRow(row)
@@ -435,7 +435,7 @@ func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug 
 		return nil, nil, perr.Wrap(err, perr.Forbidden)
 	}
 	row := repo.QueryRowContext(ctx,
-		queryset.ProjectValidCountByOrgSlug,
+		qs.ProjectValidCountByOrgSlug,
 		orgSlug, cu.ID,
 	)
 	return countValidByRow(row)
@@ -443,7 +443,7 @@ func (repo *ProjectReposotory) CountValidByOrgSlug(ctx context.Context, orgSlug 
 
 func (repo *ProjectReposotory) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
 	row := repo.QueryRowContext(ctx,
-		queryset.ProjectValidCountByUser,
+		qs.ProjectValidCountByUser,
 		userID,
 	)
 	return countValidByRow(row)

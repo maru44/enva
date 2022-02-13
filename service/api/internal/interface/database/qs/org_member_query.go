@@ -1,4 +1,4 @@
-package queryset
+package qs
 
 const (
 	/************************

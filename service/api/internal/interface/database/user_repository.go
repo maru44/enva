@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/maru44/enva/service/api/internal/interface/database/queryset"
+	"github.com/maru44/enva/service/api/internal/interface/database/qs"
 	"github.com/maru44/enva/service/api/internal/interface/password"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/enva/service/api/pkg/tools"
@@ -17,7 +17,7 @@ type UserRepository struct {
 }
 
 func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*domain.User, error) {
-	row := repo.QueryRowContext(ctx, queryset.UserGetByIDQuery, id)
+	row := repo.QueryRowContext(ctx, qs.UserGetByIDQuery, id)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -52,7 +52,7 @@ func (repo *UserRepository) GetByID(ctx context.Context, id domain.UserID) (*dom
 }
 
 func (repo *UserRepository) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
-	row := repo.QueryRowContext(ctx, queryset.UserGetByEmailQuery, email)
+	row := repo.QueryRowContext(ctx, qs.UserGetByEmailQuery, email)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.NotFound)
 	}
@@ -106,7 +106,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 		id, imageURL             *string
 		isValid, isEmailVerified bool
 	)
-	row := repo.QueryRowContext(ctx, queryset.UserExistsQuery, input.ID)
+	row := repo.QueryRowContext(ctx, qs.UserExistsQuery, input.ID)
 	if err := row.Err(); err != nil {
 		return nil, perr.Wrap(err, perr.InternalServerError)
 	}
@@ -131,7 +131,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 		}
 		if isNeedToUpdate {
 			exe, err := repo.ExecContext(ctx,
-				queryset.UserUpdateImageOrIsEmailVerifiedQuery,
+				qs.UserUpdateImageOrIsEmailVerifiedQuery,
 				input.IsEmailVerified, input.ImageURL, input.ID,
 			)
 			if err != nil {
@@ -155,7 +155,7 @@ func (repo *UserRepository) UpsertIfNotInvalid(ctx context.Context) (*string, er
 	// if not ex
 	if err := repo.QueryRowContext(
 		ctx,
-		queryset.UserInsertQuery,
+		qs.UserInsertQuery,
 		input.ID, input.Email, input.Username, input.IsEmailVerified, input.ImageURL,
 	).Scan(&id); err != nil {
 		return nil, perr.Wrap(err, perr.BadRequest)
@@ -170,7 +170,7 @@ func (repo *UserRepository) UpdateValid(ctx context.Context, input domain.UserUp
 	}
 
 	exe, err := repo.ExecContext(ctx,
-		queryset.UserUpdateValidQuery,
+		qs.UserUpdateValidQuery,
 		input.IsValid, input.ID,
 	)
 	if err != nil {
@@ -207,7 +207,7 @@ func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, err
 	}
 
 	exe, err := repo.ExecContext(ctx,
-		queryset.UserUpdateCliPasswordQuery,
+		qs.UserUpdateCliPasswordQuery,
 		input.CliPassword, input.ID,
 	)
 	if err != nil {
@@ -225,7 +225,7 @@ func (repo *UserRepository) UpdateCliPassword(ctx context.Context) (*string, err
 
 func (repo *UserRepository) GetUserCli(ctx context.Context, input *domain.UserCliValidationInput) (*domain.User, error) {
 	row := repo.QueryRowContext(ctx,
-		queryset.UserGetByEmailAdnPassword,
+		qs.UserGetByEmailAdnPassword,
 		input.EmailOrUsername,
 	)
 	if err := row.Err(); err != nil {
