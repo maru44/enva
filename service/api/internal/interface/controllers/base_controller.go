@@ -29,14 +29,6 @@ func NewBaseController(jp myjwt.JwtParserAbstract) *BaseController {
 }
 
 /********************************
-    Get jwks
-********************************/
-
-func (con *BaseController) GetKeySet() (jwk.Set, error) {
-	return jwk.Fetch(context.Background(), config.COGNITO_KEYS_URL)
-}
-
-/********************************
     End points
 ********************************/
 
@@ -52,8 +44,14 @@ func (con *BaseController) HealthCheck(w http.ResponseWriter, r *http.Request) {
     Middleware
 ********************************/
 
-func (con *BaseController) BaseMiddleware(keySet jwk.Set, next http.Handler) http.Handler {
+func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		keySet, err := jwk.Fetch(context.Background(), config.COGNITO_KEYS_URL)
+		if err != nil {
+			response(w, r, perr.Wrap(err, perr.InternalServerErrorWithUrgency), nil)
+			return
+		}
+
 		con.corsMiddleware(w, r)
 		ctx := context.WithValue(
 			r.Context(),

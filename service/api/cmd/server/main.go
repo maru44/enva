@@ -126,14 +126,9 @@ func main() {
 }
 
 func sv(ps []pmf, middlewares ...string) {
-	keySet, err := base.GetKeySet()
-	if err != nil {
-		panic(err)
-	}
-
 	if middlewares == nil {
 		for _, p := range ps {
-			router.Handle(p.Path, base.BaseMiddleware(keySet, http.HandlerFunc(p.Func)))
+			router.Handle(p.Path, base.BaseMiddleware(http.HandlerFunc(p.Func)))
 		}
 		return
 	}
@@ -162,7 +157,7 @@ func sv(ps []pmf, middlewares ...string) {
 			f = middlewareMap[middlewares[i]](f)
 		}
 
-		router.Handle(p.Path, base.BaseMiddleware(keySet, mmF(f)))
+		router.Handle(p.Path, base.BaseMiddleware(mmF(f)))
 	}
 }
 

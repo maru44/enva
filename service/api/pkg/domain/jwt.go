@@ -2,13 +2,10 @@ package domain
 
 import (
 	"context"
-
-	"github.com/golang-jwt/jwt/v4"
 )
 
 type (
 	JwtIntectactor interface {
-		Evaluate(context.Context, string) (*jwt.Token, error)
 		GetUserByJwt(context.Context, string) (*User, error)
 	}
 

@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/maru44/enva/service/api/internal/usecase"
 	"github.com/maru44/enva/service/api/pkg/config"
@@ -15,9 +15,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type jwtInteractorForTest struct {
-	usecase.JwtInteractor
-}
+type (
+	jwtInteractorForTest struct {
+		usecase.JwtInteractor
+	}
+
+	testContextViewBody struct {
+		Access domain.CtxAccess `json:"access"`
+	}
+)
 
 func newBaseControllerForTest(t *testing.T) *BaseController {
 	return &BaseController{
@@ -25,12 +31,14 @@ func newBaseControllerForTest(t *testing.T) *BaseController {
 	}
 }
 
-func (in *jwtInteractorForTest) Evaluate(context.Context, string) (*jwt.Token, error) {
-	return nil, nil
-}
-
 func (in *jwtInteractorForTest) GetUserByJwt(context.Context, string) (*domain.User, error) {
-	return nil, nil
+	return &domain.User{
+		ID:              "id",
+		Username:        "username",
+		Email:           "aaa@example.com",
+		IsValid:         true,
+		IsEmailVerified: true,
+	}, nil
 }
 
 func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Request) {
@@ -51,20 +59,9 @@ func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Reques
 /**************************
 **************************/
 
-func Test_GetKeySet(t *testing.T) {
-	_, err := jwk.Fetch(context.Background(), config.COGNITO_KEYS_URL)
-	assert.NoError(t, err)
-}
-
 func Test_BaseMiddlewareCors(t *testing.T) {
 	con := newBaseControllerForTest(t)
 	baseUrl := "http://example.com/"
-
-	// pseudo server
-	keySet, err := con.GetKeySet()
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	tests := []struct {
 		name       string
@@ -84,14 +81,16 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 			wantStatus: http.StatusOK,
 			wantAccess: domain.CtxAccess{
 				Method: http.MethodGet,
+				URL:    "/abc/efg",
 			},
 		},
 		// {
 		// 	name:   "fail for origin",
-		// 	method: http.MethodGet,
+		// 	method: http.MethodPut,
 		// 	path:   "xyz",
 		// 	headers: map[string]string{
-		// 		"Origin": "https://front.example.com",
+		// 		"Origin":     "https://front.example.com",
+		// 		"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
 		// 	},
 		// 	wantStatus: 419,
 		// },
@@ -99,17 +98,23 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest(http.MethodGet, baseUrl+tt.path, nil)
+			r := httptest.NewRequest(tt.method, baseUrl+tt.path, nil)
 			for k, v := range tt.headers {
 				r.Header.Add(k, v)
 			}
 			defer r.Body.Close()
 
 			got := httptest.NewRecorder()
-			mid := con.BaseMiddleware(keySet, http.HandlerFunc(con.testContextView))
+			mid := con.BaseMiddleware(http.HandlerFunc(con.testContextView))
 			mid.ServeHTTP(got, r)
 
+			var access testContextViewBody
+			if err := json.NewDecoder(got.Result().Body).Decode(&access); err != nil {
+				t.Fatal(err)
+			}
+
 			assert.Equal(t, tt.wantStatus, got.Result().StatusCode)
+			assert.Equal(t, tt.wantAccess, access.Access)
 		})
 	}
 }
