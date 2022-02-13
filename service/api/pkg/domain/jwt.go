@@ -2,11 +2,14 @@ package domain
 
 import (
 	"context"
+
+	"github.com/lestrrat-go/jwx/jwk"
 )
 
 type (
 	JwtIntectactor interface {
 		GetUserByJwt(context.Context, string) (*User, error)
+		FetchJwk(context.Context, string) (jwk.Set, error)
 	}
 
 	UserFromClaim struct {

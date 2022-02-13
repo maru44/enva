@@ -15,6 +15,10 @@ type JwtRepository struct {
 	JwtParserAbstract
 }
 
+func (repo *JwtRepository) FetchJwk(ctx context.Context, url string) (jwk.Set, error) {
+	return jwk.Fetch(ctx, url)
+}
+
 func (repo *JwtRepository) GetUserByJwt(ctx context.Context, idToken string) (*domain.User, error) {
 	token, err := repo.evaluate(ctx, idToken)
 	if err != nil {

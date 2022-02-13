@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/maru44/enva/service/api/internal/usecase"
 	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
@@ -50,6 +51,10 @@ func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *BaseCo
 	}
 }
 
+func (in *jwtInteractorForTest) FetchJwk(context.Context, string) (jwk.Set, error) {
+	return nil, nil
+}
+
 func (in *jwtInteractorForTest) GetUserByJwt(context.Context, string) (*domain.User, error) {
 	switch in.cookieIdToken {
 	case cookieIdTokenBlank:
@@ -80,7 +85,6 @@ func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Reques
 
 func Test_BaseMiddlewareCors(t *testing.T) {
 	con := newBaseControllerForTest(t, cookieIdTokenBlank)
-	// baseUrl := "https://example.com/"
 
 	tests := []struct {
 		name       string

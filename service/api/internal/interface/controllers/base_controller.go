@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/maru44/enva/service/api/internal/interface/myjwt"
 	"github.com/maru44/enva/service/api/internal/usecase"
 	"github.com/maru44/enva/service/api/pkg/config"
@@ -46,7 +45,7 @@ func (con *BaseController) HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		keySet, err := jwk.Fetch(context.Background(), config.COGNITO_KEYS_URL)
+		keySet, err := con.ji.FetchJwk(r.Context(), config.COGNITO_KEYS_URL)
 		if err != nil {
 			response(w, r, perr.Wrap(err, perr.ErrInternalServerErrorWithUrgency), nil)
 			return
