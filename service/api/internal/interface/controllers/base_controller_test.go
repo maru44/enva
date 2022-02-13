@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -72,6 +73,7 @@ func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	user, err := domain.UserFromCtx(ctx)
 	if err != nil {
+		fmt.Println(err)
 	}
 	access, _ := ctx.Value(domain.CtxAccessKey).(domain.CtxAccess)
 	response(w, r, nil, map[string]interface{}{
