@@ -1,6 +1,10 @@
 package queryset
 
 const (
+	/*********************************
+		List
+	*********************************/
+
 	ProjectValidListByUserQuery = "SELECT " +
 		"id, name, slug, description, owner_type, owner_user_id, owner_org_id, " +
 		"created_at, updated_at " +
@@ -20,6 +24,10 @@ const (
 		// filter current user is member of org
 		"JOIN rel_org_members AS r ON r.org_id = $1 AND r.user_id = $2 AND r.is_valid = true " +
 		"WHERE p.is_valid = true AND p.deleted_at IS NULL AND p.owner_org_id = $1"
+
+	/*********************************
+		Detail
+	*********************************/
 
 	// only by user
 	ProjectValidDetailBySlugQuery = "SELECT " +
@@ -56,16 +64,32 @@ const (
 		"FROM projects " +
 		"WHERE id = $1 AND is_valid = true AND deleted_at IS NULL"
 
+	/*********************************
+		Create
+	*********************************/
+
 	ProjectCreateQuery = "INSERT INTO " +
 		"projects(name, slug, description, owner_type, owner_user_id, owner_org_id) " +
 		"VALUES($1, $2, $3, $4, $5, $6) " +
 		"RETURNING slug"
 
+	/*********************************
+		Update
+	*********************************/
+
+	// @TODO update
+
+	/*********************************
+		Delete
+	*********************************/
+
 	ProjectDeleteQuery = "UPDATE projects " +
 		"SET deleted_at = now(), is_valid = false, updated_at = now() " +
 		"WHERE id = $1"
 
-	// @TODO: add query list of slug
+	/*********************************
+		Count
+	*********************************/
 
 	ProjectValidCountByOrgID = "SELECT " +
 		"COUNT(DISTINCT p.id)," +
