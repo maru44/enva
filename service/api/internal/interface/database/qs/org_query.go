@@ -53,5 +53,6 @@ const (
 		"FROM orgs AS o " +
 		"LEFT JOIN subscriptions AS s ON s.user_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
 		"WHERE o.created_by = $1 AND o.is_valid = true AND o.deleted_at IS NULL " +
-		"GROUP BY s.id"
+		"GROUP BY s.id " +
+		"FOR UPDATE"
 )

@@ -76,5 +76,6 @@ const (
 		"LEFT JOIN subscriptions AS s ON s.org_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
 		"JOIN rel_org_members AS r ON r.user_id = $2 AND r.org_id = $1 AND r.is_valid = true " +
 		"WHERE rs.org_id = $1 AND rs.is_valid = true AND rs.deleted_at IS NULL " +
-		"GROUP BY s.id"
+		"GROUP BY s.id " +
+		"FOR UPDATE"
 )

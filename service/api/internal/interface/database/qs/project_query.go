@@ -103,7 +103,8 @@ const (
 		// validate current user access
 		"JOIN rel_org_members AS r ON r.org_id = $1 AND r.user_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL " +
 		"WHERE o.id = $1 AND o.is_valid = true AND o.deleted_at IS NULL " +
-		"GROUP BY s.id"
+		"GROUP BY s.id " +
+		"FOR UPDATE"
 
 	ProjectValidCountByOrgSlug = "SELECT " +
 		"COUNT(DISTINCT p.id)," +
@@ -117,7 +118,8 @@ const (
 		// validate current user access
 		"JOIN rel_org_members AS r ON r.org_id = o.id AND r.user_id = $2 AND r.is_valid = true AND r.deleted_at IS NULL " +
 		"WHERE o.slug = $1 AND o.is_valid = true AND o.deleted_at IS NULL " +
-		"GROUP BY o.id, s.id"
+		"GROUP BY o.id, s.id " +
+		"FOR UPDATE"
 
 	ProjectValidCountByUser = "SELECT " +
 		"COUNT(DISTINCT p.id), " +
@@ -128,5 +130,6 @@ const (
 		"FROM projects AS p " +
 		"LEFT JOIN subscriptions AS s ON s.user_id = $1 AND s.is_valid = true AND s.deleted_at IS NULL " +
 		"WHERE p.owner_user_id = $1 AND p.owner_type = 'user' AND p.is_valid = true AND p.deleted_at IS NULL " +
-		"GROUP BY s.id"
+		"GROUP BY s.id " +
+		"FOR UPDATE"
 )
