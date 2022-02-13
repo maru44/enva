@@ -112,7 +112,6 @@ func (con *BaseController) methodsOnlyMiddleware(next http.Handler, methods []st
 			}
 		}
 		response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-		return
 	})
 }
 
