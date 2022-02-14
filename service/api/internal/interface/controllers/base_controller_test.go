@@ -2,11 +2,11 @@ package controllers_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/maru44/enva/service/api/internal/interface/controllers"
 	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/stretchr/testify/assert"
@@ -19,25 +19,25 @@ type (
 	}
 )
 
-func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *BaseController {
-	return &BaseController{
-		ji: &jwtInteractorForTest{
+func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *controllers.BaseController {
+	return controllers.NewBaseControllerFromUsecase(
+		&jwtInteractor{
 			cookieIdToken: cookieIdToken,
 		},
-	}
+	)
 }
 
-func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Request) {
+func testContextView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	user, err := domain.UserFromCtx(ctx)
-	if err != nil {
-		fmt.Println(err)
-	}
+	user, _ := domain.UserFromCtx(ctx)
+
 	access, _ := ctx.Value(domain.CtxAccessKey).(domain.CtxAccess)
-	response(w, r, nil, map[string]interface{}{
+	w.WriteHeader(200)
+	j, _ := json.Marshal(map[string]interface{}{
 		"user":   user,
 		"access": access,
 	})
+	w.Write(j)
 }
 
 /**************************
@@ -81,7 +81,7 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := http.Handler(con.BaseMiddleware(http.HandlerFunc(con.testContextView)))
+			h := http.Handler(con.BaseMiddleware(http.HandlerFunc(testContextView)))
 			ts := httptest.NewServer(h)
 			defer ts.Close()
 
@@ -119,7 +119,7 @@ func Test_GiveUserMiddleware(t *testing.T) {
 	tests := []struct {
 		name       string
 		method     string
-		con        *BaseController
+		con        *controllers.BaseController
 		wantStatus int
 		wantUser   *domain.User
 	}{
@@ -156,7 +156,7 @@ func Test_GiveUserMiddleware(t *testing.T) {
 			}
 
 			got := httptest.NewRecorder()
-			mid := con.BaseMiddleware(con.GiveUserMiddleware(http.HandlerFunc(con.testContextView)))
+			mid := con.BaseMiddleware(con.GiveUserMiddleware(http.HandlerFunc(testContextView)))
 			mid.ServeHTTP(got, r)
 
 			var bod testContextViewBody
@@ -180,7 +180,7 @@ func Test_LoginRequiredMiddleware(t *testing.T) {
 	tests := []struct {
 		name       string
 		method     string
-		con        *BaseController
+		con        *controllers.BaseController
 		wantStatus int
 		wantUser   *domain.User
 	}{
@@ -217,7 +217,7 @@ func Test_LoginRequiredMiddleware(t *testing.T) {
 			}
 
 			got := httptest.NewRecorder()
-			mid := con.BaseMiddleware(con.LoginRequiredMiddleware(http.HandlerFunc(con.testContextView)))
+			mid := con.BaseMiddleware(con.LoginRequiredMiddleware(http.HandlerFunc(testContextView)))
 			mid.ServeHTTP(got, r)
 
 			assert.Equal(t, tt.wantStatus, got.Code)

@@ -18,13 +18,17 @@ type (
 )
 
 func NewBaseController(jp myjwt.JwtParserAbstract) *BaseController {
-	return &BaseController{
-		ji: usecase.NewJwtInteractor(
+	return NewBaseControllerFromUsecase(
+		usecase.NewJwtInteractor(
 			&myjwt.JwtRepository{
 				JwtParserAbstract: jp,
 			},
 		),
-	}
+	)
+}
+
+func NewBaseControllerFromUsecase(in domain.JwtIntectactor) *BaseController {
+	return &BaseController{ji: in}
 }
 
 /********************************
