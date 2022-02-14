@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"context"
@@ -208,7 +208,8 @@ func (in *kvInteractorForTest) DeleteByKey(ctx context.Context, key domain.KvKey
 type (
 	projectInteractorForTest struct {
 		usecase.ProjectInteractor
-		hasError bool
+		hasError            bool
+		createdProjectCount int
 	}
 )
 
@@ -289,16 +290,102 @@ func (in *projectInteractorForTest) Delete(ctx context.Context, projectID domain
 }
 
 func (in *projectInteractorForTest) CountValidByOrgID(ctx context.Context, orgID domain.OrgID) (*int, *domain.Subscription, error) {
-	if in.hasError {
-		return tools.IntPtrAbleZero(0), nil, errors.New("some error")
-	}
-	return tools.IntPtrAbleZero(3), nil, nil
+	return tools.IntPtrAbleZero(in.createdProjectCount), nil, nil
 }
 
-// func (in *ProjectInteractor) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
-// 	return in.repo.CountValidByOrgSlug(ctx, orgSlug)
-// }
+func (in *projectInteractorForTest) CountValidByOrgSlug(ctx context.Context, orgSlug string) (*int, *domain.Subscription, error) {
+	return tools.IntPtrAbleZero(in.createdProjectCount), nil, nil
+}
 
-// func (in *ProjectInteractor) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
-// 	return in.repo.CountValidByUser(ctx, userID)
-// }
+func (in *projectInteractorForTest) CountValidByUser(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
+	return tools.IntPtrAbleZero(in.createdProjectCount), nil, nil
+}
+
+/**************************
+	org
+**************************/
+
+type (
+	orgInteractorForTest struct {
+		usecase.OrgInteractor
+		hasError            bool
+		createdProjectCount int
+		cretaedMemberCount  int
+	}
+)
+
+func (in *orgInteractorForTest) List(ctx context.Context) ([]domain.Org, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) ListOwnerAdmin(ctx context.Context) ([]domain.Org, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) DetailBySlug(ctx context.Context, slug string) (*domain.Org, *domain.UserType, error) {
+	return nil, nil, nil
+}
+
+func (in *orgInteractorForTest) Create(ctx context.Context, input domain.OrgInput) (*string, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) OrgValidCount(ctx context.Context, userID domain.UserID) (*int, *domain.Subscription, error) {
+	return nil, nil, nil
+}
+
+func (in *orgInteractorForTest) Invite(ctx context.Context) error {
+	return nil
+}
+
+func (in *orgInteractorForTest) InvitationListFromOrg(context.Context, domain.OrgID) ([]domain.OrgInvitation, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) InvitationList(context.Context) ([]domain.OrgInvitation, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) InvitationDetail(context.Context, domain.OrgInvitationID) (*domain.OrgInvitation, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) InvitationPastList(context.Context, domain.OrgID) ([]domain.OrgInvitationID, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) InvitationUpdateStatus(context.Context, domain.OrgInvitationID, domain.OrgInvitationStatus) error {
+	return nil
+}
+
+func (in *orgInteractorForTest) InvitationDeny(context.Context, domain.OrgInvitationID) error {
+	return nil
+}
+
+func (in *orgInteractorForTest) MemberCreate(context.Context, domain.OrgMemberInput) error {
+	return nil
+}
+
+func (in *orgInteractorForTest) MemberList(context.Context, domain.OrgID) (map[domain.UserType][]domain.User, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) MemberGetCurrentUserType(context.Context, domain.OrgID) (*domain.UserType, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) MemberGetUserType(context.Context, domain.UserID, domain.OrgID) (*domain.UserType, error) {
+	return nil, nil
+}
+
+func (in *orgInteractorForTest) MemberUpdateUserType(context.Context, domain.OrgMemberUpdateInput) error {
+	return nil
+}
+
+func (in *orgInteractorForTest) MemberDelete(context.Context, domain.UserID, domain.OrgID) error {
+	return nil
+}
+
+func (in *orgInteractorForTest) MemberValidCount(context.Context, domain.OrgID) (*int, *domain.Subscription, error) {
+	return nil, nil, nil
+}

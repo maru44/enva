@@ -19,22 +19,30 @@ type KvController struct {
 }
 
 func NewKvController(sql database.ISqlHandler) *KvController {
-	return &KvController{
-		in: usecase.NewKvInteractor(
+	return NewKvControllerFromInteractors(
+		usecase.NewKvInteractor(
 			&database.KvRepository{
 				ISqlHandler: sql,
 			},
 		),
-		pIn: usecase.NewProjectInteractor(
+		usecase.NewProjectInteractor(
 			&database.ProjectReposotory{
 				ISqlHandler: sql,
 			},
 		),
-		oIn: usecase.NewOrgInteractor(
+		usecase.NewOrgInteractor(
 			&database.OrgRepository{
 				ISqlHandler: sql,
 			},
 		),
+	)
+}
+
+func NewKvControllerFromInteractors(in domain.IKvInteractor, pIn domain.IProjectInteractor, oIn domain.IOrgInteractor) *KvController {
+	return &KvController{
+		in:  in,
+		pIn: pIn,
+		oIn: oIn,
 	}
 }
 
