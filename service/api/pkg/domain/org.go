@@ -82,8 +82,8 @@ func (o *Org) Valid() error {
 func CanCreateOrg(s *Subscription, orgCount int) error {
 	errStr := "Orgs count reaches maximum (%d)"
 
-	if s == nil && orgCount > 0 {
-		return fmt.Errorf(errStr, 1)
+	if s == nil && orgCount >= int(OrgCapacityForFreeUser) {
+		return fmt.Errorf(errStr, OrgCapacityForFreeUser)
 	}
 	// if s.StripeProductID == a {}
 	// if s.StripeProductID == b {}
@@ -94,8 +94,8 @@ func CanCreateOrg(s *Subscription, orgCount int) error {
 func CanCreateOrgMember(s *Subscription, memberCount int) error {
 	errStr := "Members count reaches maximum (%d)"
 
-	if s == nil && memberCount > 4 {
-		return fmt.Errorf(errStr, 5)
+	if s == nil && memberCount >= int(MemberCapacityForFreeOrg) {
+		return fmt.Errorf(errStr, MemberCapacityForFreeOrg)
 	}
 	// if s.StripeProductID == a {}
 	// if s.StripeProductID == b {}

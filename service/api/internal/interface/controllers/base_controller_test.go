@@ -1,71 +1,29 @@
 package controllers
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/maru44/enva/service/api/internal/usecase"
 	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/stretchr/testify/assert"
 )
 
 type (
-	jwtInteractorForTest struct {
-		usecase.JwtInteractor
-		cookieIdToken cookieIdToken
-	}
-
 	testContextViewBody struct {
 		Access domain.CtxAccess `json:"access"`
 		User   *domain.User     `json:"user"`
 	}
-
-	cookieIdToken string
 )
-
-const (
-	cookieIdTokenBlank   = cookieIdToken("blank")
-	cookieIdTokenInvalid = cookieIdToken("invalid")
-	cookieIdTokenValid   = cookieIdToken("valid")
-)
-
-var testUser = domain.User{
-	ID:              "id",
-	Username:        "username",
-	Email:           "aaa@example.com",
-	IsValid:         true,
-	IsEmailVerified: true,
-}
 
 func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *BaseController {
 	return &BaseController{
 		ji: &jwtInteractorForTest{
 			cookieIdToken: cookieIdToken,
 		},
-	}
-}
-
-func (in *jwtInteractorForTest) FetchJwk(context.Context, string) (jwk.Set, error) {
-	return nil, nil
-}
-
-func (in *jwtInteractorForTest) GetUserByJwt(context.Context, string) (*domain.User, error) {
-	switch in.cookieIdToken {
-	case cookieIdTokenBlank:
-		return nil, nil
-	case cookieIdTokenInvalid:
-		return nil, errors.New("invalid cookie")
-	case cookieIdTokenValid:
-		return &testUser, nil
-	default:
-		panic("must not reach here")
 	}
 }
 

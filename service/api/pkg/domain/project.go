@@ -14,6 +14,10 @@ type (
 	ProjectID string
 	OwnerType string
 
+	ProjectCapacity int
+	OrgCapacity     int
+	MemberCapacity  int
+
 	Project struct {
 		ID          ProjectID  `json:"id"`
 		Slug        string     `json:"slug"`
@@ -92,6 +96,13 @@ const (
 	OwnerTypeUser = OwnerType("user")
 	// if owner is org
 	OwnerTypeOrg = OwnerType("org")
+
+	ProjectCapacityForFreeUser = ProjectCapacity(5)
+	ProjectCapacityForFreeOrg  = ProjectCapacity(5)
+
+	OrgCapacityForFreeUser = OrgCapacity(1)
+
+	MemberCapacityForFreeOrg = MemberCapacity(5)
 )
 
 var (
@@ -112,14 +123,14 @@ func CanCreateProject(s *Subscription, projectCount int, ownerType OwnerType) er
 	errStr := "Projects count reaches maximum (%d)"
 	switch ownerType {
 	case OwnerTypeOrg:
-		if s == nil && projectCount > 4 {
-			return fmt.Errorf(errStr, 5)
+		if s == nil && projectCount >= int(ProjectCapacityForFreeOrg) {
+			return fmt.Errorf(errStr, ProjectCapacityForFreeOrg)
 		}
 		// if s.StripeProductID == a {}
 		// if s.StripeProductID == b {}
 	default:
-		if s == nil && projectCount > 4 {
-			return fmt.Errorf(errStr, 5)
+		if s == nil && projectCount >= int(ProjectCapacityForFreeUser) {
+			return fmt.Errorf(errStr, ProjectCapacityForFreeUser)
 		}
 		// if s.StripeProductID == a {}
 		// if s.StripeProductID == b {}
