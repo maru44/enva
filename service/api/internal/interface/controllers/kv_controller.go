@@ -138,7 +138,7 @@ func (con *KvController) userAccessToProject(ctx context.Context, projectID doma
 	// find parent project
 	p, err := con.pIn.GetByID(ctx, projectID)
 	if err != nil {
-		return perr.Wrap(err, perr.ErrNotFound, "Project is not found")
+		return perr.Wrap(err, perr.ErrNotFound, "Project not found")
 	}
 
 	if p.OwnerType == "user" {
@@ -167,7 +167,7 @@ func (con *KvController) userGuestAccessToProject(ctx context.Context, projectID
 	// find parent project
 	p, err := con.pIn.GetByID(ctx, projectID)
 	if err != nil {
-		return perr.Wrap(err, perr.ErrNotFound, "Project is not found")
+		return perr.Wrap(err, perr.ErrNotFound, "Project not found")
 	}
 
 	if p.OwnerType == "user" {

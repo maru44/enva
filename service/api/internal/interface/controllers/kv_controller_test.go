@@ -31,10 +31,13 @@ func Test_KvController_ListView(t *testing.T) {
 	projectOrg := createProjectWithOwnerOrg(t, org1)
 
 	tests := []struct {
-		name      string
-		projectID domain.ProjectID
+		name    string
+		project domain.Project
 
 		mockKvs []domain.Kv
+
+		mockMemberCurrentUserType    *domain.UserType
+		mockMemberCurrentUserTypeErr error
 
 		wantStatus int
 		wantKvs    []domain.Kv
