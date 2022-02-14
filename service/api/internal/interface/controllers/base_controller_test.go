@@ -19,10 +19,11 @@ type (
 	}
 )
 
-func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *controllers.BaseController {
+func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken, user *domain.User) *controllers.BaseController {
 	return controllers.NewBaseControllerFromUsecase(
 		&jwtInteractor{
 			cookieIdToken: cookieIdToken,
+			user:          user,
 		},
 	)
 }
@@ -44,7 +45,7 @@ func testContextView(w http.ResponseWriter, r *http.Request) {
 **************************/
 
 func Test_BaseMiddlewareCors(t *testing.T) {
-	con := newBaseControllerForTest(t, cookieIdTokenBlank)
+	con := newBaseControllerForTest(t, cookieIdTokenBlank, nil)
 
 	tests := []struct {
 		name       string
@@ -111,9 +112,9 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 }
 
 func Test_GiveUserMiddleware(t *testing.T) {
-	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank)
-	conAuth := newBaseControllerForTest(t, cookieIdTokenValid)
-	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid)
+	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank, nil)
+	conAuth := newBaseControllerForTest(t, cookieIdTokenValid, nil)
+	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid, nil)
 	baseUrl := "http://example.com/user-test"
 
 	tests := []struct {
@@ -172,9 +173,9 @@ func Test_GiveUserMiddleware(t *testing.T) {
 }
 
 func Test_LoginRequiredMiddleware(t *testing.T) {
-	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank)
-	conAuth := newBaseControllerForTest(t, cookieIdTokenValid)
-	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid)
+	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank, nil)
+	conAuth := newBaseControllerForTest(t, cookieIdTokenValid, nil)
+	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid, nil)
 	baseUrl := "http://example.com/user-test"
 
 	tests := []struct {
