@@ -14,16 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func newKvController(t *testing.T) *controllers.KvController {
-// 	ctrl := gomock.NewController(t)
-// 	defer ctrl.Finish()
-
-// 	kI := mockdomain.NewMockIKvInteractor(ctrl)
-// 	pI := mockdomain.NewMockIProjectInteractor(ctrl)
-// 	oI := mockdomain.NewMockIOrgInteractor(ctrl)
-// 	return controllers.NewKvControllerFromUsecase(kI, pI, oI)
-// }
-
 func newKvController(kv domain.IKvInteractor, p domain.IProjectInteractor, o domain.IOrgInteractor) *controllers.KvController {
 	return controllers.NewKvControllerFromUsecase(kv, p, o)
 }
