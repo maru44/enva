@@ -103,27 +103,7 @@ func createKv(t *testing.T, projectID domain.ProjectID) *domain.Kv {
 
 func createKvs(t *testing.T, projectID domain.ProjectID) []domain.Kv {
 	return []domain.Kv{
-		{
-			ID:        domain.KvID(uu()),
-			ProjectID: projectID,
-			Key:       domain.KvKey(tools.GenRandSlug(6)),
-			Value:     domain.KvValue(tools.GenRandSlug(8)),
-			IsValid:   true,
-		},
-		{
-			ID:        domain.KvID(uu()),
-			ProjectID: projectID,
-			Key:       domain.KvKey(tools.GenRandSlug(6)),
-			Value:     domain.KvValue(tools.GenRandSlug(8)),
-			IsValid:   true,
-		},
-		{
-			ID:        domain.KvID(uu()),
-			ProjectID: projectID,
-			Key:       domain.KvKey(tools.GenRandSlug(6)),
-			Value:     domain.KvValue(tools.GenRandSlug(8)),
-			IsValid:   true,
-		},
+		*createKv(t, projectID), *createKv(t, projectID), *createKv(t, projectID),
 	}
 }
 

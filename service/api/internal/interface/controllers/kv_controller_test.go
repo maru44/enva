@@ -2,6 +2,7 @@ package controllers_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -40,13 +41,14 @@ func Test_KvController_ListView(t *testing.T) {
 	projectUserOK := createProjectWithOwnerUser(t, cu)
 	projectUserNotOK := createProjectWithOwnerUser(t, u2)
 
-	// org1 := createOrg(t)
-	// projectOrg := createProjectWithOwnerOrg(t, org1)
+	org1 := createOrg(t)
+	projectOrg := createProjectWithOwnerOrg(t, org1)
+	uTypeGuest := domain.UserTypeGuest
 
 	baseCon := newBaseControllerForTest(t, cookieIdTokenValid, cu)
 
 	kvsUserOk := createKvs(t, projectUserOK.ID)
-	kvsUserNotOk := createKvs(t, projectUserNotOK.ID)
+	kvsOrg := createKvs(t, projectOrg.ID)
 
 	tests := []struct {
 		name    string
@@ -60,7 +62,6 @@ func Test_KvController_ListView(t *testing.T) {
 
 		wantStatus int
 		wantKvs    []domain.Kv
-		wantErr    string
 	}{
 		{
 			name:       "success",
@@ -73,12 +74,31 @@ func Test_KvController_ListView(t *testing.T) {
 		{
 			name:       "failed cannot access to project",
 			project:    projectUserNotOK,
-			mockKvs:    kvsUserNotOk,
+			mockKvs:    nil,
 			mockErr:    nil,
-			wantKvs:    kvsUserNotOk,
+			wantKvs:    nil,
 			wantStatus: 403,
 		},
-		{},
+		{
+			name:                         "success ownerType org",
+			project:                      projectOrg,
+			mockKvs:                      kvsOrg,
+			mockErr:                      nil,
+			mockMemberCurrentUserType:    &uTypeGuest,
+			mockMemberCurrentUserTypeErr: nil,
+			wantKvs:                      kvsOrg,
+			wantStatus:                   200,
+		},
+		{
+			name:                         "failed cannot access to project (not org member)",
+			project:                      projectOrg,
+			mockKvs:                      kvsOrg,
+			mockErr:                      nil,
+			mockMemberCurrentUserType:    nil,
+			mockMemberCurrentUserTypeErr: errors.New("some"),
+			wantKvs:                      kvsOrg,
+			wantStatus:                   403,
+		},
 	}
 
 	for _, tt := range tests {
@@ -92,9 +112,9 @@ func Test_KvController_ListView(t *testing.T) {
 			oI := mockdomain.NewMockIOrgInteractor(ctrl)
 			pI.EXPECT().GetByID(gomock.Any(), tt.project.ID).Return(tt.project, nil)
 			if tt.project.OwnerOrg != nil {
-				oI.EXPECT().MemberGetCurrentUserType(gomock.Any(), tt.project.OwnerOrg.ID).Return(tt.mockMemberCurrentUserType, tt.mockMemberCurrentUserTypeErr)
+				oI.EXPECT().MemberGetCurrentUserType(gomock.Any(), tt.project.OwnerOrg.ID).Return(tt.mockMemberCurrentUserType, tt.mockMemberCurrentUserTypeErr).Times(1)
 			}
-			if tt.project.OwnerType == domain.OwnerTypeUser && tt.project.OwnerUser == cu {
+			if tt.project.OwnerUser == cu || (tt.mockMemberCurrentUserType != nil && tt.mockMemberCurrentUserTypeErr == nil) {
 				kI.EXPECT().ListValid(gomock.Any(), tt.project.ID).Return(tt.mockKvs, tt.mockErr).Times(1)
 			}
 			con := newKvController(kI, pI, oI)
