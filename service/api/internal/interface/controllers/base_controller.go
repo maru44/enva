@@ -55,7 +55,11 @@ func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		con.corsMiddleware(w, r)
+		if err := con.corsMiddleware(w, r); err != nil {
+			response(w, r, perr.Wrap(err, perr.ErrCorsError), nil)
+			return
+		}
+
 		ctx := context.WithValue(
 			r.Context(),
 			domain.CtxAccessKey,
@@ -75,16 +79,16 @@ func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request) {
+func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request) error {
 	if r.Header.Get("Origin") != config.FRONT_URL && r.Header.Get("Origin") != "" {
-		response(w, r, perr.New("cors error", perr.ErrCorsError), nil)
-		return
+		return perr.New("cors error", perr.ErrCorsError)
 	}
 	w.Header().Set("Access-Control-Allow-Origin", config.FRONT_URL)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Origin, X-Csrftoken, Accept, Cookie, Id-Token, Refresh-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
 	w.Header().Set("Access-Control-Max-Age", "3600")
+	return nil
 }
 
 func (con *BaseController) PostOnlyMiddleware(next http.Handler) http.Handler {

@@ -12,6 +12,13 @@ import (
 	"github.com/maru44/enva/service/api/pkg/tools"
 )
 
+type (
+	errBody struct {
+		Err    string `json:"error"`
+		Status int    `json:"status"`
+	}
+)
+
 func uu() string {
 	return uuid.New().String()
 }
@@ -76,7 +83,7 @@ func createUser(t *testing.T) *domain.User {
 	emailPre := tools.GenRandSlug(6)
 	username := tools.GenRandSlug(8)
 	return &domain.User{
-		ID:              domain.UserID(testUserID),
+		ID:              domain.UserID(uu()),
 		Username:        username,
 		Email:           emailPre + "@example.com",
 		IsValid:         true,
@@ -91,6 +98,32 @@ func createKv(t *testing.T, projectID domain.ProjectID) *domain.Kv {
 		Key:       domain.KvKey(tools.GenRandSlug(6)),
 		Value:     domain.KvValue(tools.GenRandSlug(8)),
 		IsValid:   true,
+	}
+}
+
+func createKvs(t *testing.T, projectID domain.ProjectID) []domain.Kv {
+	return []domain.Kv{
+		{
+			ID:        domain.KvID(uu()),
+			ProjectID: projectID,
+			Key:       domain.KvKey(tools.GenRandSlug(6)),
+			Value:     domain.KvValue(tools.GenRandSlug(8)),
+			IsValid:   true,
+		},
+		{
+			ID:        domain.KvID(uu()),
+			ProjectID: projectID,
+			Key:       domain.KvKey(tools.GenRandSlug(6)),
+			Value:     domain.KvValue(tools.GenRandSlug(8)),
+			IsValid:   true,
+		},
+		{
+			ID:        domain.KvID(uu()),
+			ProjectID: projectID,
+			Key:       domain.KvKey(tools.GenRandSlug(6)),
+			Value:     domain.KvValue(tools.GenRandSlug(8)),
+			IsValid:   true,
+		},
 	}
 }
 

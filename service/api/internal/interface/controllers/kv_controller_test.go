@@ -1,40 +1,59 @@
 package controllers_test
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/maru44/enva/service/api/internal/interface/controllers"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/maru44/enva/service/api/pkg/domain/mockdomain"
+	"github.com/stretchr/testify/assert"
 )
 
-func newKvControllerForTest(t *testing.T) *controllers.KvController {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+// func newKvController(t *testing.T) *controllers.KvController {
+// 	ctrl := gomock.NewController(t)
+// 	defer ctrl.Finish()
 
-	kI := mockdomain.NewMockIKvInteractor(ctrl)
-	pI := mockdomain.NewMockIProjectInteractor(ctrl)
-	oI := mockdomain.NewMockIOrgInteractor(ctrl)
-	return controllers.NewKvControllerFromUsecase(kI, pI, oI)
+// 	kI := mockdomain.NewMockIKvInteractor(ctrl)
+// 	pI := mockdomain.NewMockIProjectInteractor(ctrl)
+// 	oI := mockdomain.NewMockIOrgInteractor(ctrl)
+// 	return controllers.NewKvControllerFromUsecase(kI, pI, oI)
+// }
+
+func newKvController(kv domain.IKvInteractor, p domain.IProjectInteractor, o domain.IOrgInteractor) *controllers.KvController {
+	return controllers.NewKvControllerFromUsecase(kv, p, o)
 }
 
 func Test_KvController_ListView(t *testing.T) {
+	type body struct {
+		Data []domain.Kv `json:"data"`
+	}
+
+	url := "https://example.com/kv"
+
 	cu := createUser(t)
 	u2 := createUser(t)
-
-	org1 := createOrg(t)
 
 	projectUserOK := createProjectWithOwnerUser(t, cu)
 	projectUserNotOK := createProjectWithOwnerUser(t, u2)
 
-	projectOrg := createProjectWithOwnerOrg(t, org1)
+	// org1 := createOrg(t)
+	// projectOrg := createProjectWithOwnerOrg(t, org1)
+
+	baseCon := newBaseControllerForTest(t, cookieIdTokenValid, cu)
+
+	kvsUserOk := createKvs(t, projectUserOK.ID)
+	kvsUserNotOk := createKvs(t, projectUserNotOK.ID)
 
 	tests := []struct {
 		name    string
-		project domain.Project
+		project *domain.Project
 
 		mockKvs []domain.Kv
+		mockErr error
 
 		mockMemberCurrentUserType    *domain.UserType
 		mockMemberCurrentUserTypeErr error
@@ -44,7 +63,62 @@ func Test_KvController_ListView(t *testing.T) {
 		wantErr    string
 	}{
 		{
-			name: "success",
+			name:       "success",
+			project:    projectUserOK,
+			mockKvs:    kvsUserOk,
+			mockErr:    nil,
+			wantKvs:    kvsUserOk,
+			wantStatus: 200,
 		},
+		{
+			name:       "failed cannot access to project",
+			project:    projectUserNotOK,
+			mockKvs:    kvsUserNotOk,
+			mockErr:    nil,
+			wantKvs:    kvsUserNotOk,
+			wantStatus: 403,
+		},
+		{},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			// mock usecase
+			pI := mockdomain.NewMockIProjectInteractor(ctrl)
+			kI := mockdomain.NewMockIKvInteractor(ctrl)
+			oI := mockdomain.NewMockIOrgInteractor(ctrl)
+			pI.EXPECT().GetByID(gomock.Any(), tt.project.ID).Return(tt.project, nil)
+			if tt.project.OwnerOrg != nil {
+				oI.EXPECT().MemberGetCurrentUserType(gomock.Any(), tt.project.OwnerOrg.ID).Return(tt.mockMemberCurrentUserType, tt.mockMemberCurrentUserTypeErr)
+			}
+			if tt.project.OwnerType == domain.OwnerTypeUser && tt.project.OwnerUser == cu {
+				kI.EXPECT().ListValid(gomock.Any(), tt.project.ID).Return(tt.mockKvs, tt.mockErr).Times(1)
+			}
+			con := newKvController(kI, pI, oI)
+
+			r := httptest.NewRequest(http.MethodGet, url+"?projectId="+string(tt.project.ID), nil)
+			defer r.Body.Close()
+			r.Header.Add("Cookie", domain.JwtCookieKeyIdToken+"=a")
+
+			got := httptest.NewRecorder()
+			end := baseCon.BaseMiddleware(baseCon.GetOnlyMiddleware(baseCon.LoginRequiredMiddleware(http.HandlerFunc(con.ListView))))
+			end.ServeHTTP(got, r)
+
+			assert.Equal(t, tt.wantStatus, got.Code)
+			if got.Code == 200 {
+				var bod body
+				if err := json.NewDecoder(got.Result().Body).Decode(&bod); err != nil {
+					t.Fatal(err)
+				}
+				assert.ElementsMatch(t, tt.wantKvs, bod.Data)
+			} else {
+				// var bod errBody
+				// if err := json.NewDecoder()
+			}
+			got.Result().Body.Close()
+		})
 	}
 }

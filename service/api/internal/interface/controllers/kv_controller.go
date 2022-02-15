@@ -49,6 +49,10 @@ func NewKvControllerFromUsecase(in domain.IKvInteractor, pIn domain.IProjectInte
 func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectID := r.URL.Query().Get(QueryParamsProjectID)
+	if projectID == "" {
+		response(w, r, perr.New("invalid params", perr.ErrBadRequest), nil)
+		return
+	}
 
 	if err := con.userGuestAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
 		response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
