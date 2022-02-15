@@ -134,9 +134,6 @@ func Test_KvController_ListView(t *testing.T) {
 					t.Fatal(err)
 				}
 				assert.ElementsMatch(t, tt.wantKvs, bod.Data)
-			} else {
-				// var bod errBody
-				// if err := json.NewDecoder()
 			}
 			got.Result().Body.Close()
 		})
