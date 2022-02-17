@@ -17,6 +17,12 @@ type (
 	}
 )
 
+const ConBase = ConName("BASE")
+
+func (con *BaseController) Name() ConName {
+	return ConBase
+}
+
 func NewBaseController(jp myjwt.JwtParserAbstract) *BaseController {
 	return NewBaseControllerFromUsecase(
 		usecase.NewJwtInteractor(
