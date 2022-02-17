@@ -1,5 +1,3 @@
-import { NextPageContext } from 'next'
-import { parseCookies } from 'nookies'
 import { IsDevelopment } from '../config/env'
 
 export const GetPath = {
@@ -91,39 +89,5 @@ export async function fetcherGetFromApiUrl(path: string) {
   } catch (e) {
     IsDevelopment && console.log(e)
     throw new Error('Internal Server Error')
-  }
-}
-
-export async function fetcherSSR<
-  F extends (...args: any[]) => Promise<Response>
->(ctx: NextPageContext, func: F) {
-  const cookies = parseCookies(ctx)
-  const res = await func(cookies.accessToken ?? '')
-  switch (res.status) {
-    case 200:
-      return res
-    case 401:
-      const resUser = await fetch(
-        `${process.env.NEXT_PUBLIC_FRONT_URL}/api/auth/server/refresh`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      )
-      // setCookie
-      if (resUser.status === 200) {
-        // destroyCookie(ctx, 'accessToken');
-        // destroyCookie(ctx, 'refreshToken');
-        // const data = await resUser.json();
-        // mySetCookie('refreshToken', data['refreshToken'], 10 * 60 * 60, ctx);
-        // const newAccessToken = data['idToken'];
-        // mySetCookie('accessToken', newAccessToken, 5 * 60, ctx);
-        // const res2 = await func;
-        // return res2;
-      } else {
-        return res
-      }
-    default:
-      return res
   }
 }
