@@ -38,7 +38,7 @@ func testContextView(w http.ResponseWriter, r *http.Request) {
 		"user":   user,
 		"access": access,
 	})
-	w.Write(j)
+	w.Write(j) //nolint:errcheck
 }
 
 /**************************

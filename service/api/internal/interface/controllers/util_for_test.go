@@ -12,13 +12,6 @@ import (
 	"github.com/maru44/enva/service/api/pkg/tools"
 )
 
-type (
-	errBody struct {
-		Err    string `json:"error"`
-		Status int    `json:"status"`
-	}
-)
-
 func uu() string {
 	return uuid.New().String()
 }
