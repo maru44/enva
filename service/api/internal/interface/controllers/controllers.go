@@ -3,29 +3,24 @@ package controllers
 import "net/http"
 
 type (
-	ConName string
-
-	Controller interface {
-		Name() ConName
+	Controllers struct {
+		Base    *BaseController
+		Kv      *KvController
+		Project *ProjectController
+		Org     *OrgController
+		User    *UserController
+		Health  *HealthController
+		// for cli
+		CliKv      *CliKvController
+		CliProject *CliProjectController
+		CliUser    *CliUserController
 	}
 
-	// Controllers struct {
-	// 	Base    *BaseController
-	// 	Kv      *KvController
-	// 	Project *ProjectController
-	// 	Org     *OrgController
-	// 	User    *UserController
-	// 	Health  *HealthController
-	// 	// for cli
-	// 	CliKv      *CliKvController
-	// 	CliProject *CliProjectController
-	// 	CliUser    *CliUserController
-	// }
-
 	Server struct {
-		Mux         *http.ServeMux
-		Routes      []Route
-		Controllers []Controller
+		Mux    *http.ServeMux
+		Routes []Route
+		Controllers
+		// Controllers []Controller
 	}
 
 	Route struct {
@@ -46,9 +41,6 @@ const (
 	UserMiddleware     = Middleware("user")
 	CliBaseMiddleware  = Middleware("cli")
 	CliLoginMiddleware = Middleware("cliLogin")
-
-	ConKv      = ConName("KV")
-	ConProject = ConName("PROJECT")
 
 	AnyMethod    = "ANY"
 	UpsertMethod = "UPSERT"
@@ -81,13 +73,16 @@ func GenMiddlewares(base *BaseController, cliU *CliUserController) MiddlewareMap
 	}
 }
 
-// func (s *Server) Sv(routes []Route, preMiddlewares []Middleware, middlewares ...Middleware) {
-// 	if len(middlewares) == 0 {{
-// 		for _, r := range routes {
-// 			s.Mux.Handle(r.Path, )
-// 		}
-// 	}}
-// }
+func (s *Server) Sv(routes []Route, preMiddlewares []Middleware, middlewares ...Middleware) {
+	if len(middlewares) == 0 {{
+		for _, r := range routes {
+			if len(preMiddlewares) == 0 {
+				s.Mux.Handle(r.Path, http.HandlerFunc(r.Func))
+				continue
+			}
+		}
+	}}
+}
 
 func S(path string, method string, fun func(http.ResponseWriter, *http.Request), ms []Middleware, middlewareMap MiddlewareMap) Route {
 	initialMiddlewares := make([]func(http.Handler) http.Handler, len(ms))
