@@ -28,3 +28,6 @@ exe:
 
 test:
 	@go test $(TEST_REPOSITORY) $(TEST_CONTROLLER) $(TEST_USECASE) $(TEST_INFRA)
+
+gen:
+	go generate ./...

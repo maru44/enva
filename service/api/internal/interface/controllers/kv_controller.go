@@ -19,28 +19,40 @@ type KvController struct {
 }
 
 func NewKvController(sql database.ISqlHandler) *KvController {
-	return &KvController{
-		in: usecase.NewKvInteractor(
+	return NewKvControllerFromUsecase(
+		usecase.NewKvInteractor(
 			&database.KvRepository{
 				ISqlHandler: sql,
 			},
 		),
-		pIn: usecase.NewProjectInteractor(
+		usecase.NewProjectInteractor(
 			&database.ProjectReposotory{
 				ISqlHandler: sql,
 			},
 		),
-		oIn: usecase.NewOrgInteractor(
+		usecase.NewOrgInteractor(
 			&database.OrgRepository{
 				ISqlHandler: sql,
 			},
 		),
+	)
+}
+
+func NewKvControllerFromUsecase(in domain.IKvInteractor, pIn domain.IProjectInteractor, oIn domain.IOrgInteractor) *KvController {
+	return &KvController{
+		in:  in,
+		pIn: pIn,
+		oIn: oIn,
 	}
 }
 
 func (con *KvController) ListView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	projectID := r.URL.Query().Get(QueryParamsProjectID)
+	if projectID == "" {
+		response(w, r, perr.New("invalid params", perr.ErrBadRequest), nil)
+		return
+	}
 
 	if err := con.userGuestAccessToProject(ctx, domain.ProjectID(projectID)); err != nil {
 		response(w, r, perr.Wrap(err, perr.ErrForbidden), nil)
@@ -130,7 +142,7 @@ func (con *KvController) userAccessToProject(ctx context.Context, projectID doma
 	// find parent project
 	p, err := con.pIn.GetByID(ctx, projectID)
 	if err != nil {
-		return perr.Wrap(err, perr.ErrNotFound, "Project is not found")
+		return perr.Wrap(err, perr.ErrNotFound, "Project not found")
 	}
 
 	if p.OwnerType == "user" {
@@ -159,7 +171,7 @@ func (con *KvController) userGuestAccessToProject(ctx context.Context, projectID
 	// find parent project
 	p, err := con.pIn.GetByID(ctx, projectID)
 	if err != nil {
-		return perr.Wrap(err, perr.ErrNotFound, "Project is not found")
+		return perr.Wrap(err, perr.ErrNotFound, "Project not found")
 	}
 
 	if p.OwnerType == "user" {

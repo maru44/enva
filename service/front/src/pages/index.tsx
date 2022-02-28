@@ -45,6 +45,20 @@ const Home: NextPage = () => {
           The ambassador of environmental variables.
         </Typography>
       </Box>
+      {/* pause message */}
+      <Box mt={12}>
+        <Typography textAlign="center" variant="h3" className={styles.pausing}>
+          <b>Pausing because server price is too high for me.</b>
+        </Typography>
+        <Typography textAlign="center" variant="h3">
+          You can use this by self hosting. Source code is{' '}
+          <Link href="https://github.com/maru44/enva" passHref>
+            <a>here</a>
+          </Link>
+          .
+        </Typography>
+      </Box>
+      {/* pausing message */}
       <Box mt={6}>
         <List disablePadding className={styles.list}>
           <ListItem>

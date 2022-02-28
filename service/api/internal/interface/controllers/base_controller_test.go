@@ -1,90 +1,51 @@
-package controllers
+package controllers_test
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/maru44/enva/service/api/internal/usecase"
+	"github.com/maru44/enva/service/api/internal/interface/controllers"
 	"github.com/maru44/enva/service/api/pkg/config"
 	"github.com/maru44/enva/service/api/pkg/domain"
 	"github.com/stretchr/testify/assert"
 )
 
 type (
-	jwtInteractorForTest struct {
-		usecase.JwtInteractor
-		cookieIdToken cookieIdToken
-	}
-
 	testContextViewBody struct {
 		Access domain.CtxAccess `json:"access"`
 		User   *domain.User     `json:"user"`
 	}
-
-	cookieIdToken string
 )
 
-const (
-	cookieIdTokenBlank   = cookieIdToken("blank")
-	cookieIdTokenInvalid = cookieIdToken("invalid")
-	cookieIdTokenValid   = cookieIdToken("valid")
-)
-
-var testUser = domain.User{
-	ID:              "id",
-	Username:        "username",
-	Email:           "aaa@example.com",
-	IsValid:         true,
-	IsEmailVerified: true,
-}
-
-func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken) *BaseController {
-	return &BaseController{
-		ji: &jwtInteractorForTest{
+func newBaseControllerForTest(t *testing.T, cookieIdToken cookieIdToken, user *domain.User) *controllers.BaseController {
+	return controllers.NewBaseControllerFromUsecase(
+		&jwtInteractor{
 			cookieIdToken: cookieIdToken,
+			user:          user,
 		},
-	}
+	)
 }
 
-func (in *jwtInteractorForTest) FetchJwk(context.Context, string) (jwk.Set, error) {
-	return nil, nil
-}
-
-func (in *jwtInteractorForTest) GetUserByJwt(context.Context, string) (*domain.User, error) {
-	switch in.cookieIdToken {
-	case cookieIdTokenBlank:
-		return nil, nil
-	case cookieIdTokenInvalid:
-		return nil, errors.New("invalid cookie")
-	case cookieIdTokenValid:
-		return &testUser, nil
-	default:
-		panic("must not reach here")
-	}
-}
-
-func (con *BaseController) testContextView(w http.ResponseWriter, r *http.Request) {
+func testContextView(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	user, err := domain.UserFromCtx(ctx)
-	if err != nil {
-	}
+	user, _ := domain.UserFromCtx(ctx)
+
 	access, _ := ctx.Value(domain.CtxAccessKey).(domain.CtxAccess)
-	response(w, r, nil, map[string]interface{}{
+	w.WriteHeader(200)
+	j, _ := json.Marshal(map[string]interface{}{
 		"user":   user,
 		"access": access,
 	})
+	w.Write(j) //nolint:errcheck
 }
 
 /**************************
 **************************/
 
 func Test_BaseMiddlewareCors(t *testing.T) {
-	con := newBaseControllerForTest(t, cookieIdTokenBlank)
+	con := newBaseControllerForTest(t, cookieIdTokenBlank, nil)
 
 	tests := []struct {
 		name       string
@@ -121,7 +82,7 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := http.Handler(con.BaseMiddleware(http.HandlerFunc(con.testContextView)))
+			h := http.Handler(con.BaseMiddleware(http.HandlerFunc(testContextView)))
 			ts := httptest.NewServer(h)
 			defer ts.Close()
 
@@ -151,15 +112,15 @@ func Test_BaseMiddlewareCors(t *testing.T) {
 }
 
 func Test_GiveUserMiddleware(t *testing.T) {
-	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank)
-	conAuth := newBaseControllerForTest(t, cookieIdTokenValid)
-	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid)
+	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank, nil)
+	conAuth := newBaseControllerForTest(t, cookieIdTokenValid, nil)
+	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid, nil)
 	baseUrl := "http://example.com/user-test"
 
 	tests := []struct {
 		name       string
 		method     string
-		con        *BaseController
+		con        *controllers.BaseController
 		wantStatus int
 		wantUser   *domain.User
 	}{
@@ -196,7 +157,7 @@ func Test_GiveUserMiddleware(t *testing.T) {
 			}
 
 			got := httptest.NewRecorder()
-			mid := con.BaseMiddleware(con.GiveUserMiddleware(http.HandlerFunc(con.testContextView)))
+			mid := con.BaseMiddleware(con.GiveUserMiddleware(http.HandlerFunc(testContextView)))
 			mid.ServeHTTP(got, r)
 
 			var bod testContextViewBody
@@ -212,15 +173,15 @@ func Test_GiveUserMiddleware(t *testing.T) {
 }
 
 func Test_LoginRequiredMiddleware(t *testing.T) {
-	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank)
-	conAuth := newBaseControllerForTest(t, cookieIdTokenValid)
-	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid)
+	conAnonymous := newBaseControllerForTest(t, cookieIdTokenBlank, nil)
+	conAuth := newBaseControllerForTest(t, cookieIdTokenValid, nil)
+	conInvalid := newBaseControllerForTest(t, cookieIdTokenInvalid, nil)
 	baseUrl := "http://example.com/user-test"
 
 	tests := []struct {
 		name       string
 		method     string
-		con        *BaseController
+		con        *controllers.BaseController
 		wantStatus int
 		wantUser   *domain.User
 	}{
@@ -257,7 +218,7 @@ func Test_LoginRequiredMiddleware(t *testing.T) {
 			}
 
 			got := httptest.NewRecorder()
-			mid := con.BaseMiddleware(con.LoginRequiredMiddleware(http.HandlerFunc(con.testContextView)))
+			mid := con.BaseMiddleware(con.LoginRequiredMiddleware(http.HandlerFunc(testContextView)))
 			mid.ServeHTTP(got, r)
 
 			assert.Equal(t, tt.wantStatus, got.Code)

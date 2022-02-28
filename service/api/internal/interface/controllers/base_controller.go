@@ -18,13 +18,17 @@ type (
 )
 
 func NewBaseController(jp myjwt.JwtParserAbstract) *BaseController {
-	return &BaseController{
-		ji: usecase.NewJwtInteractor(
+	return NewBaseControllerFromUsecase(
+		usecase.NewJwtInteractor(
 			&myjwt.JwtRepository{
 				JwtParserAbstract: jp,
 			},
 		),
-	}
+	)
+}
+
+func NewBaseControllerFromUsecase(in domain.JwtIntectactor) *BaseController {
+	return &BaseController{ji: in}
 }
 
 /********************************
@@ -51,7 +55,11 @@ func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		con.corsMiddleware(w, r)
+		if err := con.corsMiddleware(w, r); err != nil {
+			response(w, r, perr.Wrap(err, perr.ErrCorsError), nil)
+			return
+		}
+
 		ctx := context.WithValue(
 			r.Context(),
 			domain.CtxAccessKey,
@@ -71,71 +79,47 @@ func (con *BaseController) BaseMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request) {
+func (con *BaseController) corsMiddleware(w http.ResponseWriter, r *http.Request) error {
 	if r.Header.Get("Origin") != config.FRONT_URL && r.Header.Get("Origin") != "" {
-		response(w, r, perr.New("cors error", perr.ErrCorsError), nil)
-		return
+		return perr.New("cors error", perr.ErrCorsError)
 	}
 	w.Header().Set("Access-Control-Allow-Origin", config.FRONT_URL)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, Origin, X-Csrftoken, Accept, Cookie, Id-Token, Refresh-Token, Authorization")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
 	w.Header().Set("Access-Control-Max-Age", "3600")
+	return nil
 }
 
 func (con *BaseController) PostOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
-			response(w, r, nil, nil)
-			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
-		}
-	})
+	return con.methodsOnlyMiddleware(next, []string{http.MethodPost})
 }
 
 func (con *BaseController) PutOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPut {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
-			response(w, r, nil, nil)
-			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
-		}
-	})
+	return con.methodsOnlyMiddleware(next, []string{http.MethodPut})
 }
 
 func (con *BaseController) DeleteOnlyMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodDelete {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
-			response(w, r, nil, nil)
-			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
-		}
-	})
+	return con.methodsOnlyMiddleware(next, []string{http.MethodDelete})
 }
 
 func (con *BaseController) GetOnlyMiddleware(next http.Handler) http.Handler {
+	return con.methodsOnlyMiddleware(next, []string{http.MethodGet})
+}
+
+func (con *BaseController) methodsOnlyMiddleware(next http.Handler, methods []string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
-			next.ServeHTTP(w, r)
-		} else if r.Method == http.MethodOptions {
+		if r.Method == http.MethodOptions {
 			response(w, r, nil, nil)
 			return
-		} else {
-			response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
-			return
 		}
+		for _, m := range methods {
+			if r.Method == m {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		response(w, r, perr.New("", perr.ErrMethodNotAllowed), nil)
 	})
 }
 
